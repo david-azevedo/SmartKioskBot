@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -40,6 +42,15 @@ namespace SmartKioskBot
                 // Handle conversation state changes, like members being added and removed
                 // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
                 // Not available in all channels
+
+                // text activation
+                if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id)) {
+                    var reply = message.CreateReply("Bem vindo à Technon! O meu nome é Sr. Technon. Em que o posso ajudar?");
+
+                    ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
+
+                    connector.Conversations.ReplyToActivity(reply);
+                }
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {
