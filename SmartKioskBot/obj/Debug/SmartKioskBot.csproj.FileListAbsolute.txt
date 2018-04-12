@@ -106,56 +106,57 @@ C:\Users\PeaceOff\Documents\GitHub\SmartKioskBot\SmartKioskBot\obj\Debug\SmartKi
 C:\Users\PeaceOff\Documents\GitHub\SmartKioskBot\SmartKioskBot\obj\Debug\SmartKioskBot.csproj.CopyComplete
 C:\Users\PeaceOff\Documents\GitHub\SmartKioskBot\SmartKioskBot\obj\Debug\Bot Application.dll
 C:\Users\PeaceOff\Documents\GitHub\SmartKioskBot\SmartKioskBot\obj\Debug\Bot Application.pdb
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Bot Application.dll.config
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Bot Application.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Bot Application.pdb
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Autofac.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Chronic.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Builder.Autofac.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Builder.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Connector.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Logging.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocol.Extensions.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocols.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Tokens.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.Rest.ClientRuntime.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.WindowsAzure.Configuration.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Newtonsoft.Json.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\System.IdentityModel.Tokens.Jwt.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\System.Net.Http.Formatting.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\System.Web.Http.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\System.Web.Http.WebHost.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Autofac.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Builder.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Builder.Autofac.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Connector.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Logging.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocol.Extensions.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocols.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocols.OpenIdConnect.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Tokens.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.Rest.ClientRuntime.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Microsoft.WindowsAzure.Configuration.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\Newtonsoft.Json.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\System.IdentityModel.Tokens.Jwt.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\System.Net.Http.Formatting.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\System.Web.Http.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\System.Web.Http.WebHost.xml
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\ar\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\cs\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\de-dE\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\en\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\es\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\fa\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\fr\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\it\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\ja\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\nl\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\pt-BR\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\ru\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\bin\zh-hans\Microsoft.Bot.Builder.resources.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\obj\Debug\SmartKioskBot.csprojResolveAssemblyReference.cache
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\obj\Debug\SmartKioskBot.csproj.CoreCompileInputs.cache
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\obj\Debug\Bot Application.dll
-C:\Users\Catarina\Documents\Académico\4º Ano\LGP\SmartKioskBot\SmartKioskBot\obj\Debug\Bot Application.pdb
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Bot Application.dll.config
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Bot Application.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Bot Application.pdb
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Autofac.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Chronic.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Builder.Autofac.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Builder.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Connector.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Logging.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocol.Extensions.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocols.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Tokens.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.Rest.ClientRuntime.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.WindowsAzure.Configuration.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Newtonsoft.Json.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\System.Net.Http.Formatting.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\System.Web.Http.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\System.Web.Http.WebHost.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Autofac.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Builder.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Builder.Autofac.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.Bot.Connector.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Logging.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocol.Extensions.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocols.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Protocols.OpenIdConnect.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.IdentityModel.Tokens.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.Rest.ClientRuntime.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Microsoft.WindowsAzure.Configuration.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\Newtonsoft.Json.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\System.IdentityModel.Tokens.Jwt.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\System.Net.Http.Formatting.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\System.Web.Http.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\System.Web.Http.WebHost.xml
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\ar\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\cs\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\de-dE\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\en\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\es\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\fa\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\fr\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\it\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\ja\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\nl\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\pt-BR\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\ru\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\bin\zh-hans\Microsoft.Bot.Builder.resources.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\obj\Debug\SmartKioskBot.csprojResolveAssemblyReference.cache
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\obj\Debug\SmartKioskBot.csproj.CoreCompileInputs.cache
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\obj\Debug\SmartKioskBot.csproj.CopyComplete
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\obj\Debug\Bot Application.dll
+C:\Users\david\Documents\Git\SmartKioskBot\SmartKioskBot\obj\Debug\Bot Application.pdb
