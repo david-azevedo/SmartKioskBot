@@ -129,6 +129,8 @@
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\BotDefaultAnswers.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
+    <Compile Include="Dialogs\TextToSpeech.cs" />
+    <Compile Include="Dialogs\TextToSpeechUtils.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

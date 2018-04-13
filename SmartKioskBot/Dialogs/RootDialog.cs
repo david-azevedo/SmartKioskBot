@@ -25,8 +25,9 @@ namespace SmartKioskBot.Dialogs
             // calculate something for us to return
             int length = (activity.Text ?? string.Empty).Length;
 
+            string msg = BotDefaultAnswers.getGreeting("João"); 
             // return our reply to the user
-            await context.PostAsync(BotDefaultAnswers.getGreeting("João"));
+            await context.PostAsync(TextToSpeech.TTSbegin(msg));
            // await context.PostAsync($"Hello {name}! You sent {activity.Text} which was {length} characters");
 
             context.Wait(MessageReceivedAsync);
