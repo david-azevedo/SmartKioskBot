@@ -35,10 +35,12 @@ namespace SmartKioskBot.Dialogs
             //testing purposes only: getting the command (filter) and the argument (brand)
             string[] details = message.Text.Split(' ');
 
+            //ADD PRODUCT TO DB (TESTING)
             if (details[0].Equals("add", StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new AddProductDialog(), this.StartAsync, message, CancellationToken.None);
             }
+            //FILTER PRODUCT
             else if (details[0].Equals("filter", StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new FilterDialog(), this.StartAsync, message, CancellationToken.None);

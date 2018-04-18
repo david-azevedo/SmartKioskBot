@@ -157,6 +157,7 @@
     <Compile Include="Helpers\DbSingleton.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ProductCard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">

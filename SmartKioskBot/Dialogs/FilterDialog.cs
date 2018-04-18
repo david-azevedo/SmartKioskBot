@@ -3,6 +3,7 @@ using Microsoft.Bot.Connector;
 using MongoDB.Driver;
 using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
+using SmartKioskBot.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,55 +32,47 @@ namespace SmartKioskBot.Dialogs
             // Get products and create a reply to reply back to the user.
             var brand = details[1];//message.Text; //TODO
             List<Product> products = GetProductsForUser(brand);
+            ShowProducts(products, context);
 
-            var reply = context.MakeMessage();
-            reply.Text = BuildProductText(products, brand);
-            //reply.Text = "tou aqui";
-
-            await context.PostAsync(reply);
-
+           // await context.PostAsync(reply);
             context.Done<object>(null);
         }
 
         private static List<Product> GetProductsForUser(string brand)
         {
             var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
-            var xx = collection.Count(Builders<Product>.Filter.Empty);
-
             var filter = Builders<Product>.Filter.Where(x => x.Brand.ToLower() == brand.ToLower());
-            
-            //this shows every product 
-            //var filter = Builders<Product>.Filter.Empty;
 
 
             var products = collection.Find(filter).ToList();
-            int xix = products.Count();
             return products;
         }
 
-        private static string BuildProductText(List<Product> products, string brand)
+        private async Task ShowProducts(List<Product> products, IDialogContext context)
         {
-            var text = "";
+            
 
-            List<Product> p = products;
+            var reply = context.MakeMessage();
 
             if (products.Count == 0)
             {
-                return "No products found";
+                reply.Text = "Não existem produtos com essas especificações.";
             }
-
-            text += "[" + products.Count + "]Filter (" + brand + "):\n";
-
-            foreach (var product in products)
+            else
             {
-                if (product != null)
-                {
-                    
-                    text += "\n- " + product.Model;
-                }
-            }
+                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                List<Attachment> cards = new List<Attachment>();
 
-            return text;
+                foreach (Product p in products)
+                {
+                    cards.Add(ProductCard.getCard(p).ToAttachment());
+                }
+
+                reply.Attachments = cards;
+            }
+            
+            await context.PostAsync(reply);
+
         }
     }
 }
