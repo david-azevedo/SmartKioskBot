@@ -44,15 +44,16 @@ namespace SmartKioskBot.Dialogs
         private static List<Product> GetProductsForUser(string brand)
         {
             var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
-            var filter = Builders<Product>.Filter.Where(x => x.Brand.ToLower() == brand.ToLower());
+            var xx = collection.Count(Builders<Product>.Filter.Empty);
 
-            /*
-            if (!String.IsNullOrEmpty(searchText))
-            {
-                filter = filter & Builders<Product>.Filter.Where(x => x.Content.Contains(searchText));
-            }*/
+            var filter = Builders<Product>.Filter.Where(x => x.Brand.ToLower() == brand.ToLower());
+            
+            //this shows every product 
+            //var filter = Builders<Product>.Filter.Empty;
+
 
             var products = collection.Find(filter).ToList();
+            int xix = products.Count();
             return products;
         }
 
@@ -60,7 +61,14 @@ namespace SmartKioskBot.Dialogs
         {
             var text = "";
 
-            text += "Filter (" + brand + "):\n";
+            List<Product> p = products;
+
+            if (products.Count == 0)
+            {
+                return "No products found";
+            }
+
+            text += "[" + products.Count + "]Filter (" + brand + "):\n";
 
             foreach (var product in products)
             {

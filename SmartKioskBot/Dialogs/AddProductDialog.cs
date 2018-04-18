@@ -34,7 +34,7 @@ namespace SmartKioskBot.Dialogs
             // When users types in "add" without the content, give them instructions.
             if (String.IsNullOrWhiteSpace(content))
             {
-                reply = "usage: add <brand>;<model>;<category>;<price>";
+                reply = "usage: add <brand>;<model>;<price>";
             }
             // Save the product.
             else
@@ -57,8 +57,7 @@ namespace SmartKioskBot.Dialogs
             {
                 Brand = details[0],
                 Model = details[1],
-                Category = details[2],
-                Price = double.Parse(details[3])
+                Price = details[2]
             };
         }
     }
