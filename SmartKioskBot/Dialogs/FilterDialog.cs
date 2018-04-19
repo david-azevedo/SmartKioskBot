@@ -7,6 +7,7 @@ using SmartKioskBot.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SmartKioskBot.Dialogs
@@ -14,52 +15,71 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class FilterDialog : IDialog<object>
     {
-#pragma warning disable 1998
+        protected List<FilterDefinition<Product>> filters { get; set; }
+
         public async Task StartAsync(IDialogContext context)
-#pragma warning restore 1998
         {
             context.Wait(MessageReceivedAsync);
         }
 
-        public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-            var message = await result as Activity;
+            var message = await activity;
 
-            var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 2);
-
+            //parse message
+            var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 3);
             string[] details = message.Text.Split(' ');
 
-            // Get products and create a reply to reply back to the user.
-            var brand = details[1];//message.Text; //TODO
-            List<Product> products = GetProductsForUser(brand);
-            ShowProducts(products, context);
+            if (filters == null)
+                filters = new List<FilterDefinition<Product>>();
 
-           // await context.PostAsync(reply);
-            context.Done<object>(null);
+            if (details[0] != "filter")
+                context.Done<object>(null);
+
+            //tmp
+            var m = context.MakeMessage();
+            m.Text = filters.Count.ToString();
+            await context.PostAsync(m);
+
+            // Get products and create a reply to reply back to the user.
+            this.filters.Add(GetFilter(details[1], details[2]));
+            List<Product> products = GetProductsForUser();
+            await ShowProducts(products, context);
+
+            context.Wait(this.MessageReceivedAsync);
+
+            //tmp
+            m = context.MakeMessage();
+            m.Text = "saiu";
+            await context.PostAsync(m);
         }
 
-        private static List<Product> GetProductsForUser(string brand)
+        private List<Product> GetProductsForUser()
         {
             var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
-            var filter = Builders<Product>.Filter.Where(x => x.Brand.ToLower() == brand.ToLower());
+            var total_filter = Builders<Product>.Filter.Empty;
 
-
-            var products = collection.Find(filter).ToList();
+            foreach (FilterDefinition<Product> f in filters)
+            {
+                total_filter = total_filter & f;
+            }
+            
+            var products = collection.Find(total_filter).ToList();
             return products;
         }
 
         private async Task ShowProducts(List<Product> products, IDialogContext context)
         {
-            
-
             var reply = context.MakeMessage();
 
             if (products.Count == 0)
             {
-                reply.Text = "Não existem produtos com essas especificações.";
+                reply.AttachmentLayout = AttachmentLayoutTypes.List;
+                reply.Text = BotDefaultAnswers.getFilterFail();
             }
             else
             {
+                reply.Text = BotDefaultAnswers.getFilterSuccess();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
@@ -70,9 +90,21 @@ namespace SmartKioskBot.Dialogs
 
                 reply.Attachments = cards;
             }
-            
             await context.PostAsync(reply);
+        }
 
+        private FilterDefinition<Product> GetFilter(string filter, string value){
+            switch (filter.ToLower())
+            {
+                case "nome":
+                    return Builders<Product>.Filter.Where(x => x.Name.ToLower() == value.ToLower());
+                case "preço":
+                    return Builders<Product>.Filter.Where(x => x.Price.ToLower() == value.ToLower());
+                case "marca":
+                    return Builders<Product>.Filter.Where(x => x.Brand.ToLower() == value.ToLower());
+            }
+
+            return null;
         }
     }
 }

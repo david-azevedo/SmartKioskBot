@@ -25,9 +25,9 @@ namespace SmartKioskBot.UI
                 Images = new List<CardImage> { new CardImage(p.Photo) },
                 // list of buttons   
                 Buttons = new List<CardAction> {
-                        new CardAction(ActionTypes.Invoke, "Detalhes", value: ""),
-                        new CardAction(ActionTypes.Invoke, "Wish List", value: ""),
-                        new CardAction(ActionTypes.Invoke, "Comparar", value: "") }
+                        new CardAction(ActionTypes.Call, "Detalhes", value: ""),
+                        new CardAction(ActionTypes.Call, "Wish List", value: ""),
+                        new CardAction(ActionTypes.Call, "Comparar", value: "") }
             };
         }
 

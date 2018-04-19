@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
@@ -27,7 +28,7 @@ namespace SmartKioskBot.Dialogs
 
             // Get the command, or the first word, that the user typed in.
             var userInput = message.Text != null ? message.Text : "";
-            var command = (userInput.Split(new[] { ' ' }, 2))[0];
+            var command = (userInput.Split(new[] { ' ' }, 3))[0];
 
             // getting the senders name
             string name = message.From.Name.ToString();
