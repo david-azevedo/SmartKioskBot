@@ -13,7 +13,7 @@ namespace SmartKioskBot.Services
         private static string QNAMAKER_SUBSCRIPTION_KEY = "2a10f8ce8c324d8a81cfff5a86d837b3";
         private static string QNAMAKER_BASE_URI = "https://westus.api.cognitive.microsoft.com/qnamaker/v2.0";
 
-        public static Result MakeRequest(string query)
+        public static Result GetResult(string query)
         {
             string responseString = string.Empty;
 
@@ -38,7 +38,7 @@ namespace SmartKioskBot.Services
             return GetResultFromResponse(responseString);
         }
 
-        public static Result GetResultFromResponse(string responseString)
+        private static Result GetResultFromResponse(string responseString)
         {
             //De-serialize the response
             Result response;

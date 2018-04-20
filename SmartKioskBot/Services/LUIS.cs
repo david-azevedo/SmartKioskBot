@@ -16,7 +16,7 @@ namespace SmartKioskBot.Services
         private static string LUIS_SUBSCRIPTION_KEY = "b17f8347b5874cdcbf4a867adf34db7f";
         private static string LUIS_BASE_URI = "https://westeurope.api.cognitive.microsoft.com/luis/v2.0/apps/";
 
-        static public async Task<LuisResult> GetLuisResult(string message)
+        static public async Task<LuisResult> GetResult(string message)
         {
             var client = new HttpClient();
             var queryString = HttpUtility.ParseQueryString(string.Empty);
@@ -29,7 +29,7 @@ namespace SmartKioskBot.Services
 
             // These optional request parameters are set to their default values
             queryString["timezoneOffset"] = "0";
-            queryString["verbose"] = "false";
+            queryString["verbose"] = "true";
             queryString["spellCheck"] = "false";
             queryString["staging"] = "true";
 
