@@ -40,8 +40,9 @@ namespace SmartKioskBot.Dialogs
                 "Olá " + user_name + "! O meu nome é Sr.Technon, procura alguma coisa em específico?",
                 "Olá sou o Sr.Technon, em que o posso ajudar " + user_name + "?"
             };
-            String br = "oi cara tudo bem? Meu nome é Technon e estou aqui para o ajudar.";
-            return br;
+            //String br = "oi cara tudo bem? Meu nome é Technon e estou aqui para o ajudar.";
+            //return br;
+            return greetings[new Random().Next(0, greetings.Length)]; ;
         }
     }
 }

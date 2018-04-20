@@ -117,7 +117,7 @@ namespace SmartKioskBot.Dialogs
                 Locale = "en-US",
                 // You can also customize the output voice. Refer to the documentation to view the different
                 // voices that the TTS service can output.
-                VoiceName = "Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)",
+                VoiceName = "Microsoft Server Speech Text to Speech Voice (pt-PT, HeliaRUS)",
                 // Service can return audio in different output format.
                 OutputFormat = AudioOutputFormat.Riff16Khz16BitMonoPcm,
                 AuthorizationToken = "Bearer " + accessToken,
