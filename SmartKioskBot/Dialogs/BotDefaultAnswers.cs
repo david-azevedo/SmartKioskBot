@@ -30,6 +30,14 @@ namespace SmartKioskBot.Dialogs
         }
 
         /*
+         * Button Click Message
+         */
+        public static string show_product_details = "Detalhes";
+        public static string add_wish_list = "AdicionarWishList";
+        public static string add_to_comparator = "AdicionarComparador";
+
+
+        /*
          * Intents Dialog
          */
 

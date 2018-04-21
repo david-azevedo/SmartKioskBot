@@ -36,22 +36,12 @@ namespace SmartKioskBot.Dialogs
             if (details[0] != "filter")
                 context.Done<object>(null);
 
-            //tmp
-            var m = context.MakeMessage();
-            m.Text = filters.Count.ToString();
-            await context.PostAsync(m);
-
             // Get products and create a reply to reply back to the user.
             this.filters.Add(GetFilter(details[1], details[2]));
             List<Product> products = GetProductsForUser();
             await ShowProducts(products, context);
 
-            context.Wait(this.MessageReceivedAsync);
-
-            //tmp
-            m = context.MakeMessage();
-            m.Text = "saiu";
-            await context.PostAsync(m);
+            context.Wait(MessageReceivedAsync);
         }
 
         private List<Product> GetProductsForUser()
@@ -85,7 +75,7 @@ namespace SmartKioskBot.Dialogs
 
                 foreach (Product p in products)
                 {
-                    cards.Add(ProductCard.getCard(p).ToAttachment());
+                    cards.Add(ProductCard.getProductCard(p).ToAttachment());
                 }
 
                 reply.Attachments = cards;
