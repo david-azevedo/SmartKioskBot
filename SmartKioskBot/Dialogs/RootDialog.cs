@@ -46,6 +46,21 @@ namespace SmartKioskBot.Dialogs
             {
                 await context.Forward(new FilterDialog(), this.StartAsync, message, CancellationToken.None);
             }
+            //PRODUCT DETAILS
+            else if(details[0].Equals(BotDefaultAnswers.show_product_details, StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new ProductDetails(), this.StartAsync, message, CancellationToken.None);
+            }
+            //ADD PRODUCT TO WISH LIST
+            else if (details[0].Equals(BotDefaultAnswers.add_wish_list, StringComparison.CurrentCultureIgnoreCase))
+            {
+                //TODO
+            }
+            //ADD PRODUCT TO COMPARATOR
+            else if (details[0].Equals(BotDefaultAnswers.add_to_comparator, StringComparison.CurrentCultureIgnoreCase))
+            {
+                //TODO
+            }
             else
             {
                 // calculate something for us to return
