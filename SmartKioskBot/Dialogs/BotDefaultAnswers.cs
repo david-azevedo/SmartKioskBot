@@ -42,5 +42,23 @@ namespace SmartKioskBot.Dialogs
             };
             return greetings[new Random().Next(0,greetings.Length)];
         }
+
+        public static String getFilterFail()
+        {
+            String[] fail = {
+                "Não temos nenhum produto com tais características.",
+                "Não existem produtos com essas especificações"
+            };
+            return fail[new Random().Next(0, fail.Length)];
+        }
+
+        public static String getFilterSuccess()
+        {
+            String[] success = {
+                "Temos os seguintes produtos com essas características:",
+                "Temos várias opções com essas especificações:"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
     }
 }
