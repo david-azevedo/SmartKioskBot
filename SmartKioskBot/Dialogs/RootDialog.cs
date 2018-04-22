@@ -54,7 +54,7 @@ namespace SmartKioskBot.Dialogs
             //ADD PRODUCT TO WISH LIST
             else if (details[0].Equals(BotDefaultAnswers.add_wish_list, StringComparison.CurrentCultureIgnoreCase))
             {
-                //TODO
+                await context.Forward(new AddWishList(), this.StartAsync, message, CancellationToken.None);
             }
             //ADD PRODUCT TO COMPARATOR
             else if (details[0].Equals(BotDefaultAnswers.add_to_comparator, StringComparison.CurrentCultureIgnoreCase))
