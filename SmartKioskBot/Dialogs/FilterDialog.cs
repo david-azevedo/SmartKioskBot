@@ -26,22 +26,57 @@ namespace SmartKioskBot.Dialogs
         {
             var message = await activity;
 
-            //parse message
+            //Get client & user data
+            StateClient client = message.GetStateClient();
+            BotData userData = await client.BotState.GetUserDataAsync(message.ChannelId, message.From.Id);
+
+            var reply = context.MakeMessage();
+            //reply.Text = "CHANNEL ID: " + message.ChannelId + "\n USER ID: " + message.From.Id;
+            //await context.PostAsync(reply);
+
+            reply.Text = "STATE BEFORE: \n\n" + userData.Data.ToString();
+            await context.PostAsync(reply);
+
+            //load filters
+            string[] filtersStored = userData.GetProperty<string[]>("Filter");
+            if (filtersStored == null)
+                filtersStored = new String[] { };
+            else
+                this.filters = ParseFilters(filtersStored);
+
+            //parse message ->TEMPORARIO
             var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 3);
             string[] details = message.Text.Split(' ');
 
-            if (filters == null)
-                filters = new List<FilterDefinition<Product>>();
+            if (this.filters == null)
+                this.filters = new List<FilterDefinition<Product>>();
 
-            if (details[0] != "filter")
-                context.Done<object>(null);
+            //FILTER PRODUCT
+            if (details[0] == "filter")
+            {
+                // Get products and create a reply to reply back to the user.
+                this.filters.Add(GetFilter(details[1], details[2]));
+                List<Product> products = GetProductsForUser();
+                await ShowProducts(products, context);
 
-            // Get products and create a reply to reply back to the user.
-            this.filters.Add(GetFilter(details[1], details[2]));
-            List<Product> products = GetProductsForUser();
-            await ShowProducts(products, context);
+                //update filters
+                var tmp = filtersStored.ToList<String>();
+                tmp.Add(details[1] + "^=^" + details[2]);
+                userData.SetProperty<string[]>("Filter", tmp.ToArray<string>());
+                await client.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
+            }
+            //CLEAN ALL FILTERS
+            else if (details[0] == "filter-clean")
+            {
+                userData.SetProperty<string[]>("Filter", new String[] { });
+                await client.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
+            }
 
-            context.Wait(MessageReceivedAsync);
+            //TESTE
+            reply.Text = "STATE AFTER: \n\n" + userData.Data.ToString();
+            await context.PostAsync(reply);
+
+            context.Done<object>(null);
         }
 
         private List<Product> GetProductsForUser()
@@ -81,6 +116,19 @@ namespace SmartKioskBot.Dialogs
                 reply.Attachments = cards;
             }
             await context.PostAsync(reply);
+        }
+
+        private List<FilterDefinition<Product>> ParseFilters(string[] filters)
+        {
+            List<FilterDefinition<Product>> parsed = new List<FilterDefinition<Product>>();
+
+            foreach (string a in filters)
+            {
+                string[] parts = a.Split('^');
+                parsed.Add(GetFilter(parts[0], parts[2]));
+            }
+
+            return parsed;
         }
 
         private FilterDefinition<Product> GetFilter(string filter, string value){

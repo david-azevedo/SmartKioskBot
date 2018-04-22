@@ -36,13 +36,27 @@ namespace SmartKioskBot.Dialogs
             //testing purposes only: getting the command (filter) and the argument (brand)
             string[] details = message.Text.Split(' ');
 
+            if (details[0].Equals("help", StringComparison.CurrentCultureIgnoreCase))
+            {
+                var reply = context.MakeMessage();
+
+                reply.Text = "Comandos:\n\n" +
+                    "filter [marca/preço/nome] [valor] \n\n" +
+                    "filter-clean \n\n";
+                context.PostAsync(reply);
+            }
             //ADD PRODUCT TO DB (TESTING)
-            if (details[0].Equals("add", StringComparison.CurrentCultureIgnoreCase))
+            else if(details[0].Equals("add", StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new AddProductDialog(), this.StartAsync, message, CancellationToken.None);
             }
             //FILTER PRODUCT
             else if (details[0].Equals("filter", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new FilterDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //FILTER CLEAN
+            else if (details[0].Equals("filter-clean", StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new FilterDialog(), this.StartAsync, message, CancellationToken.None);
             }

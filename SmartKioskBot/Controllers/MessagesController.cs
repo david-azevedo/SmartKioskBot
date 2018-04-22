@@ -48,7 +48,6 @@ namespace SmartKioskBot
                 if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id)) {
                     var reply = message.CreateReply(BotDefaultAnswers.getMemberAdded());
 
-
                     ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
 
                     connector.Conversations.ReplyToActivity(reply);
