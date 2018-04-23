@@ -34,11 +34,11 @@ namespace SmartKioskBot.Dialogs
             //reply.Text = "CHANNEL ID: " + message.ChannelId + "\n USER ID: " + message.From.Id;
             //await context.PostAsync(reply);
 
-            reply.Text = "STATE BEFORE: \n\n" + userData.Data.ToString();
-            await context.PostAsync(reply);
+            /*reply.Text = "STATE BEFORE: \n\n" + userData.Data.ToString();
+            await context.PostAsync(reply);*/
 
             //load filters
-            string[] filtersStored = userData.GetProperty<string[]>("Filter");
+            context.UserData.TryGetValue<string[]>("Filter", out string[]filtersStored);
             if (filtersStored == null)
                 filtersStored = new String[] { };
             else
@@ -62,14 +62,14 @@ namespace SmartKioskBot.Dialogs
                 //update filters
                 var tmp = filtersStored.ToList<String>();
                 tmp.Add(details[1] + "^=^" + details[2]);
-                userData.SetProperty<string[]>("Filter", tmp.ToArray<string>());
-                await client.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
+                context.UserData.SetValue<string[]>("Filter", tmp.ToArray());
+               // await client.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
             }
             //CLEAN ALL FILTERS
             else if (details[0] == "filter-clean")
             {
-                userData.SetProperty<string[]>("Filter", new String[] { });
-                await client.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
+                context.UserData.SetValue<string[]>("Filter", new String[] { });
+                // await client.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
             }
 
             //TESTE
