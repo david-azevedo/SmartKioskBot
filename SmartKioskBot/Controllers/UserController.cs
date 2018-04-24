@@ -25,17 +25,9 @@ namespace SmartKioskBot.Controllers
                  return user[0];
         }
 
-        public static void CreateUser(string channelId, string email, string customerCard, string name, string country)
+        public static void CreateUser(string channelId, string email, string name, string country)
         {
-            User u = new User
-            {
-                ChannelsIds = new string[] { channelId },
-                Email = email,
-                CustomerCard = customerCard,
-                Name = name,
-                Country = country
-            };
-
+            User u = new User(name, email, country, channelId);
             var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
             userCollection.InsertOne(u);
         }
@@ -50,6 +42,11 @@ namespace SmartKioskBot.Controllers
 
                 userCollection.UpdateOne(filter, update);
             }
+        }
+
+        public static void SetCustomerCard(string card)
+        {
+            //TODO
         }
 
         public static string PrintUser(User u)

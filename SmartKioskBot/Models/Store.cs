@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace SmartKioskBot.Models
     public class Store
     {
         [BsonId]
-        public MongoDB.Bson.ObjectId Id { get; set; }
+        public ObjectId Id { get; set; }
 
         [BsonElement("name")]
         public string Name { get; set; }
@@ -22,12 +23,39 @@ namespace SmartKioskBot.Models
         public string[] Coordinates { get; set; }
 
         [BsonElement("productsInStock")]
-        public string[][] ProductsInStock { get; set; }
+        public ProductStock[] ProductsInStock { get; set; }
 
         [BsonElement("address")]
         public string Address { get; set; }
 
         [BsonElement("phoneNumber")]
         public string PhoneNumber { get; set; }
+
+        [BsonConstructor]
+        public Store(string name, string[] coords, ProductStock[] stock, string address, string phonenumber)
+        {
+            this.Name = name;
+            this.Coordinates = coords;
+            this.ProductsInStock = stock;
+            this.Address = address;
+            this.PhoneNumber = phonenumber;
+        }
+
+        [Serializable, JsonObject]
+        public class ProductStock
+        {
+            [BsonElement("productId")]
+            public ObjectId ProductId { get; set; }
+
+            [BsonElement("stock")]
+            public int Stock { get; set; }
+
+            [BsonConstructor]
+            public ProductStock(ObjectId productId, int stock)
+            {
+                this.ProductId = productId;
+                this.Stock = stock;
+            }
+        }
     }
 }

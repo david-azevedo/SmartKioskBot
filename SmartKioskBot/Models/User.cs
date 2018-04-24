@@ -29,6 +29,15 @@ namespace SmartKioskBot.Models
 
         [BsonElement("country")]
         public string Country { get; set; }
-        
+
+        [BsonConstructor]
+        public User(string name, string email, string country, string channelId)
+        {
+            this.Name = name;
+            this.Email = email;
+            this.Country = country;
+            this.ChannelsIds = new string[] { channelId };
+            this.CustomerCard = "";
+        }
     }
 }
