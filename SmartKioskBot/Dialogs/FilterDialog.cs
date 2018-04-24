@@ -81,7 +81,7 @@ namespace SmartKioskBot.Dialogs
 
         private List<Product> GetProductsForUser()
         {
-            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
+            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
             var total_filter = Builders<Product>.Filter.Empty;
 
             foreach (FilterDefinition<Product> f in filters)

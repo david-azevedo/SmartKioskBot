@@ -21,5 +21,6 @@ namespace SmartKioskBot.Helpers
         {
             return database;
         }
+
     }
 }

@@ -18,25 +18,6 @@ namespace SmartKioskBot
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
-
-            var uri = new Uri(ConfigurationManager.AppSettings["DocumentDbUrl"]);
-            var key = ConfigurationManager.AppSettings["DocumentDbKey"];
-            var store = new DocumentDbBotDataStore(uri, key);
-
-            Conversation.UpdateContainer(
-                        builder =>
-                        {
-                            builder.Register(c => store)
-                                .Keyed<IBotDataStore<BotData>>(AzureModule.Key_DataStore)
-                                .AsSelf()
-                                .SingleInstance();
-
-                            builder.Register(c => new CachingBotDataStore(store, CachingBotDataStoreConsistencyPolicy.ETagBasedConsistency))
-                                .As<IBotDataStore<BotData>>()
-                                .AsSelf()
-                                .InstancePerLifetimeScope();
-
-                        });
         }
     }
 }

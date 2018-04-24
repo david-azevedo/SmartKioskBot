@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using SmartKioskBot.Controllers;
+using SmartKioskBot.Models;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -25,6 +27,23 @@ namespace SmartKioskBot.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             var message = await activity as Activity;
+                        
+           if(UserController.getUser("slack1") != null)
+            {
+                User u = UserController.getUser("slack1");
+
+                var r = context.MakeMessage();
+                r.Text = UserController.PrintUser(u);
+                await context.PostAsync(r);
+                
+                UserController.AddChannel(u,"hello2");
+
+                User u2 = UserController.getUser("slack1");
+
+                r = context.MakeMessage();
+                r.Text = UserController.PrintUser(u2);
+                await context.PostAsync(r);
+            }
 
             // Get the command, or the first word, that the user typed in.
             var userInput = message.Text != null ? message.Text : "";
