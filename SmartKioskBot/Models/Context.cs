@@ -11,8 +11,6 @@ namespace SmartKioskBot.Models
 {
 
     [Serializable, JsonObject]
-    [BsonDiscriminator(Required = true)]
-    [BsonKnownTypes(typeof(Context))]
     public class Context
     {
         [BsonId]
@@ -30,15 +28,6 @@ namespace SmartKioskBot.Models
         [BsonElement("comparator")]
         public string[] Comparator { get; set; }
 
-        [BsonConstructor]
-        public Context(ObjectId userId)
-        {
-            this.UserId = userId;
-            this.Filters = new Filter[] { };
-            this.WishList = new string[] { };
-            this.Comparator = new string[] { };
-        }
-
         [Serializable, JsonObject]
         public class Filter
         {
@@ -50,14 +39,6 @@ namespace SmartKioskBot.Models
 
             [BsonElement("value")]
             public string Value { get; set; }
-
-            [BsonConstructor]
-            public Filter(string filterName, string op, string value)
-            {
-                this.FilterName = filterName;
-                this.Operator = op;
-                this.Value = value;
-            }
         }
 
     }

@@ -9,8 +9,6 @@ using System.Web;
 namespace SmartKioskBot.Models
 {
     [Serializable, JsonObject]
-    [BsonDiscriminator(Required = true)]
-    [BsonKnownTypes(typeof(Store))]
     public class Store
     {
         [BsonId]
@@ -31,16 +29,6 @@ namespace SmartKioskBot.Models
         [BsonElement("phoneNumber")]
         public string PhoneNumber { get; set; }
 
-        [BsonConstructor]
-        public Store(string name, string[] coords, ProductStock[] stock, string address, string phonenumber)
-        {
-            this.Name = name;
-            this.Coordinates = coords;
-            this.ProductsInStock = stock;
-            this.Address = address;
-            this.PhoneNumber = phonenumber;
-        }
-
         [Serializable, JsonObject]
         public class ProductStock
         {
@@ -49,13 +37,6 @@ namespace SmartKioskBot.Models
 
             [BsonElement("stock")]
             public int Stock { get; set; }
-
-            [BsonConstructor]
-            public ProductStock(ObjectId productId, int stock)
-            {
-                this.ProductId = productId;
-                this.Stock = stock;
-            }
         }
     }
 }

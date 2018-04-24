@@ -27,7 +27,14 @@ namespace SmartKioskBot.Controllers
 
         public static void CreateUser(string channelId, string email, string name, string country)
         {
-            User u = new User(name, email, country, channelId);
+            User u = new User() {
+                Name = name,
+                Email = email,
+                Country = country,
+                ChannelsIds = new string[] { channelId },
+                CustomerCard = ""
+            };
+
             var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
             userCollection.InsertOne(u);
         }
@@ -37,8 +44,8 @@ namespace SmartKioskBot.Controllers
             if (!user.ChannelsIds.Contains(channelId))
             {
                 var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
-                var update = Builders<User>.Update.Push(o => o.ChannelsIds,channelId);
-                var filter = Builders<User>.Filter.Eq(o => o.Id,user.Id);
+                var update = Builders<User>.Update.Set("name","cata");
+                var filter = Builders<User>.Filter.Eq("name","cat");
 
                 userCollection.UpdateOne(filter, update);
             }

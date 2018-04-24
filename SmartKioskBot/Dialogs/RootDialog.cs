@@ -27,10 +27,10 @@ namespace SmartKioskBot.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             var message = await activity as Activity;
-                        
-           if(UserController.getUser("slack1") != null)
+            
+           if(UserController.getUser("slack3") != null)
             {
-                User u = UserController.getUser("slack1");
+                User u = UserController.getUser("slack3");
 
                 var r = context.MakeMessage();
                 r.Text = UserController.PrintUser(u);
@@ -38,7 +38,7 @@ namespace SmartKioskBot.Dialogs
                 
                 UserController.AddChannel(u,"hello2");
 
-                User u2 = UserController.getUser("slack1");
+                User u2 = UserController.getUser("slack3");
 
                 r = context.MakeMessage();
                 r.Text = UserController.PrintUser(u2);
