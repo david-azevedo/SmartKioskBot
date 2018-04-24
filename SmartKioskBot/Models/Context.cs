@@ -19,6 +19,9 @@ namespace SmartKioskBot.Models
         [BsonElement("userId")]
         public ObjectId UserId { get; set; }
 
+        [BsonElement("country")]
+        public string Country { get; set; }
+
         [BsonElement("filters")]
         public Filter[] Filters { get; set; }
 

@@ -181,6 +181,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+	<Compile Include="Controllers\ContextController.cs" />
+	<Compile Include="Controllers\StoreController.cs" />
+	<Compile Include="Controllers\CRMController.cs" />
     <Compile Include="Dialogs\AddProductDialog.cs" />
     <Compile Include="Dialogs\BotDefaultAnswers.cs" />
     <Compile Include="Dialogs\FilterDialog.cs" />

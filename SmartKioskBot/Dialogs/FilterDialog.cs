@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using MongoDB.Driver;
+using SmartKioskBot.Controllers;
 using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 using SmartKioskBot.UI;
@@ -9,13 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Dialogs
 {
     [Serializable]
     public class FilterDialog : IDialog<object>
     {
-        protected List<FilterDefinition<Product>> filters { get; set; }
+        private List<FilterDefinition<Product>> filters;
+        private Context context;
 
         public async Task StartAsync(IDialogContext context)
         {
@@ -26,55 +29,37 @@ namespace SmartKioskBot.Dialogs
         {
             var message = await activity;
 
-            //Get client & user data
-            StateClient client = message.GetStateClient();
-            BotData userData = await client.BotState.GetUserDataAsync(message.ChannelId, message.From.Id);
-
-            var reply = context.MakeMessage();
-            //reply.Text = "CHANNEL ID: " + message.ChannelId + "\n USER ID: " + message.From.Id;
-            //await context.PostAsync(reply);
-
-            /*reply.Text = "STATE BEFORE: \n\n" + userData.Data.ToString();
-            await context.PostAsync(reply);*/
-
-            //load filters
-            context.UserData.TryGetValue<string[]>("Filter", out string[]filtersStored);
-            if (filtersStored == null)
-                filtersStored = new String[] { };
-            else
-                this.filters = ParseFilters(filtersStored);
+            //fetch context
+            var currentUser = UserController.getUser(message.ChannelId);
+            this.context = ContextController.GetContext(currentUser.Id);
 
             //parse message ->TEMPORARIO
             var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 3);
             string[] details = message.Text.Split(' ');
 
-            if (this.filters == null)
-                this.filters = new List<FilterDefinition<Product>>();
-
             //FILTER PRODUCT
             if (details[0] == "filter")
             {
-                // Get products and create a reply to reply back to the user.
-                this.filters.Add(GetFilter(details[1], details[2]));
+                //parse filters
+                this.filters = new List<FilterDefinition<Product>>();
+                foreach (Filter f in this.context.Filters)
+                {
+                    this.filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
+                }
+
+                // Get products and create a reply back to the user.
+                this.filters.Add(GetFilter(details[1], "", details[2]));
                 List<Product> products = GetProductsForUser();
                 await ShowProducts(products, context);
 
                 //update filters
-                var tmp = filtersStored.ToList<String>();
-                tmp.Add(details[1] + "^=^" + details[2]);
-                context.UserData.SetValue<string[]>("Filter", tmp.ToArray());
-               // await client.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
+                ContextController.AddFilter(currentUser, details[1], "=", details[2]);
             }
+
             //CLEAN ALL FILTERS
             else if (details[0] == "filter-clean")
             {
-                context.UserData.SetValue<string[]>("Filter", new String[] { });
-                // await client.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
             }
-
-            //TESTE
-            reply.Text = "STATE AFTER: \n\n" + userData.Data.ToString();
-            await context.PostAsync(reply);
 
             context.Done<object>(null);
         }
@@ -84,6 +69,7 @@ namespace SmartKioskBot.Dialogs
             var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
             var total_filter = Builders<Product>.Filter.Empty;
 
+            //combine all filters
             foreach (FilterDefinition<Product> f in filters)
             {
                 total_filter = total_filter & f;
@@ -118,20 +104,7 @@ namespace SmartKioskBot.Dialogs
             await context.PostAsync(reply);
         }
 
-        private List<FilterDefinition<Product>> ParseFilters(string[] filters)
-        {
-            List<FilterDefinition<Product>> parsed = new List<FilterDefinition<Product>>();
-
-            foreach (string a in filters)
-            {
-                string[] parts = a.Split('^');
-                parsed.Add(GetFilter(parts[0], parts[2]));
-            }
-
-            return parsed;
-        }
-
-        private FilterDefinition<Product> GetFilter(string filter, string value){
+        private FilterDefinition<Product> GetFilter(string filter, string op,string value){
             switch (filter.ToLower())
             {
                 case "nome":

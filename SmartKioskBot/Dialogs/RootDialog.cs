@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using MongoDB.Driver;
 using SmartKioskBot.Controllers;
+using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 
 namespace SmartKioskBot.Dialogs
@@ -27,23 +29,21 @@ namespace SmartKioskBot.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             var message = await activity as Activity;
-            
-           if(UserController.getUser("slack3") != null)
+
+
+            //USER IDENTIFICATION
+            var channelId = message.ChannelId;
+            var currentUser = UserController.getUser(channelId);
+
+            //user doesn't exist
+            if (currentUser == null)
             {
-                User u = UserController.getUser("slack3");
-
-                var r = context.MakeMessage();
-                r.Text = UserController.PrintUser(u);
-                await context.PostAsync(r);
-                
-                UserController.AddChannel(u,"hello2");
-
-                User u2 = UserController.getUser("slack3");
-
-                r = context.MakeMessage();
-                r.Text = UserController.PrintUser(u2);
-                await context.PostAsync(r);
+                UserController.CreateUser(channelId, message.From.Id, message.From.Name, "Portugal");
+                currentUser = UserController.getUser(channelId);
+                ContextController.CreateContext(currentUser);
             }
+            // IDENTIFICATION
+
 
             // Get the command, or the first word, that the user typed in.
             var userInput = message.Text != null ? message.Text : "";
@@ -62,7 +62,7 @@ namespace SmartKioskBot.Dialogs
                 reply.Text = "Comandos:\n\n" +
                     "filter [marca/preço/nome] [valor] \n\n" +
                     "filter-clean \n\n";
-                context.PostAsync(reply);
+                await context.PostAsync(reply);
             }
             //ADD PRODUCT TO DB (TESTING)
             else if(details[0].Equals("add", StringComparison.CurrentCultureIgnoreCase))
@@ -100,7 +100,7 @@ namespace SmartKioskBot.Dialogs
                 int length = (message.Text ?? string.Empty).Length;
 
                 // return our reply to the user
-                await context.PostAsync(BotDefaultAnswers.getGreeting("João"));
+                await context.PostAsync(BotDefaultAnswers.getGreeting(name));
                 // await context.PostAsync($"Hello {name}! You sent {activity.Text} which was {length} characters");
             }
         }

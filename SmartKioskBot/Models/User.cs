@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 namespace SmartKioskBot.Models
 {
     [Serializable, JsonObject]
+    [BsonIgnoreExtraElements]
     public class User
     {
         [BsonId]
