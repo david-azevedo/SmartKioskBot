@@ -5,7 +5,8 @@ using System.Web;
 
 namespace SmartKioskBot.Controllers
 {
-    public class CRMController
+    public abstract class CRMController
     {
+        //TODO
     }
 }

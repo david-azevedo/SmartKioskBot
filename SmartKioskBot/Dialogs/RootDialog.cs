@@ -61,7 +61,8 @@ namespace SmartKioskBot.Dialogs
 
                 reply.Text = "Comandos:\n\n" +
                     "filter [marca/preço/nome] [valor] \n\n" +
-                    "filter-clean \n\n";
+                    "filter-clean \n\n" + 
+                    "wishlist\n\n";
                 await context.PostAsync(reply);
             }
             //ADD PRODUCT TO DB (TESTING)
@@ -84,10 +85,20 @@ namespace SmartKioskBot.Dialogs
             {
                 await context.Forward(new ProductDetails(), this.StartAsync, message, CancellationToken.None);
             }
+            //VIEW WISH LIST
+            else if (details[0].Equals("wishlist", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new WishListDialog(WishListDialog.Action.VIEW), this.StartAsync, message, CancellationToken.None);
+            }
             //ADD PRODUCT TO WISH LIST
             else if (details[0].Equals(BotDefaultAnswers.add_wish_list, StringComparison.CurrentCultureIgnoreCase))
             {
-                //TODO
+                await context.Forward(new WishListDialog(WishListDialog.Action.ADD), this.StartAsync,message, CancellationToken.None);
+            }
+            //REM PRODUCT FROM WISH LIST
+            else if (details[0].Equals(BotDefaultAnswers.rem_wish_list, StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new WishListDialog(WishListDialog.Action.REM), this.StartAsync, message, CancellationToken.None);
             }
             //ADD PRODUCT TO COMPARATOR
             else if (details[0].Equals(BotDefaultAnswers.add_to_comparator, StringComparison.CurrentCultureIgnoreCase))
