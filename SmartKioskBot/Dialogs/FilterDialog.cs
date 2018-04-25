@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using MongoDB.Driver;
+using SmartKioskBot.Controllers;
 using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 using SmartKioskBot.UI;
@@ -9,13 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Dialogs
 {
     [Serializable]
     public class FilterDialog : IDialog<object>
     {
-        protected List<FilterDefinition<Product>> filters { get; set; }
+        private List<FilterDefinition<Product>> filters;
+        private Context context;
 
         public async Task StartAsync(IDialogContext context)
         {
@@ -26,29 +29,47 @@ namespace SmartKioskBot.Dialogs
         {
             var message = await activity;
 
-            //parse message
+            //fetch context
+            var currentUser = UserController.getUser(message.ChannelId);
+            this.context = ContextController.GetContext(currentUser.Id);
+
+            //parse message ->TEMPORARIO
             var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 3);
             string[] details = message.Text.Split(' ');
 
-            if (filters == null)
-                filters = new List<FilterDefinition<Product>>();
+            //FILTER PRODUCT
+            if (details[0] == "filter")
+            {
+                //parse filters
+                this.filters = new List<FilterDefinition<Product>>();
+                foreach (Filter f in this.context.Filters)
+                {
+                    this.filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
+                }
 
-            if (details[0] != "filter")
-                context.Done<object>(null);
+                // Get products and create a reply back to the user.
+                this.filters.Add(GetFilter(details[1], "", details[2]));
+                List<Product> products = GetProductsForUser();
+                await ShowProducts(products, context);
 
-            // Get products and create a reply to reply back to the user.
-            this.filters.Add(GetFilter(details[1], details[2]));
-            List<Product> products = GetProductsForUser();
-            await ShowProducts(products, context);
+                //update filters
+                ContextController.AddFilter(currentUser, details[1], "=", details[2]);
+            }
 
-            context.Wait(MessageReceivedAsync);
+            //CLEAN ALL FILTERS
+            else if (details[0] == "filter-clean")
+            {
+            }
+
+            context.Done<object>(null);
         }
 
         private List<Product> GetProductsForUser()
         {
-            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
+            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
             var total_filter = Builders<Product>.Filter.Empty;
 
+            //combine all filters
             foreach (FilterDefinition<Product> f in filters)
             {
                 total_filter = total_filter & f;
@@ -83,7 +104,7 @@ namespace SmartKioskBot.Dialogs
             await context.PostAsync(reply);
         }
 
-        private FilterDefinition<Product> GetFilter(string filter, string value){
+        private FilterDefinition<Product> GetFilter(string filter, string op,string value){
             switch (filter.ToLower())
             {
                 case "nome":

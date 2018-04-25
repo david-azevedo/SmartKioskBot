@@ -28,7 +28,7 @@ namespace SmartKioskBot.Dialogs
             string[] details = message.Text.Split(' ');
             var id = details[1];
 
-            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
+            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
 
             //get product
             var query_id = Builders<Product>.Filter.Eq("_id", ObjectId.Parse(id));
