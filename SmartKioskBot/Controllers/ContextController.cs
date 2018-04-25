@@ -10,7 +10,7 @@ using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Controllers
 {
-    public class ContextController
+    public abstract class ContextController
     {
         /// <summary>
         /// Get a conversation context related to a user.
@@ -44,12 +44,19 @@ namespace SmartKioskBot.Controllers
                 UserId = user.Id,
                 Country = user.Country,
                 Filters = new Filter[] { },
-                WishList = new string[] { },
-                Comparator = new string[] { }
+                WishList = new ObjectId[] { },
+                Comparator = new ObjectId[] { }
             };
             contextCollection.InsertOne(c);
         }
 
+        /// <summary>
+        /// Adds a filter in the search of a product and saves it in the user context.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="filterName"></param>
+        /// <param name="op"></param>
+        /// <param name="value"></param>
         public static void AddFilter(User user, string filterName, string op, string value)
         {
             Filter f = new Filter()
@@ -69,6 +76,11 @@ namespace SmartKioskBot.Controllers
             contextCollection.UpdateOne(filter, update);
         }
 
+        /// <summary>
+        /// Removes a filter frin the search of a product and saves it in the user context.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="filterName"></param>
         public static void RemFilter(User user, string filterName)
         {
             var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
@@ -92,7 +104,11 @@ namespace SmartKioskBot.Controllers
             }
         }
 
-        public static void cleanFilters(User user)
+        /// <summary>
+        /// Removes all the filters in the search of a product and saves is in the user context.
+        /// </summary>
+        /// <param name="user"></param>
+        public static void CleanFilters(User user)
         {
             var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
 
@@ -104,14 +120,61 @@ namespace SmartKioskBot.Controllers
             contextCollection.UpdateOne(filter, update);
         }
 
-        public static void AddWishList(string productId)
+        /// <summary>
+        /// Adds a wish product and saves it in the user context.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="productId"></param>
+        public static void AddWishList(User user, string productId)
         {
-            //TODO
+            var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
+
+            var filter = Builders<Context>.Filter.And(
+                Builders<Context>.Filter.Eq(o => o.UserId, user.Id),                                        //same user id
+                Builders<Context>.Filter.Eq(o => o.Country, user.Country),                                  //same country (shard)
+                Builders<Context>.Filter.Not(
+                    Builders<Context>.Filter.AnyEq(o => o.WishList, ObjectId.Parse(productId))));  //don't contain the product already     
+            var update = Builders<Context>.Update.Push(o => o.WishList, ObjectId.Parse(productId));     //push new wish 
+
+            contextCollection.UpdateOne(filter, update);
         }
 
-        public static void RemWishList(string productId)
+        /// <summary>
+        /// Removes a wish product and updates it in the user context.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="productId"></param>
+        public static void RemWishList(User user, string productId)
         {
-            //TODO
+            var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
+
+            var filter = Builders<Context>.Filter.And(
+                Builders<Context>.Filter.Eq(o => o.UserId, user.Id),           //same user id
+                Builders<Context>.Filter.Eq(o => o.Country, user.Country));    //same country (shard)
+
+            var update = Builders<Context>.Update.Pull(o => o.WishList, ObjectId.Parse(productId));
+            contextCollection.UpdateOne(filter, update);
+        }
+
+        /// <summary>
+        /// Gets all the product wishes from the user.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="productId"></param>
+        /// <returns></returns>
+        public static ObjectId[] getWishes(User user, string productId)
+        {
+            var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
+
+            var filter = Builders<Context>.Filter.And(
+                Builders<Context>.Filter.Eq(o => o.UserId, user.Id),           //same user id
+                Builders<Context>.Filter.Eq(o => o.Country, user.Country));    //same country (shard)
+
+            var tmp = contextCollection.Find(filter).ToList();
+
+            if (tmp.Count != 0)
+                return tmp[0].WishList;
+            return new ObjectId[] { };
         }
 
         public static void AddComparator(string productId)

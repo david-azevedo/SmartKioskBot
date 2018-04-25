@@ -66,7 +66,6 @@ namespace SmartKioskBot.Dialogs
 
         private List<Product> GetProductsForUser()
         {
-            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
             var total_filter = Builders<Product>.Filter.Empty;
 
             //combine all filters
@@ -74,9 +73,8 @@ namespace SmartKioskBot.Dialogs
             {
                 total_filter = total_filter & f;
             }
-            
-            var products = collection.Find(total_filter).ToList();
-            return products;
+
+            return ProductController.getProductsFilter(total_filter);
         }
 
         private async Task ShowProducts(List<Product> products, IDialogContext context)
@@ -96,7 +94,7 @@ namespace SmartKioskBot.Dialogs
 
                 foreach (Product p in products)
                 {
-                    cards.Add(ProductCard.getProductCard(p).ToAttachment());
+                    cards.Add(ProductCard.GetProductCard(p,ProductCard.CardType.SEARCH).ToAttachment());
                 }
 
                 reply.Attachments = cards;

@@ -26,10 +26,10 @@ namespace SmartKioskBot.Models
         public Filter[] Filters { get; set; }
 
         [BsonElement("wishList")]
-        public string[] WishList { get; set; }
+        public ObjectId[] WishList { get; set; }
 
         [BsonElement("comparator")]
-        public string[] Comparator { get; set; }
+        public ObjectId[] Comparator { get; set; }
 
         [Serializable, JsonObject]
         public class Filter

@@ -35,6 +35,8 @@ namespace SmartKioskBot.Dialogs
         public static string show_product_details = "Detalhes";
         public static string add_wish_list = "AdicionarWishList";
         public static string add_to_comparator = "AdicionarComparador";
+        public static string rem_wish_list = "RemoverWishList";
+        public static string rem_comparator = "RemoverComparador";
 
 
         /*
@@ -51,6 +53,7 @@ namespace SmartKioskBot.Dialogs
             return greetings[new Random().Next(0,greetings.Length)];
         }
 
+        //FILTERS
         public static String getFilterFail()
         {
             String[] fail = {
@@ -65,6 +68,43 @@ namespace SmartKioskBot.Dialogs
             String[] success = {
                 "Temos os seguintes produtos com essas características:",
                 "Temos várias opções com essas especificações:"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
+        //WISHLIST
+        public static String getWishList()
+        {
+            String[] success =
+            {
+                "Aqui está a sua lista de desejos:"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
+        public static String getEmptyWishList()
+        {
+            String[] success =
+            {
+                "De momentos não tem nada na sua lista de desejos."
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
+        public static String getAddWishList()
+        {
+            String[] success =
+            {
+                "Produto adicionado com sucesso à sua lista de desejos!"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
+        public static String getRemWishList()
+        {
+            String[] success =
+            {
+                "Produto removido com sucesso da sua lista de desejos!"
             };
             return success[new Random().Next(0, success.Length)];
         }
