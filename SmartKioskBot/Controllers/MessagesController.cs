@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using SmartKioskBot.Controllers;
 using SmartKioskBot.Dialogs;
 
 namespace SmartKioskBot
@@ -47,7 +48,6 @@ namespace SmartKioskBot
                 // text activation
                 if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id)) {
                     var reply = message.CreateReply(BotDefaultAnswers.getMemberAdded());
-
 
                     ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
 
