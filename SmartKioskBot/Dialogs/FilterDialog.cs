@@ -126,11 +126,11 @@ namespace SmartKioskBot.Dialogs
                     return Builders<Product>.Filter.Where(x => x.Name.ToLower() == value.ToLower());
                 case "preço":
                        if (op == "=")
-                            return Builders<Product>.Filter.Where(x => x.Price.ToLower() == value.ToLower());
+                            return Builders<Product>.Filter.Where(x => x.Price == short.Parse(value.ToLower()));
                         else if (op == ">") 
-                            return Builders<Product>.Filter.Gte(x => short.Parse(x.Price),short.Parse(value));
+                            return Builders<Product>.Filter.Gte(x => x.Price,short.Parse(value));
                         else if (op == "<")
-                            return Builders<Product>.Filter.Lte(x => short.Parse(x.Price),short.Parse(value));
+                            return Builders<Product>.Filter.Lte(x => x.Price, short.Parse(value));
                         break;
                 case "marca":
                     return Builders<Product>.Filter.Where(x => x.Brand.ToLower() == value.ToLower());

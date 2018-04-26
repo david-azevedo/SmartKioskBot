@@ -15,7 +15,7 @@ namespace SmartKioskBot.Models
         public string Name { get; set; }
 
         [BsonElement("preço")]
-        public string Price { get; set; }
+        public double Price { get; set; }
 
         [BsonElement("foto")]
         public string Photo { get; set; }
