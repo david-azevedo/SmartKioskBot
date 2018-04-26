@@ -1,7 +1,11 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
+using System;
 
 namespace SmartKioskBot.Models
 {
+    [Serializable, JsonObject]
+    [BsonIgnoreExtraElements]
     public class Product
     {
         [BsonId]

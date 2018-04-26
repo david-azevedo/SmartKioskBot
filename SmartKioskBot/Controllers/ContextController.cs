@@ -97,7 +97,7 @@ namespace SmartKioskBot.Controllers
                 Filter[] filters = tmp[0].Filters;
 
                 //remove filter of filters array
-                var newFilters = filters.Where(val => val.FilterName == filterName).ToArray();
+                var newFilters = filters.Where(val => val.FilterName != filterName).ToArray();
 
                 var update = Builders<Context>.Update.Set(o => o.Filters, newFilters);
                 contextCollection.UpdateOne(filter, update);
