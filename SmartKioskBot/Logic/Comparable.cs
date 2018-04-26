@@ -8,7 +8,7 @@ namespace SmartKioskBot.Logic
 {
     public abstract class Comparable
     {
-        private string compareExceptionMessage = "Product to compare is not of the same class.";
+        private string compareExceptionMessage = "Product to compare is not of the same type.";
 
         /// <summary>
         /// This method is used to compare the current computer part with another part. It compares attributes of the parts directly, so it isn't as truthful as it should be.

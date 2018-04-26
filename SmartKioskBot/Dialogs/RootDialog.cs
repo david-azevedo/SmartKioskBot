@@ -46,6 +46,11 @@ namespace SmartKioskBot.Dialogs
             {
                 await context.Forward(new FilterDialog(), this.StartAsync, message, CancellationToken.None);
             }
+            //PRODUCT COMPARISON
+            else if (details[0].Equals("compare", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new CompareDialog(), this.StartAsync, message, CancellationToken.None);
+            }
             //PRODUCT DETAILS
             else if(details[0].Equals(BotDefaultAnswers.show_product_details, StringComparison.CurrentCultureIgnoreCase))
             {

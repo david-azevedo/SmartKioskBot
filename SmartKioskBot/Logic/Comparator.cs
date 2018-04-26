@@ -1,34 +1,54 @@
-﻿using SmartKioskBot.Models;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using SmartKioskBot.Helpers;
+using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace SmartKioskBot.Logic
 {
-    public class Comparator
+    public static class Comparator
     {
-        public Product GetBestProduct (List<Product> products)
+        public static Product GetBestProduct (List<Product> products)
         {
             int bestCPUIndex = GetBestCPU(products);
 
             return products[bestCPUIndex];
         }
 
-        public int GetBestCPU (List<Product> products)
+        public static int GetBestCPU (List<Product> products)
         {
             List<Comparable.CPU> cpus = new List<Comparable.CPU>();
 
-            for(int i = 0; i < products.Count; i++)
+            Regex dualRegex = new Regex(@"dual", RegexOptions.IgnoreCase);
+            Regex quadRegex = new Regex(@"quad", RegexOptions.IgnoreCase);
+
+            for (int i = 0; i < products.Count; i++)
             {
                 Product currentProduct = products[i];
-                cpus.Add(new Comparable.CPU(int.Parse(currentProduct.CoreNr), float.Parse(currentProduct.CPUSpeed)));
+                int numOfCores = 0;
+
+                if (dualRegex.Match(currentProduct.CoreNr).Length != 0) // match dual core (2 cores)
+                {
+                    numOfCores = 2;
+                }
+
+                if (quadRegex.Match(currentProduct.CoreNr).Length != 0) // match quad core (4 cores)
+                {
+                    numOfCores = 4;
+                }
+
+                cpus.Add(new Comparable.CPU(numOfCores, float.Parse(currentProduct.CPUSpeed)));
             }
 
             return GetBestPart(cpus);
         }
 
-        public int GetBestPart<T> (List<T> comparables) where T : Comparable
+        public static int GetBestPart<T> (List<T> comparables) where T : Comparable
         {
             int indexOfBestComparable = -1;
 
@@ -47,6 +67,20 @@ namespace SmartKioskBot.Logic
             }
 
             return indexOfBestComparable;
+        }
+
+        public static void Test()
+        {
+            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
+            var builder = Builders<Product>.Filter;
+
+            var filter1 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
+            var filter2 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
+
+            var product1 = collection.Find(filter1).FirstOrDefault();
+            var product2 = collection.Find(filter2).FirstOrDefault();
+
+            var winner = GetBestProduct(new List<Product>() { product1, product2 });
         }
     }
 }
