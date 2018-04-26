@@ -153,8 +153,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\DbSingleton.cs" />
+    <Compile Include="Logic\Comparator.cs" />
+    <Compile Include="Logic\Comparable.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\LUIS.cs" />
+    <Compile Include="Services\QnAMaker.cs" />
     <Compile Include="UI\ProductCard.cs" />
   </ItemGroup>
   <ItemGroup>
