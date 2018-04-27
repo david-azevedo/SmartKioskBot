@@ -15,7 +15,7 @@ namespace SmartKioskBot.Models
         public string Name { get; set; }
 
         [BsonElement("preço")]
-        public string Price { get; set; }
+        public double Price { get; set; }
 
         [BsonElement("foto")]
         public string Photo { get; set; }
@@ -27,19 +27,19 @@ namespace SmartKioskBot.Models
         public string CPUFamily { get; set; }
 
         [BsonElement("Velocidade Processador")]
-        public string CPUSpeed { get; set; }
+        public double CPUSpeed { get; set; }        //ghz
 
         [BsonElement("Quantidade de Núcleos Core")]
         public string CoreNr { get; set; }
 
         [BsonElement("RAM")]
-        public string RAM { get; set; }
+        public double RAM { get; set; }             //gb
 
         [BsonElement("Tipo de Armazenamento")]
         public string StorageType { get; set; }
 
         [BsonElement("Armazenamento")]
-        public string StorageAmount { get; set; }
+        public double StorageAmount { get; set; }   //gb
 
         [BsonElement("Tipo de Placa Gráfica")]
         public string GraphicsCardType { get; set; }
@@ -51,7 +51,7 @@ namespace SmartKioskBot.Models
         public string MaxVideoMem { get; set; }
 
         [BsonElement("Autonomia (Estimada)")]
-        public string Autonomy { get; set; }
+        public double Autonomy { get; set; }            //hours
 
         [BsonElement("Placa de Som")]
         public string SoundCard { get; set; }
@@ -81,7 +81,7 @@ namespace SmartKioskBot.Models
         public string Screen { get; set; }
 
         [BsonElement("Diagonal do Ecrã ('')")]
-        public string ScreenDiagonal { get; set; }
+        public double ScreenDiagonal { get; set; }      //inches
 
         [BsonElement("Resolução do Ecrã")]
         public string ScreenResolution { get; set; }
@@ -102,22 +102,22 @@ namespace SmartKioskBot.Models
         public string Model { get; set; }
 
         [BsonElement("Garantia")]
-        public string Warranty { get; set; }
+        public double Warranty { get; set; }        //years
 
         [BsonElement("Peso")]
-        public string Weight { get; set; }
+        public double Weight { get; set; }          //kg
 
         [BsonElement("Cor")]
         public string Colour { get; set; }
 
         [BsonElement("Altura")]
-        public string Height { get; set; }
+        public double Height { get; set; }          //cm
 
         [BsonElement("Largura")]
-        public string Width { get; set; }
+        public double Width { get; set; }           //cm
         
         [BsonElement("Profundidade")]
-        public string Depth { get; set; }
+        public double Depth { get; set; }           //cm
 
         [BsonElement("Garantia Bateria")]
         public string BatteryWarranty { get; set; }
