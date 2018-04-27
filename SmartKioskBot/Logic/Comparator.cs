@@ -32,17 +32,27 @@ namespace SmartKioskBot.Logic
                 Product currentProduct = products[i];
                 int numOfCores = 0;
 
-                if (dualRegex.Match(currentProduct.CoreNr).Length != 0) // match dual core (2 cores)
+                if(currentProduct.CoreNr != null)
                 {
-                    numOfCores = 2;
+                    if (dualRegex.Match(currentProduct.CoreNr).Length != 0) // match dual core (2 cores)
+                    {
+                        numOfCores = 2;
+                    }
+
+                    if (quadRegex.Match(currentProduct.CoreNr).Length != 0) // match quad core (4 cores)
+                    {
+                        numOfCores = 4;
+                    }
                 }
 
-                if (quadRegex.Match(currentProduct.CoreNr).Length != 0) // match quad core (4 cores)
+                float cpuSpeed = 0;
+
+                if (currentProduct.CPUSpeed != null)
                 {
-                    numOfCores = 4;
+                   cpuSpeed = float.Parse(currentProduct.CPUSpeed, System.Globalization.CultureInfo.InvariantCulture);
                 }
 
-                cpus.Add(new Comparable.CPU(numOfCores, float.Parse(currentProduct.CPUSpeed)));
+                cpus.Add(new Comparable.CPU(numOfCores, cpuSpeed));
             }
 
             return GetBestPart(cpus);
@@ -74,13 +84,22 @@ namespace SmartKioskBot.Logic
             var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
             var builder = Builders<Product>.Filter;
 
-            var filter1 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
-            var filter2 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
+            // var filter1 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
+            // var filter2 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
 
-            var product1 = collection.Find(filter1).FirstOrDefault();
-            var product2 = collection.Find(filter2).FirstOrDefault();
+            // var product1 = collection.Find(filter1).FirstOrDefault();
+            // var product2 = collection.Find(filter2).FirstOrDefault();
 
-            var winner = GetBestProduct(new List<Product>() { product1, product2 });
+            Product product1 = new Product();
+            product1.CoreNr = "Dual Core";
+            product1.CPUSpeed = "2.7";
+
+            Product product2 = new Product();
+            product2.CoreNr = "Quad Core";
+            product2.CPUSpeed = "2.7";
+
+            Product winner = GetBestProduct(new List<Product>() { product1, product2 });
+            Debug.Write("LOL");
         }
     }
 }
