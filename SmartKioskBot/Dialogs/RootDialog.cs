@@ -60,7 +60,8 @@ namespace SmartKioskBot.Dialogs
                 var reply = context.MakeMessage();
 
                 reply.Text = "Comandos:\n\n" +
-                    "filter [marca/preço/nome] [valor] \n\n" +
+                    "filter [marca/preço/nome] [operator] [valor] \n\n" +
+                    "filter-rem [filter] \n\n" + 
                     "filter-clean \n\n" + 
                     "wishlist\n\n";
                 await context.PostAsync(reply);
@@ -72,6 +73,11 @@ namespace SmartKioskBot.Dialogs
             }
             //FILTER PRODUCT
             else if (details[0].Equals("filter", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new FilterDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //FILTER REMOVE
+            else if (details[0].Equals("filter-rem", StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new FilterDialog(), this.StartAsync, message, CancellationToken.None);
             }
@@ -107,12 +113,14 @@ namespace SmartKioskBot.Dialogs
             }
             else
             {
-                // calculate something for us to return
-                int length = (message.Text ?? string.Empty).Length;
+                var reply = context.MakeMessage();
 
-                // return our reply to the user
-                await context.PostAsync(BotDefaultAnswers.getGreeting(name));
-                // await context.PostAsync($"Hello {name}! You sent {activity.Text} which was {length} characters");
+                reply.Text = "Comandos:\n\n" +
+                    "filter [marca/preço/nome] [operator] [valor] \n\n" +
+                    "filter-rem [filter] \n\n" +
+                    "filter-clean \n\n" +
+                    "wishlist\n\n";
+                await context.PostAsync(reply);
             }
         }
     }
