@@ -1,0 +1,93 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Connector;
+using SmartKioskBot.Controllers;
+using SmartKioskBot.UI;
+
+namespace SmartKioskBot.Dialogs
+{
+    [Serializable]
+    public class IdentificationDialog : IDialog<object>
+    {
+        public Task StartAsync(IDialogContext context)
+        {
+            context.Wait(MessageReceivedAsync);
+
+            return Task.CompletedTask;
+        }
+  
+         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+         {
+
+               var message = await result as Activity;
+
+               var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 3);
+               var command = userInput[0];
+               var reply = "";
+               var channelId = message.ChannelId;
+               var currentUser = UserController.getUser(channelId);
+
+                // customer-card/set-customer-card <number> 
+                // customer -email/set-customer-email <email>
+                if (command.Equals("set-customer-card"))
+                {
+                    var customerCard = userInput[1];
+                    await IdentificationCards.DisplayHeroCard(context, "set-customer-card", "Cartão cliente", customerCard);
+                }
+                else if (command.Equals("set-customer-email"))
+                {
+                    var customerEmail = userInput[1];
+                    await IdentificationCards.DisplayHeroCard(context, "set-customer-email", "E-mail", customerEmail);
+                }
+                else if (command.Equals("customer-card"))
+                {
+                    currentUser = UserController.getUserByCustomerCard(userInput[1]);
+                    await IdentificationCards.DisplayHeroCard(context, "customer-card", "Cartão cliente", userInput[1]);
+                }
+                else if (command.Equals("customer-email"))
+                {
+                    currentUser = UserController.getUserByEmail(userInput[1]);
+                    await IdentificationCards.DisplayHeroCard(context, "customer-email", "E-mail", userInput[1]);
+                }
+                else if (command.Equals("first-dialog"))
+                {
+                    UserController.CreateUser(channelId, message.From.Id, message.From.Name, "Portugal");
+                    currentUser = UserController.getUser(channelId);
+                    ContextController.CreateContext(currentUser);
+                    
+                }
+
+
+
+                if (userInput[1].Equals("yes"))
+                {
+                    if (command.Equals("SaveEmail"))
+                    {
+                        UserController.SetEmail(currentUser, userInput[2]);
+                        reply = "O seu email foi atualizado para : " + userInput[2];
+                    }
+                    else if (command.Equals("SaveCard"))
+                    {
+                        UserController.SetCustomerCard(currentUser, userInput[2]);
+                        reply = "O seu numero de cliente foi atualizado para : " + userInput[2];
+                    }
+                    else if (command.Equals("AddChannel"))
+                    {
+                        UserController.AddChannel(currentUser, channelId);
+                    }
+
+                }
+                else if (userInput[1].Equals("no"))
+                {
+                    reply = "Acção cancelada!";
+                }
+
+                if (reply != "")
+                    await context.PostAsync(reply);
+
+        }
+
+    }
+}

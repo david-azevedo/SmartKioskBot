@@ -37,6 +37,9 @@ namespace SmartKioskBot.Dialogs
         public static string add_to_comparator = "AdicionarComparador";
         public static string rem_wish_list = "RemoverWishList";
         public static string rem_comparator = "RemoverComparador";
+        public static string set_customer_email = "SaveEmail";
+        public static string set_customer_card = "SaveCard";
+        public static string add_channel = "AddChannel";
 
 
         /*
@@ -107,6 +110,25 @@ namespace SmartKioskBot.Dialogs
                 "Produto removido com sucesso da sua lista de desejos!"
             };
             return success[new Random().Next(0, success.Length)];
+        }
+        
+        public static String getIdentification()
+        {
+            String[] dialog =
+            {
+                "Olá, já nos conhecemos? pode indicar o seu email ou numero de cliente?"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getCustomerCardOrEmail(String n)
+        {
+            String[] dialog =
+            {
+                "Olá " + n + ", pode introduzir o seu email ou cartão cliente?"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
         }
     }
 }

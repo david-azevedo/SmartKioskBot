@@ -31,20 +31,6 @@ namespace SmartKioskBot.Dialogs
             var message = await activity as Activity;
 
 
-            //USER IDENTIFICATION
-            var channelId = message.ChannelId;
-            var currentUser = UserController.getUser(channelId);
-
-            //user doesn't exist
-            if (currentUser == null)
-            {
-                UserController.CreateUser(channelId, message.From.Id, message.From.Name, "Portugal");
-                currentUser = UserController.getUser(channelId);
-                ContextController.CreateContext(currentUser);
-            }
-            // IDENTIFICATION
-
-
             // Get the command, or the first word, that the user typed in.
             var userInput = message.Text != null ? message.Text : "";
             var command = (userInput.Split(new[] { ' ' }, 3))[0];
@@ -104,6 +90,46 @@ namespace SmartKioskBot.Dialogs
             else if (details[0].Equals(BotDefaultAnswers.add_to_comparator, StringComparison.CurrentCultureIgnoreCase))
             {
                 //TODO
+            }
+            //ADD CUSTOMER CARD
+            else if (details[0].Equals("set-customer-card", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //ADD CUSTOMER EMAIL
+            else if (details[0].Equals("set-customer-email", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //IDENTIFICATION BY CUSTOMER CARD
+            else if (details[0].Equals("customer-card", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //IDENTIFICATION BY EMAIL
+            else if (details[0].Equals("customer-email", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //FIRST DIALOG
+            else if (details[0].Equals("first-dialog", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //ADD CUSTOMER CARD CONFIRMATION
+            else if (details[0].Equals("SaveCard", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //ADD CUSTOMER EMAIL CONFIRMATION
+            else if (details[0].Equals("SaveEmail", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //ADD CHANNEL CONFIRMATION
+            else if (details[0].Equals("AddChannel", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
             }
             else
             {
