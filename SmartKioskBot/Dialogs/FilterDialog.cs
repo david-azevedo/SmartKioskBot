@@ -126,11 +126,11 @@ namespace SmartKioskBot.Dialogs
                     return Builders<Product>.Filter.Where(x => x.Name.ToLower() == value.ToLower());
                 case "preço":
                        if (op == "=")
-                            return Builders<Product>.Filter.Where(x => x.Price == short.Parse(value.ToLower()));
+                            return Builders<Product>.Filter.Eq(x => x.Price, Convert.ToDouble(value));
                         else if (op == ">") 
-                            return Builders<Product>.Filter.Gte(x => x.Price,short.Parse(value));
+                            return Builders<Product>.Filter.Gte(x => x.Price, Convert.ToDouble(value));
                         else if (op == "<")
-                            return Builders<Product>.Filter.Lte(x => x.Price, short.Parse(value));
+                            return Builders<Product>.Filter.Lte(x => x.Price, Convert.ToDouble(value));
                         break;
                 case "marca":
                     return Builders<Product>.Filter.Where(x => x.Brand.ToLower() == value.ToLower());
@@ -139,19 +139,19 @@ namespace SmartKioskBot.Dialogs
                 case "familia_cpu":
                     return Builders<Product>.Filter.Where(x => x.CPUFamily.ToLower() == value.ToLower()); ;
                 case "velocidade_cpu":
-                    return Builders<Product>.Filter.Where(x => x.CPUSpeed.ToLower() == value.ToLower());
+                    return Builders<Product>.Filter.Eq(x => x.CPUSpeed.ToString(), value);
                 case "nrNucleos":
                     return Builders<Product>.Filter.Where(x => x.CoreNr.ToLower() == value.ToLower());
                 case "ram":
-                    return Builders<Product>.Filter.Where(x => x.RAM.ToLower() == value.ToLower());
+                    return Builders<Product>.Filter.Eq(x => x.RAM, Convert.ToDouble(value));
                 case "tipo_armazenamento":
                     return Builders<Product>.Filter.Where(x => x.StorageType.ToLower() == value.ToLower());
                 case "armazenamento":
-                    return Builders<Product>.Filter.Where(x => x.StorageAmount.ToLower() == value.ToLower());
+                    return Builders<Product>.Filter.Eq(x => x.StorageAmount, Convert.ToDouble(value));
                 case "placa_grafica":
                     return Builders<Product>.Filter.Where(x => x.GraphicsCardType.ToLower() == value.ToLower());
                 case "autonomia":
-                    return Builders<Product>.Filter.Where(x => x.Autonomy.ToLower() == value.ToLower());
+                    return Builders<Product>.Filter.Eq(x => x.Autonomy, Convert.ToDouble(value));
                 case "placa_som":
                     return Builders<Product>.Filter.Where(x => x.SoundCard.ToLower() == value.ToLower());
                 case "camera":
@@ -161,11 +161,11 @@ namespace SmartKioskBot.Dialogs
                 case "os":
                     return Builders<Product>.Filter.Where(x => x.OS.ToLower() == value.ToLower());
                 case "tamanho_ecra":
-                    return Builders<Product>.Filter.Where(x => x.ScreenDiagonal.ToLower() == value.ToLower());
+                    return Builders<Product>.Filter.Eq(x => x.ScreenDiagonal, Convert.ToDouble(value));
                 case "ecra_tactil":
                     return Builders<Product>.Filter.Where(x => x.TouchScreen.ToLower() == value.ToLower());
                 case "garantia":
-                    return Builders<Product>.Filter.Where(x => x.Warranty.ToLower() == value.ToLower());
+                    return Builders<Product>.Filter.Eq(x => x.Warranty, Convert.ToDouble(value));
                 case "cor":
                     return Builders<Product>.Filter.Where(x => x.Colour.ToLower() == value.ToLower());
             }
