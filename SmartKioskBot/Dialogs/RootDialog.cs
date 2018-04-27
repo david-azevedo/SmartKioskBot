@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Luis;
+using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using MongoDB.Driver;
 using SmartKioskBot.Controllers;
@@ -11,10 +13,22 @@ using SmartKioskBot.Models;
 
 namespace SmartKioskBot.Dialogs
 {
+    [LuisModel(AppSettings.LuisAppId, AppSettings.LuisSubscriptionKey, domain: AppSettings.LuisDomain)]
     [Serializable]
-    public sealed class RootDialog : IDialog<object>
+    public sealed class RootDialog : LuisDialog<object>
     {
-#pragma warning disable 1998
+        [LuisIntent("")]
+        [LuisIntent("ViewWishList")]
+        public async Task None(IDialogContext context, LuisResult result)
+        {
+            string message = $"Sorry, I did not understand '{result.Query}'. Type 'help' if you need assistance.";
+
+            await context.PostAsync(message);
+
+            context.Wait(this.MessageReceived);
+        }
+
+        /*#pragma warning disable 1998
         public async Task StartAsync(IDialogContext context)
         {
             context.Wait(MessageReceivedAsync);
@@ -24,8 +38,8 @@ namespace SmartKioskBot.Dialogs
 #pragma warning restore 1998
         {
             context.Wait(MessageReceivedAsync);
-        }
-
+        }*/
+        /*
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             var message = await activity as Activity;
@@ -122,6 +136,6 @@ namespace SmartKioskBot.Dialogs
                     "wishlist\n\n";
                 await context.PostAsync(reply);
             }
-        }
+        }*/
     }
 }
