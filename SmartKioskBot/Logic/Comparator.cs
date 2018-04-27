@@ -13,12 +13,37 @@ namespace SmartKioskBot.Logic
 {
     public static class Comparator
     {
-        public static Product GetBestProduct (List<Product> products)
+        public static void GetBestProduct (List<Product> products)
         {
-            int bestCPUIndex = GetBestCPU(products);
+            // The key is the index of the product in the list argument. The value is the number of times a component of the product is 
+            // better than the others.
+            Dictionary<int, int> punctuations = new Dictionary<int, int>();
 
-            return products[bestCPUIndex];
-           
+            for(int i = 0; i < products.Count; i++)
+            {
+                punctuations.Add(i, 0); // every product starts with punctuation equal to zero
+            }
+
+            int bestCPUIndex = GetBestCPU(products);
+            punctuations[bestCPUIndex] = punctuations[bestCPUIndex]++;
+
+            int bestRAMIndex = GetBestRAM(products);
+            punctuations[bestRAMIndex] = punctuations[bestRAMIndex]++;
+
+            int bestScreenIndex = GetBestScreen(products);
+            punctuations[bestScreenIndex] = punctuations[bestScreenIndex]++;
+
+            int bestOverallIndex = 0;
+
+            for(int i = 1; i < punctuations.Count; i++)
+            {
+                if(punctuations[i] > punctuations[bestOverallIndex])
+                {
+                    bestOverallIndex = i;
+                }
+            }
+
+            // TODO: do something with the indexes, like showing on a card the comparison
         }
 
         public static int GetBestCPU (List<Product> products)
@@ -67,9 +92,12 @@ namespace SmartKioskBot.Logic
             for (int i = 0; i < products.Count; i++)
             {
                 Product currentProduct = products[i];
-                int memory;
+                int memory = 0;
 
-                memory = int.Parse(numberRegex.Match(currentProduct.RAM).Value);
+                if(currentProduct.RAM != null)
+                {
+                    memory = int.Parse(numberRegex.Match(currentProduct.RAM).Value);
+                }
 
                 rams.Add(new Comparable.RAM(memory));
             }
@@ -88,23 +116,34 @@ namespace SmartKioskBot.Logic
             for (int i = 0; i < products.Count; i++)
             {
                 Product currentProduct = products[i];
-                int resolution_x, resolution_y;
-                float diagonal;
+                int resolution_x = 0, resolution_y = 0;
+                float diagonal = 0;
                 bool touch = false;
                 
-                diagonal = float.Parse(numberRegex.Match(currentProduct.ScreenDiagonal).Value);
-                Match resMatch = numberRegex.Match(currentProduct.ScreenResolution);
-                resolution_x = int.Parse(resMatch.Value);
-                resolution_y = int.Parse(resMatch.NextMatch().Value);
-
-                if (negRegex.Match(currentProduct.TouchScreen).Length != 0)
+                if(currentProduct.ScreenDiagonal != null)
                 {
-                    touch = false;
-                } else if (posRegex.Match(currentProduct.TouchScreen).Length != 0)
+                    diagonal = float.Parse(numberRegex.Match(currentProduct.ScreenDiagonal).Value);
+                }
+                
+                if(currentProduct.ScreenResolution != null)
+                {
+                    Match resMatch = numberRegex.Match(currentProduct.ScreenResolution);
+                    resolution_x = int.Parse(resMatch.Value);
+                    resolution_y = int.Parse(resMatch.NextMatch().Value);
+                }
+
+                if (currentProduct.TouchScreen != null)
+                {
+                    if (negRegex.Match(currentProduct.TouchScreen).Length != 0)
+                    {
+                        touch = false;
+                    }
+                    else if (posRegex.Match(currentProduct.TouchScreen).Length != 0)
                     {
                         touch = true;
                     }
-
+                }
+               
                 screens.Add(new Comparable.Screen(diagonal, resolution_x, resolution_y, touch));
             }
 
@@ -147,13 +186,14 @@ namespace SmartKioskBot.Logic
             Product product1 = new Product();
             product1.CoreNr = "Dual Core";
             product1.CPUSpeed = "2.7";
+            product1.RAM = "8GB";
 
             Product product2 = new Product();
             product2.CoreNr = "Quad Core";
             product2.CPUSpeed = "2.7";
+            product2.RAM = "4GB";
 
-            Product winner = GetBestProduct(new List<Product>() { product1, product2 });
-            Debug.Write(winner.CoreNr);
+            GetBestProduct(new List<Product>() { product1, product2 });
         }
     }
 }
