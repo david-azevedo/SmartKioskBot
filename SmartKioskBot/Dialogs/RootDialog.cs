@@ -36,7 +36,9 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("Filter")]
         public async Task Filter(IDialogContext context, LuisResult result)
         {
-            
+            FilterDialog w = new FilterDialog();
+            IMessageActivity r = w.filtering(result.Entities, context.MakeMessage());
+            context.PostAsync(r);
         }
 
         [LuisIntent("Recommendation")]
@@ -54,7 +56,11 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("ViewWishList")]
         public async Task ViewWishList(IDialogContext context, LuisResult result)
         {
-           // await context.Forward(new WishListDialog(WishListDialog.Action.VIEW), null);
+            // await context.Forward(new WishListDialog(WishListDialog.Action.VIEW), null);
+
+
+            FilterDialog w = new FilterDialog();
+            IMessageActivity r = w.filtering(result.Entities, context.MakeMessage());
         }
     }
 }
