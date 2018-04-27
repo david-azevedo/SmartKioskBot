@@ -25,7 +25,6 @@ namespace SmartKioskBot.Dialogs
 
                var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 3);
                var command = userInput[0];
-               var reply = "";
                var channelId = message.ChannelId;
                var currentUser = UserController.getUser(channelId);
 
@@ -60,19 +59,19 @@ namespace SmartKioskBot.Dialogs
                 }
 
 
-
+                //Save values on DB
                 if (userInput[1].Equals("yes"))
                 {
                     if (command.Equals("SaveEmail"))
                     {
                         UserController.SetEmail(currentUser, userInput[2]);
-                        reply = "O seu email foi atualizado para : " + userInput[2];
-                    }
+                        await context.PostAsync(BotDefaultAnswers.getAddIdentifier("email", userInput[2]));
+                }
                     else if (command.Equals("SaveCard"))
                     {
                         UserController.SetCustomerCard(currentUser, userInput[2]);
-                        reply = "O seu numero de cliente foi atualizado para : " + userInput[2];
-                    }
+                        await context.PostAsync(BotDefaultAnswers.getAddIdentifier("numero de cliente", userInput[2]));
+                }
                     else if (command.Equals("AddChannel"))
                     {
                         UserController.AddChannel(currentUser, channelId);
@@ -81,12 +80,9 @@ namespace SmartKioskBot.Dialogs
                 }
                 else if (userInput[1].Equals("no"))
                 {
-                    reply = "Acção cancelada!";
+                    await context.PostAsync(BotDefaultAnswers.getActionCanceled());
                 }
-
-                if (reply != "")
-                    await context.PostAsync(reply);
-
+                
         }
 
     }

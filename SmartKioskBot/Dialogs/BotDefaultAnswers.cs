@@ -111,7 +111,8 @@ namespace SmartKioskBot.Dialogs
             };
             return success[new Random().Next(0, success.Length)];
         }
-        
+
+        //IDENTIFICATION
         public static String getIdentification()
         {
             String[] dialog =
@@ -126,6 +127,24 @@ namespace SmartKioskBot.Dialogs
             String[] dialog =
             {
                 "Olá " + n + ", pode introduzir o seu email ou cartão cliente?"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getAddIdentifier(String identifier, String valeu)
+        {
+            String[] dialog =
+            {
+               "O seu " + identifier + " foi atualizado para : " + valeu
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getActionCanceled()
+        {
+            String[] dialog =
+            {
+               "Acção cancelada!"
             };
 
             return dialog[new Random().Next(0, dialog.Length)];
