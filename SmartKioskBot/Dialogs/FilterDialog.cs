@@ -139,19 +139,37 @@ namespace SmartKioskBot.Dialogs
                 case "familia_cpu":
                     return Builders<Product>.Filter.Where(x => x.CPUFamily.ToLower() == value.ToLower()); ;
                 case "velocidade_cpu":
-                    return Builders<Product>.Filter.Eq(x => x.CPUSpeed.ToString(), value);
+                    return Builders<Product>.Filter.Eq(x => x.CPUSpeed.ToString(), value.ToLower());
                 case "nrNucleos":
                     return Builders<Product>.Filter.Where(x => x.CoreNr.ToLower() == value.ToLower());
                 case "ram":
-                    return Builders<Product>.Filter.Eq(x => x.RAM, Convert.ToDouble(value));
+                    if (op == "=")
+                        return Builders<Product>.Filter.Eq(x => x.RAM, Convert.ToDouble(value));
+                    else if (op == ">")
+                        return Builders<Product>.Filter.Gte(x => x.RAM, Convert.ToDouble(value));
+                    else if (op == "<")
+                        return Builders<Product>.Filter.Lte(x => x.RAM, Convert.ToDouble(value));
+                    break;
                 case "tipo_armazenamento":
                     return Builders<Product>.Filter.Where(x => x.StorageType.ToLower() == value.ToLower());
                 case "armazenamento":
-                    return Builders<Product>.Filter.Eq(x => x.StorageAmount, Convert.ToDouble(value));
+                    if (op == "=")
+                        return Builders<Product>.Filter.Eq(x => x.StorageAmount, Convert.ToDouble(value));
+                    else if (op == ">")
+                        return Builders<Product>.Filter.Gte(x => x.StorageAmount, Convert.ToDouble(value));
+                    else if (op == "<")
+                        return Builders<Product>.Filter.Lte(x => x.StorageAmount, Convert.ToDouble(value));
+                    break;
                 case "placa_grafica":
                     return Builders<Product>.Filter.Where(x => x.GraphicsCardType.ToLower() == value.ToLower());
                 case "autonomia":
-                    return Builders<Product>.Filter.Eq(x => x.Autonomy, Convert.ToDouble(value));
+                    if (op == "=")
+                        return Builders<Product>.Filter.Eq(x => x.Autonomy, Convert.ToDouble(value));
+                    else if (op == ">")
+                        return Builders<Product>.Filter.Gte(x => x.Autonomy, Convert.ToDouble(value));
+                    else if (op == "<")
+                        return Builders<Product>.Filter.Lte(x => x.Autonomy, Convert.ToDouble(value));
+                    break;
                 case "placa_som":
                     return Builders<Product>.Filter.Where(x => x.SoundCard.ToLower() == value.ToLower());
                 case "camera":
@@ -161,11 +179,23 @@ namespace SmartKioskBot.Dialogs
                 case "os":
                     return Builders<Product>.Filter.Where(x => x.OS.ToLower() == value.ToLower());
                 case "tamanho_ecra":
-                    return Builders<Product>.Filter.Eq(x => x.ScreenDiagonal, Convert.ToDouble(value));
+                    if (op == "=")
+                        return Builders<Product>.Filter.Eq(x => x.ScreenDiagonal, Convert.ToDouble(value));
+                    else if (op == ">")
+                        return Builders<Product>.Filter.Gte(x => x.ScreenDiagonal, Convert.ToDouble(value));
+                    else if (op == "<")
+                        return Builders<Product>.Filter.Lte(x => x.ScreenDiagonal, Convert.ToDouble(value));
+                    break;
                 case "ecra_tactil":
                     return Builders<Product>.Filter.Where(x => x.TouchScreen.ToLower() == value.ToLower());
                 case "garantia":
-                    return Builders<Product>.Filter.Eq(x => x.Warranty, Convert.ToDouble(value));
+                    if (op == "=")
+                        return Builders<Product>.Filter.Eq(x => x.Warranty, Convert.ToDouble(value));
+                    else if (op == ">")
+                        return Builders<Product>.Filter.Gte(x => x.Warranty, Convert.ToDouble(value));
+                    else if (op == "<")
+                        return Builders<Product>.Filter.Lte(x => x.Warranty, Convert.ToDouble(value));
+                    break;
                 case "cor":
                     return Builders<Product>.Filter.Where(x => x.Colour.ToLower() == value.ToLower());
             }
