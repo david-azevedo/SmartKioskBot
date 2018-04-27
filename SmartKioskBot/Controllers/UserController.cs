@@ -138,6 +138,23 @@ namespace SmartKioskBot.Controllers
 
             userCollection.UpdateOne(filter, update);
         }
+
+        /// <summary>
+        /// Sets the user email.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="name"></param>
+        public static void SetCustomerName(User user, string name)
+        {
+            var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
+            var update = Builders<User>.Update.Set(o => o.Name, name);
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(o => o.Id, user.Id),
+                Builders<User>.Filter.Eq(o => o.Country, user.Country));
+
+            userCollection.UpdateOne(filter, update);
+        }
+
         /// <summary>
         /// DEBUG - Prints the user's information.
         /// </summary>

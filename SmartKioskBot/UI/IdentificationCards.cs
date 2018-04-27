@@ -44,14 +44,23 @@ namespace SmartKioskBot.UI
                 buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: BotDefaultAnswers.set_customer_card + " yes " + value));
                 buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: BotDefaultAnswers.set_customer_card + " no "));
             }
+            else if (option.Equals("set-customer-name"))
+            {
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: BotDefaultAnswers.set_customer_name + " yes " + value));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: BotDefaultAnswers.set_customer_name + " no "));
+            }
+            else if (option.Equals("set-customer-country"))
+            {
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: BotDefaultAnswers.set_customer_country + " yes " + value));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: BotDefaultAnswers.set_customer_country + " no "));
+            }
             else
             {
                 buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: BotDefaultAnswers.add_channel + " yes " + value));
                 buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: BotDefaultAnswers.add_channel + " no "));
             }
 
-
-            return buttons;
+                return buttons;
 
         }
     }
