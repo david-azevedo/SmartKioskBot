@@ -18,6 +18,7 @@ namespace SmartKioskBot.Logic
             int bestCPUIndex = GetBestCPU(products);
 
             return products[bestCPUIndex];
+           
         }
 
         public static int GetBestCPU (List<Product> products)
@@ -57,6 +58,58 @@ namespace SmartKioskBot.Logic
 
             return GetBestPart(cpus);
         }
+        public static int GetBestRAM(List<Product> products)
+        {
+            List<Comparable.RAM> rams = new List<Comparable.RAM>();
+
+            Regex numberRegex = new Regex(@"\d+"); 
+
+            for (int i = 0; i < products.Count; i++)
+            {
+                Product currentProduct = products[i];
+                int memory;
+
+                memory = int.Parse(numberRegex.Match(currentProduct.RAM).Value);
+
+                rams.Add(new Comparable.RAM(memory));
+            }
+
+            return GetBestPart(rams);
+        }
+
+        public static int GetBestScreen(List<Product> products)
+        {
+            List<Comparable.Screen> screens = new List<Comparable.Screen>();
+
+            Regex numberRegex = new Regex(@"\d+");
+            Regex negRegex = new Regex(@"não", RegexOptions.IgnoreCase);
+            Regex posRegex = new Regex(@"sim", RegexOptions.IgnoreCase);
+
+            for (int i = 0; i < products.Count; i++)
+            {
+                Product currentProduct = products[i];
+                int resolution_x, resolution_y;
+                float diagonal;
+                bool touch = false;
+                
+                diagonal = float.Parse(numberRegex.Match(currentProduct.ScreenDiagonal).Value);
+                Match resMatch = numberRegex.Match(currentProduct.ScreenResolution);
+                resolution_x = int.Parse(resMatch.Value);
+                resolution_y = int.Parse(resMatch.NextMatch().Value);
+
+                if (negRegex.Match(currentProduct.TouchScreen).Length != 0)
+                {
+                    touch = false;
+                } else if (posRegex.Match(currentProduct.TouchScreen).Length != 0)
+                    {
+                        touch = true;
+                    }
+
+                screens.Add(new Comparable.Screen(diagonal, resolution_x, resolution_y, touch));
+            }
+
+            return GetBestPart(screens);
+        }
 
         public static int GetBestPart<T> (List<T> comparables) where T : Comparable
         {
@@ -81,6 +134,7 @@ namespace SmartKioskBot.Logic
 
         public static void Test()
         {
+
             var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
             var builder = Builders<Product>.Filter;
 
@@ -99,7 +153,7 @@ namespace SmartKioskBot.Logic
             product2.CPUSpeed = "2.7";
 
             Product winner = GetBestProduct(new List<Product>() { product1, product2 });
-            Debug.Write("LOL");
+            Debug.Write(winner.CoreNr);
         }
     }
 }
