@@ -161,7 +161,7 @@ namespace SmartKioskBot.Logic
 
         public static int GetBestPart<T> (List<T> comparables) where T : Comparable
         {
-            int indexOfBestComparable = -1;
+            int indexOfCurrentBest= -1;
 
             for(int i = 0; i < comparables.Count - 1; i++)
             {
@@ -169,15 +169,15 @@ namespace SmartKioskBot.Logic
 
                 if (comparisonResult > 0)
                 {
-                    indexOfBestComparable = i;
+                    indexOfCurrentBest = i;
                 }
                 else if (comparisonResult < 0)
                 {
-                    indexOfBestComparable = i + 1;
+                    indexOfCurrentBest = i + 1;
                 }
             }
 
-            return indexOfBestComparable;
+            return indexOfCurrentBest;
         }
 
         public static void Test()

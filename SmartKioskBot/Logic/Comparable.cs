@@ -78,6 +78,8 @@ namespace SmartKioskBot.Logic
             private int numberOfCores = 0;
             private float clock = 0; // in GHz
 
+            private static int MAX_RESULT = 2; // there are 2 fields (numberOfCores and clock) so the max score is 2
+
             public CPU(string name, int numberOfCores, float clock)
             {
                 this.name = name;
@@ -115,12 +117,12 @@ namespace SmartKioskBot.Logic
                         // current is better
                         if(currrentCPURanking < otherCPURanking)
                         {
-                            return 2;
+                            return MAX_RESULT;
                         }
                         // other is better
                         else if (currrentCPURanking > otherCPURanking)
                         {
-                            return -2;
+                            return -MAX_RESULT;
                         }
                         // current == other
                         else
@@ -155,19 +157,46 @@ namespace SmartKioskBot.Logic
 
         public class GPU : Comparable
         {
+            public static List<string> gpuRanking;
+            public static string gpuRankingFile = "gpu.csv";
+
+            public static void GetGPURanking()
+            {
+                gpuRanking = GetRanking(gpuRankingFile);
+            }
+
+            public static int FindGPURanking(string gpuName)
+            {
+                int ranking = -1;
+
+                for (int i = 0; i < gpuRanking.Count; i++)
+                {
+                    string[] keywords = gpuName.Split(' ');
+
+                    var invariantText = gpuName.ToUpperInvariant();
+                    bool matches = keywords.All(kw => invariantText.Contains(kw.ToUpperInvariant())); // true if all keywords are present in ranking
+
+                    if (matches)
+                    {
+                        ranking = i;
+                        break;
+                    }
+                }
+
+                return ranking;
+            }
+
             private bool exists = true; // if there is a DEDICATED GPU
             private string name = null;
             private float vRAM = 0; // in GB
 
-            public GPU (string name, float vRAM)
-            {
-                this.name = name;
-                this.vRAM = vRAM;
-            }
+            private static int MAX_RESULT = 1; // there is only one field (vRAM)
 
-            public GPU (bool exists)
+            public GPU (bool exists, string name, float vRAM)
             {
                 this.exists = exists;
+                this.name = name;
+                this.vRAM = vRAM;
             }
 
             public override int CompareTo(Comparable c)
@@ -180,7 +209,40 @@ namespace SmartKioskBot.Logic
                 GPU gpu = (GPU)c;
                 int result = 0;
 
-                if(this.exists && !(gpu.exists))
+                // if both GPUs have names, search in ranking
+                if (this.name != null && gpu.name != null)
+                {
+                    // if ranking is null, generate it
+                    if (gpuRanking == null)
+                    {
+                        GetGPURanking();
+                    }
+
+                    int currrentGPURanking = FindGPURanking(this.name);
+                    int otherGPURanking = FindGPURanking(gpu.name);
+
+                    // only compare if we have both rankings
+                    if (!(currrentGPURanking < 0 || otherGPURanking < 0))
+                    {
+                        // current is better
+                        if (currrentGPURanking < otherGPURanking)
+                        {
+                            return MAX_RESULT;
+                        }
+                        // other is better
+                        else if (currrentGPURanking > otherGPURanking)
+                        {
+                            return -MAX_RESULT;
+                        }
+                        // current == other
+                        else
+                        {
+                            return 0;
+                        }
+                    }
+                }
+
+                if (this.exists && !(gpu.exists))
                 {
                     result++;
                     return result;
