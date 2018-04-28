@@ -5,6 +5,7 @@ using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -171,17 +172,42 @@ namespace SmartKioskBot.Logic
             return indexOfBestComparable;
         }
 
+        public static List<string> GetRanking(string file)
+        {
+            List<string> ranking = new List<string>();
+
+            string rankingsDir = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory.ToString(), "Logic\\rankings");
+
+            using (var reader = new StreamReader(rankingsDir + Path.DirectorySeparatorChar +  file))
+            {
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+
+                    // values[0] is the ranking position (not needed because List is ordered)
+                    // values[1] is the name of the CPU 
+                    ranking.Add(values[1]);
+                }
+            }
+
+            return ranking;
+        }
+
         public static void Test()
         {
 
-            var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
-            var builder = Builders<Product>.Filter;
+            // var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
+            // var builder = Builders<Product>.Filter;
 
             // var filter1 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
             // var filter2 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
 
             // var product1 = collection.Find(filter1).FirstOrDefault();
             // var product2 = collection.Find(filter2).FirstOrDefault();
+
+            List<string> cpuRanking = GetRanking("cpu.csv");
+            List<string> gpuRanking = GetRanking("gpu.csv");
 
             Product product1 = new Product();
             product1.CoreNr = "Dual Core";
