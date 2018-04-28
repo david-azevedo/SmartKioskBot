@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using MongoDB.Driver;
 using SmartKioskBot.Controllers;
@@ -201,6 +202,46 @@ namespace SmartKioskBot.Dialogs
             }
 
             return null;
+        }
+
+
+        public IMessageActivity filtering(IList<EntityRecommendation> entities, IMessageActivity reply)
+        {
+            this.filters = new List<FilterDefinition<Product>>();
+            if(this.context != null)
+            {
+                foreach (Filter f in this.context.Filters)
+                {
+                    this.filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
+                }
+            }
+
+            // Get products and create a reply back to the user.
+            this.filters.Add(Builders<Product>.Filter.Where(x => x.Brand.ToLower() == entities[0].Entity.ToLower()));
+
+
+            List<Product> products = GetProductsForUser();
+
+
+            if (products.Count == 0)
+            {
+                reply.AttachmentLayout = AttachmentLayoutTypes.List;
+                reply.Text = BotDefaultAnswers.getFilterFail();
+            }
+            else
+            {
+                reply.Text = BotDefaultAnswers.getFilterSuccess();
+                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                List<Attachment> cards = new List<Attachment>();
+
+                foreach (Product p in products)
+                {
+                    cards.Add(ProductCard.GetProductCard(p, ProductCard.CardType.SEARCH).ToAttachment());
+                }
+
+                reply.Attachments = cards;
+            }
+            return reply;
         }
 
 

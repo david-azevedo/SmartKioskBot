@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Connector;
 using MongoDB.Bson;
 using SmartKioskBot.Controllers;
@@ -12,9 +13,9 @@ using System.Web;
 
 namespace SmartKioskBot.Dialogs
 {
-
+    [LuisModel(AppSettings.LuisAppId, AppSettings.LuisSubscriptionKey, domain: AppSettings.LuisDomain)]
     [Serializable]
-    public class WishListDialog : IDialog
+    public class WishListDialog : LuisDialog<object>
     {
         protected Context userContext;
         protected Action action;
