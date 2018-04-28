@@ -79,11 +79,19 @@ namespace SmartKioskBot.Logic
                    cpuSpeed = float.Parse(currentProduct.CPUSpeed, System.Globalization.CultureInfo.InvariantCulture);
                 }
 
-                cpus.Add(new Comparable.CPU(numOfCores, cpuSpeed));
+                string name = null;
+
+                if(currentProduct.CPU != null)
+                {
+                    name = currentProduct.CPU;
+                }
+
+                cpus.Add(new Comparable.CPU(name, numOfCores, cpuSpeed));
             }
 
             return GetBestPart(cpus);
         }
+
         public static int GetBestRAM(List<Product> products)
         {
             List<Comparable.RAM> rams = new List<Comparable.RAM>();
@@ -172,28 +180,6 @@ namespace SmartKioskBot.Logic
             return indexOfBestComparable;
         }
 
-        public static List<string> GetRanking(string file)
-        {
-            List<string> ranking = new List<string>();
-
-            string rankingsDir = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory.ToString(), "Logic\\rankings");
-
-            using (var reader = new StreamReader(rankingsDir + Path.DirectorySeparatorChar +  file))
-            {
-                while (!reader.EndOfStream)
-                {
-                    var line = reader.ReadLine();
-                    var values = line.Split(',');
-
-                    // values[0] is the ranking position (not needed because List is ordered)
-                    // values[1] is the name of the CPU 
-                    ranking.Add(values[1]);
-                }
-            }
-
-            return ranking;
-        }
-
         public static void Test()
         {
 
@@ -206,15 +192,14 @@ namespace SmartKioskBot.Logic
             // var product1 = collection.Find(filter1).FirstOrDefault();
             // var product2 = collection.Find(filter2).FirstOrDefault();
 
-            List<string> cpuRanking = GetRanking("cpu.csv");
-            List<string> gpuRanking = GetRanking("gpu.csv");
-
             Product product1 = new Product();
+            product1.CPU = "Intel Core i7-6500U";
             product1.CoreNr = "Dual Core";
             product1.CPUSpeed = "2.7";
             product1.RAM = "8GB";
 
             Product product2 = new Product();
+            product2.CPU = "Intel Core i7-7820HQ";
             product2.CoreNr = "Quad Core";
             product2.CPUSpeed = "2.7";
             product2.RAM = "4GB";
