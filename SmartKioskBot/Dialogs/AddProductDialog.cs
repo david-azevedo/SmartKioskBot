@@ -39,7 +39,7 @@ namespace SmartKioskBot.Dialogs
             // Save the product.
             else
             {
-                var productsCollection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
+                var productsCollection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
                 productsCollection.InsertOne(CreateProduct(content));
 
                 reply = "Added product to DB";
@@ -57,7 +57,7 @@ namespace SmartKioskBot.Dialogs
             {
                 Brand = details[0],
                 Model = details[1],
-                Price = details[2]
+                Price = Convert.ToDouble(details[2])
             };
         }
     }

@@ -6,12 +6,15 @@ using System.Linq;
 using System.Web;
 using SmartKioskBot.Dialogs;
 using MongoDB.Driver;
+using static SmartKioskBot.UI.ProductCard;
 
 namespace SmartKioskBot.UI
 {
     public abstract class ProductCard
     {
-        public static HeroCard getProductCard(Product p)
+        public enum CardType { SEARCH, RECOMMENDATION, WISHLIST, COMPARATOR, PRODUCT_DETAILS};
+
+        public static HeroCard GetProductCard(Product p, CardType type)
         {
             return new HeroCard
             {
@@ -20,22 +23,14 @@ namespace SmartKioskBot.UI
                 //subtitle of the card  
                 Subtitle = p.Price + "€",
                 // navigate to page , while tab on card  
-                //Tap = new CardAction(ActionTypes.OpenUrl, "Learn More", value: "http://www.devenvexe.com"),
+                Tap = new CardAction(ActionTypes.ImBack, "Ver detalhes", value: BotDefaultAnswers.show_product_details + " " + p.Id.ToString()),
                 //Detail Text  
                 Text = p.Name,
                 // list of  Large Image  
                 Images = new List<CardImage> { new CardImage(p.Photo) },
                 // list of buttons   
-                Buttons = new List<CardAction> {
-                        new CardAction(ActionTypes.ImBack, "Ver Detalhes", value: BotDefaultAnswers.show_product_details + " " + p.Id.ToString()),
-                        new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + " " + p.Id.ToString()),
-                        new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + " " + p.Id.ToString())}
+                Buttons = getButtonsCardType(type, p.Id.ToString())
             };
-        }
-
-        internal static object getProductDetailsCard(IFindFluent<Product, Product> product)
-        {
-            throw new NotImplementedException();
         }
 
         public static HeroCard getProductDetailsCard(Product p)
@@ -90,12 +85,47 @@ namespace SmartKioskBot.UI
                 Text = details,
                 Images = new List<CardImage> { new CardImage(p.Photo) },
                 // list of buttons   
-                Buttons = new List<CardAction> {
-                        new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + ": " + p.Id),
-                        new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + ": " + p.Id),
-                        new CardAction(ActionTypes.ImBack, "Ver Pacotes", value: BotDefaultAnswers.add_to_comparator + ": " + p.Id),
-                        new CardAction(ActionTypes.ImBack, "Produtos Relacionados", value: BotDefaultAnswers.add_to_comparator + ": " + p.Id)}
+                Buttons = getButtonsCardType(CardType.PRODUCT_DETAILS, p.Id.ToString())
             };
+        }
+
+        private static List<CardAction> getButtonsCardType(CardType type, string id)
+        {
+            var buttons = new List<CardAction>();
+
+            switch (type)
+            {
+                case CardType.SEARCH:
+                case CardType.RECOMMENDATION:
+                    {
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + " " + id));
+                        break;
+                    }
+                case CardType.PRODUCT_DETAILS:
+                    {
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Ver Pacotes", value: BotDefaultAnswers.add_to_comparator + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Produtos Relacionados", value: BotDefaultAnswers.add_to_comparator + " " + id));
+                        break;
+                    }
+                case CardType.WISHLIST:
+                    {
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover da Wish List", value: BotDefaultAnswers.rem_wish_list + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + " " + id));
+                        break;
+                    }
+                case CardType.COMPARATOR:
+                    {
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover do Comparador", value: BotDefaultAnswers.rem_comparator + " " + id));
+                        break;
+                    }
+            }
+
+
+            return buttons;
         }
 
     }
