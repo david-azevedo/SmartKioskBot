@@ -20,7 +20,11 @@ namespace SmartKioskBot.Dialogs
         {
             var activity = await result as IMessageActivity;
 
-            Comparator.Test();
+            var reply = context.MakeMessage();
+            reply.Text = "Hello, I'm comparing";
+            await context.PostAsync(reply);
+
+            Comparator.Test(context);
 
             context.Wait(MessageReceivedAsync);
         }

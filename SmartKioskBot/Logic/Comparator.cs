@@ -1,66 +1,45 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
-
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-// ADD THIS PART TO YOUR CODE
-using System.Net;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Newtonsoft.Json;
 using System.Security.Authentication;
+using SmartKioskBot.Helpers;
+using Microsoft.Bot.Builder.Dialogs;
 
 namespace SmartKioskBot.Logic
 {
     public static class Comparator
     {
-        public static void GetBestProduct(List<Product> products)
+        public enum Parts { CPU, GPU, RAM, Screen };
+
+        public static Dictionary<Parts, List<int>> GetBestProduct(List<Product> products)
         {
             // The key is the index of the product in the list argument. The value is the number of times a component of the product is 
             // better than the others.
-            Dictionary<int, int> punctuations = new Dictionary<int, int>();
+            Dictionary<Parts, List<int>> partToSortedBestProducts = new Dictionary<Parts, List<int>>();
 
-            for (int i = 0; i < products.Count; i++)
-            {
-                punctuations.Add(i, 0); // every product starts with punctuation equal to zero
-            }
+            List<int> bestSortedCPUIndex = GetSortedBestCPUs(products);
+            partToSortedBestProducts.Add(Parts.CPU, bestSortedCPUIndex);
 
-            int bestCPUIndex = GetBestCPU(products);
-            punctuations[bestCPUIndex] = punctuations[bestCPUIndex]++;
+            List<int> bestSortedGPUIndex = GetSortedBestGPUs(products);
+            partToSortedBestProducts.Add(Parts.GPU, bestSortedGPUIndex);
 
-            int bestRAMIndex = GetBestRAM(products);
-            punctuations[bestRAMIndex] = punctuations[bestRAMIndex]++;
+            List<int> bestSortedRAMIndex = GetSortedBestRAMs(products);
+            partToSortedBestProducts.Add(Parts.RAM, bestSortedRAMIndex);
 
-            int bestScreenIndex = GetBestScreen(products);
-            punctuations[bestScreenIndex] = punctuations[bestScreenIndex]++;
+            List<int> bestSortedScreenIndex = GetSortedBestScreens(products);
+            partToSortedBestProducts.Add(Parts.Screen, bestSortedScreenIndex);
 
-            int bestOverallIndex = 0;
-
-            for (int i = 1; i < punctuations.Count; i++)
-            {
-                if (punctuations[i] > punctuations[bestOverallIndex])
-                {
-                    bestOverallIndex = i;
-                }
-            }
-
-            // TODO: do something with the indexes, like showing on a card the comparison
+            return partToSortedBestProducts;
         }
 
-        public static int GetBestCPU(List<Product> products)
+        public static List<int> GetSortedBestCPUs(List<Product> products)
         {
-            List<Comparable.CPU> cpus = new List<Comparable.CPU>();
+            List<Part.CPU> cpus = new List<Part.CPU>();
 
             Regex dualRegex = new Regex(@"dual", RegexOptions.IgnoreCase);
             Regex quadRegex = new Regex(@"quad", RegexOptions.IgnoreCase);
@@ -85,10 +64,9 @@ namespace SmartKioskBot.Logic
 
                 float cpuSpeed = 0;
 
-                if (currentProduct.CPUSpeed != null)
-                {
-                    cpuSpeed = float.Parse(currentProduct.CPUSpeed, System.Globalization.CultureInfo.InvariantCulture);
-                }
+               
+                cpuSpeed = (float) currentProduct.CPUSpeed;
+                
 
                 string name = null;
 
@@ -97,37 +75,56 @@ namespace SmartKioskBot.Logic
                     name = currentProduct.CPU;
                 }
 
-                cpus.Add(new Comparable.CPU(name, numOfCores, cpuSpeed));
+                cpus.Add(new Part.CPU(name, numOfCores, cpuSpeed));
             }
 
-            return GetBestPart(cpus);
+            return GetSortedParts(cpus);
         }
 
-        public static int GetBestRAM(List<Product> products)
+        public static List<int> GetSortedBestGPUs(List<Product> products)
         {
-            List<Comparable.RAM> rams = new List<Comparable.RAM>();
+            List<Part.GPU> gpus = new List<Part.GPU>();
 
-            Regex numberRegex = new Regex(@"\d+");
+            for (int i = 0; i < products.Count; i++)
+            {
+                Product currentProduct = products[i];
+
+                bool exists = false;
+                string name = null;
+                int vRAM = 0;
+
+                if (currentProduct.GraphicsCard != null)
+                {
+                    name = currentProduct.GraphicsCard;
+                    exists = true;
+                }
+
+                gpus.Add(new Part.GPU(exists, name, vRAM));
+            }
+
+            return GetSortedParts(gpus);
+        }
+
+        public static List<int> GetSortedBestRAMs(List<Product> products)
+        {
+            List<Part.RAM> rams = new List<Part.RAM>();
 
             for (int i = 0; i < products.Count; i++)
             {
                 Product currentProduct = products[i];
                 int memory = 0;
 
-                if (currentProduct.RAM != null)
-                {
-                    memory = int.Parse(numberRegex.Match(currentProduct.RAM).Value);
-                }
+                memory = (int) currentProduct.RAM;
 
-                rams.Add(new Comparable.RAM(memory));
+                rams.Add(new Part.RAM(memory));
             }
 
-            return GetBestPart(rams);
+            return GetSortedParts(rams);
         }
 
-        public static int GetBestScreen(List<Product> products)
+        public static List<int> GetSortedBestScreens(List<Product> products)
         {
-            List<Comparable.Screen> screens = new List<Comparable.Screen>();
+            List<Part.Screen> screens = new List<Part.Screen>();
 
             Regex numberRegex = new Regex(@"\d+");
             Regex negRegex = new Regex(@"não", RegexOptions.IgnoreCase);
@@ -140,10 +137,7 @@ namespace SmartKioskBot.Logic
                 float diagonal = 0;
                 bool touch = false;
 
-                if (currentProduct.ScreenDiagonal != null)
-                {
-                    diagonal = float.Parse(numberRegex.Match(currentProduct.ScreenDiagonal).Value);
-                }
+                diagonal = (float) currentProduct.ScreenDiagonal;
 
                 if (currentProduct.ScreenResolution != null)
                 {
@@ -164,90 +158,88 @@ namespace SmartKioskBot.Logic
                     }
                 }
 
-                screens.Add(new Comparable.Screen(diagonal, resolution_x, resolution_y, touch));
+                screens.Add(new Part.Screen(diagonal, resolution_x, resolution_y, touch));
             }
 
-            return GetBestPart(screens);
+            return GetSortedParts(screens);
         }
 
-        public static int GetBestPart<T>(List<T> comparables) where T : Comparable
+        public static List<int> GetSortedParts<T>(List<T> comparables) where T : Part
         {
-            int indexOfCurrentBest = -1;
+            Dictionary<T, int> partToIndexOfProduct = new Dictionary<T, int>();
 
-            for (int i = 0; i < comparables.Count - 1; i++)
+            for(int i = 0; i < comparables.Count; i++)
             {
-                int comparisonResult = comparables[i].CompareTo(comparables[i + 1]);
-
-                if (comparisonResult > 0)
-                {
-                    indexOfCurrentBest = i;
-                }
-                else if (comparisonResult < 0)
-                {
-                    indexOfCurrentBest = i + 1;
-                }
+                partToIndexOfProduct.Add(comparables[i], i);
             }
 
-            return indexOfCurrentBest;
+            List<T> sortedComparables = new List<T>(comparables);
+
+            sortedComparables.Sort();
+
+            List<int> orderedIndexes = new List<int>();
+
+            for(int i = 0; i < sortedComparables.Count; i++)
+            {
+                // add index of the product to which the part belongs
+                orderedIndexes.Add(partToIndexOfProduct[sortedComparables[i]]); 
+            }
+
+            return orderedIndexes;
         }
 
-        public static void Test()
+        public static void Test(IDialogContext context)
         {
-            string host = "skb-cosmos-mongo-v1.documents.azure.com";
-
-            MongoClientSettings settings = new MongoClientSettings();
-            settings.Server = new MongoServerAddress(host, 10255);
-            settings.UseSsl = true;
-            settings.SslSettings = new SslSettings();
-            settings.SslSettings.EnabledSslProtocols = SslProtocols.Tls12;
-            
-            string dbName = "db";
-            string collectionName = "Products";
-
-            MongoIdentity identity = new MongoInternalIdentity(dbName, "skb-cosmos-mongo-v1");
-            MongoIdentityEvidence evidence = new PasswordEvidence("mD9P6JY7iA863jozlyaXWjTdkvEMJyG6N3mHFF9iTCYyUfN0dYfrLQXx3Fkg4meW9EVGnwWSMlJGNpg34OepnA==");
-
-            settings.Credential = new MongoCredential("SCRAM-SHA-1", identity, evidence);
-
-            MongoClient client = new MongoClient(settings);
-
             try
             {
-                var database = client.GetDatabase(dbName);
-                var productCollection = database.GetCollection<Product>(collectionName);
+                var productCollection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
 
                 List<Product> products = productCollection.Find(new BsonDocument()).ToList();
-                Debug.WriteLine(products.Count);
+
+                var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
+                var builder = Builders<Product>.Filter;
+
+                var filter1 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
+                var filter2 = builder.Eq("_id", ObjectId.Parse("5ad6628186e5482fb04ea97e"));
+
+                var product1 = collection.Find(filter1).FirstOrDefault();
+                var product2 = collection.Find(filter2).FirstOrDefault();
+
+                Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(new List<Product>() { product1, product2 });
+
+                var reply = context.MakeMessage();
+                reply.Text = "Comparison results: \n";
+
+                foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
+                {
+                    reply.Text += String.Format("Best {0}:\n\n", entry.Key);
+
+                    entry.Value.ForEach(item => reply.Text += String.Format("\t-{0}\n\n", item));
+                }
+
+                context.PostAsync(reply);
             }
             catch (Exception e)
             {
                 Exception baseException = e.GetBaseException();
-                Console.WriteLine("{0} error occurred: {1}, Message: {2}", e.Message, baseException.Message);
+                Debug.WriteLine(string.Format("Caught exception! Error ocurred! Message: {0}", e.Message));
+                Debug.WriteLine(string.Format("Stack trace: {0}", e.ToString()));
             }
 
-            // var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
-            // var builder = Builders<Product>.Filter;
-
-            // var filter1 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
-            // var filter2 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
-
-            // var product1 = collection.Find(filter1).FirstOrDefault();
-            // var product2 = collection.Find(filter2).FirstOrDefault();
-            
-
-            Product product1 = new Product();
+           
+            /*Product product1 = new Product();
             product1.CPU = "Intel Core i7-6500U";
             product1.CoreNr = "Dual Core";
-            product1.CPUSpeed = "2.7";
-            product1.RAM = "8GB";
+            product1.CPUSpeed = 2.7;
+            product1.RAM = 8;
 
             Product product2 = new Product();
             product2.CPU = "Intel Core i7-7820HQ";
             product2.CoreNr = "Quad Core";
-            product2.CPUSpeed = "2.7";
-            product2.RAM = "4GB";
+            product2.CPUSpeed = 2.7;
+            product2.RAM = 4;*/
 
-            GetBestProduct(new List<Product>() { product1, product2 });
+           
         }
     }
 }

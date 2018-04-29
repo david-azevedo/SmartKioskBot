@@ -111,6 +111,11 @@ namespace SmartKioskBot.Dialogs
             {
                 //TODO
             }
+            //COMPARE
+            else if (details[0].Equals("compare", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new CompareDialog(), this.StartAsync, message, CancellationToken.None);
+            }
             else
             {
                 var reply = context.MakeMessage();

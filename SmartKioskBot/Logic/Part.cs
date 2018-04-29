@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SmartKioskBot.Logic
 {
-    public abstract class Comparable
+    public abstract class Part : IComparable<Part>
     {
         private string compareExceptionMessage = "Product to compare is not of the same type.";
 
@@ -16,7 +16,7 @@ namespace SmartKioskBot.Logic
         /// </summary>
         /// <param name="c">The part to compare to.</param>
         /// <returns>Returns an integer with the value of the comparison. Less than 0 means the current part is worst. More than 0 means it's better. Equal to 0 means it's a draw.</returns>
-        public abstract int CompareTo(Comparable c);
+        public abstract int CompareTo(Part c);
 
         public static List<string> GetRanking(string file)
         {
@@ -40,7 +40,7 @@ namespace SmartKioskBot.Logic
             return ranking;
         }
 
-        public class CPU : Comparable
+        public class CPU : Part
         {
             public static List<string> cpuRanking;
             public static string cpuRankingFile = "cpu.csv";
@@ -49,7 +49,6 @@ namespace SmartKioskBot.Logic
             {
                 cpuRanking = GetRanking(cpuRankingFile);
             }
-
 
             public static string GetChipName(string cpuName)
             {
@@ -77,8 +76,7 @@ namespace SmartKioskBot.Logic
             private string name = null;
             private int numberOfCores = 0;
             private float clock = 0; // in GHz
-
-            private static int MAX_RESULT = 2; // there are 2 fields (numberOfCores and clock) so the max score is 2
+            
 
             public CPU(string name, int numberOfCores, float clock)
             {
@@ -89,7 +87,7 @@ namespace SmartKioskBot.Logic
 
             public CPU (int numberOfCores, float clock) : this(null, numberOfCores, clock) { }
            
-            public override int CompareTo(Comparable c)
+            public override int CompareTo(Part c)
             {
                 if (!(c is CPU))
                 {
@@ -99,8 +97,8 @@ namespace SmartKioskBot.Logic
                 CPU cpu = (CPU)c;
                 int result = 0;
 
-                // if both CPUs have names, search in ranking
-                if (this.name != null && cpu.name != null)
+                // if both CPUs have names and they are different, search in ranking
+                if ((this.name != null && cpu.name != null) && (!this.name.Equals(cpu.name)))
                 {
                     // if ranking is null, generate it
                     if(cpuRanking == null)
@@ -117,12 +115,12 @@ namespace SmartKioskBot.Logic
                         // current is better
                         if(currrentCPURanking < otherCPURanking)
                         {
-                            return MAX_RESULT;
+                            return 1;
                         }
                         // other is better
                         else if (currrentCPURanking > otherCPURanking)
                         {
-                            return -MAX_RESULT;
+                            return -1;
                         }
                         // current == other
                         else
@@ -155,7 +153,7 @@ namespace SmartKioskBot.Logic
             }
         }
 
-        public class GPU : Comparable
+        public class GPU : Part
         {
             public static List<string> gpuRanking;
             public static string gpuRankingFile = "gpu.csv";
@@ -190,8 +188,6 @@ namespace SmartKioskBot.Logic
             private string name = null;
             private float vRAM = 0; // in GB
 
-            private static int MAX_RESULT = 1; // there is only one field (vRAM)
-
             public GPU (bool exists, string name, float vRAM)
             {
                 this.exists = exists;
@@ -199,9 +195,9 @@ namespace SmartKioskBot.Logic
                 this.vRAM = vRAM;
             }
 
-            public override int CompareTo(Comparable c)
+            public override int CompareTo(Part c)
             {
-                if (!(c is CPU))
+                if (!(c is GPU))
                 {
                     throw new Exception(this.compareExceptionMessage);
                 }
@@ -227,12 +223,12 @@ namespace SmartKioskBot.Logic
                         // current is better
                         if (currrentGPURanking < otherGPURanking)
                         {
-                            return MAX_RESULT;
+                            return 1;
                         }
                         // other is better
                         else if (currrentGPURanking > otherGPURanking)
                         {
-                            return -MAX_RESULT;
+                            return -1;
                         }
                         // current == other
                         else
@@ -270,7 +266,7 @@ namespace SmartKioskBot.Logic
             }
         }
 
-        public class RAM : Comparable
+        public class RAM : Part
         {
             private int memory = 0; // in GB
 
@@ -279,7 +275,7 @@ namespace SmartKioskBot.Logic
                 this.memory = memory;
             }
 
-            public override int CompareTo(Comparable c)
+            public override int CompareTo(Part c)
             {
                 if (!(c is RAM))
                 {
@@ -303,7 +299,7 @@ namespace SmartKioskBot.Logic
             }
         }
 
-        public class Screen : Comparable
+        public class Screen : Part
         {
             private float diagonal = 0;
             private int resolution_x = 0;
@@ -318,7 +314,7 @@ namespace SmartKioskBot.Logic
                 this.touch = touch;
             }
 
-            public override int CompareTo(Comparable c)
+            public override int CompareTo(Part c)
             {
                 if (!(c is Screen))
                 {
