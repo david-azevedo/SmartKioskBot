@@ -66,9 +66,9 @@ namespace SmartKioskBot.Logic
 
                 float cpuSpeed = 0;
 
-               
-                cpuSpeed = (float) currentProduct.CPUSpeed;
-                
+
+                cpuSpeed = (float)currentProduct.CPUSpeed;
+
 
                 string name = null;
 
@@ -116,7 +116,7 @@ namespace SmartKioskBot.Logic
                 Product currentProduct = products[i];
                 int memory = 0;
 
-                memory = (int) currentProduct.RAM;
+                memory = (int)currentProduct.RAM;
 
                 rams.Add(new Part.RAM(memory));
             }
@@ -139,7 +139,7 @@ namespace SmartKioskBot.Logic
                 float diagonal = 0;
                 bool touch = false;
 
-                diagonal = (float) currentProduct.ScreenDiagonal;
+                diagonal = (float)currentProduct.ScreenDiagonal;
 
                 if (currentProduct.ScreenResolution != null)
                 {
@@ -170,7 +170,7 @@ namespace SmartKioskBot.Logic
         {
             Dictionary<T, int> partToIndexOfProduct = new Dictionary<T, int>();
 
-            for(int i = 0; i < comparables.Count; i++)
+            for (int i = 0; i < comparables.Count; i++)
             {
                 partToIndexOfProduct.Add(comparables[i], i);
             }
@@ -181,87 +181,45 @@ namespace SmartKioskBot.Logic
 
             List<int> orderedIndexes = new List<int>();
 
-            for(int i = 0; i < sortedComparables.Count; i++)
+            for (int i = 0; i < sortedComparables.Count; i++)
             {
                 // add index of the product to which the part belongs
-                orderedIndexes.Add(partToIndexOfProduct[sortedComparables[i]]); 
+                orderedIndexes.Add(partToIndexOfProduct[sortedComparables[i]]);
             }
 
             return orderedIndexes;
         }
 
-        public static void Test(IDialogContext context)
+        public static void ShowProductComparison(IDialogContext context, List<Product> productsToCompare)
         {
-            try
+            Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare);
+
+            var reply = context.MakeMessage();
+            reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            List<Attachment> cards = new List<Attachment>();
+
+            //size of products to show on result(top 3 if >3)
+            var resultSize = 0;
+            if (productsToCompare.Count > 3)
             {
-                var productCollection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
-
-                List<Product> products = productCollection.Find(new BsonDocument()).ToList();
-
-                var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.CollectionName);
-                var builder = Builders<Product>.Filter;
-
-                var filter1 = builder.Eq("_id", ObjectId.Parse("5ad6628086e5482fb04ea97b"));
-                var filter2 = builder.Eq("_id", ObjectId.Parse("5ad6628186e5482fb04ea97e"));
-
-                var product1 = collection.Find(filter1).FirstOrDefault();
-                var product2 = collection.Find(filter2).FirstOrDefault();
-
-                //list of the products to compares
-                var productsToCompare = new List<Product>() { product1, product2 , product1, product2 };
-
-                Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare);
-
-                var reply = context.MakeMessage();
+                resultSize = 3;
+            }
+            else resultSize = productsToCompare.Count;
+            //Sends a reply for each specification compared and shows the products(best ones first)  
+            foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
+            {
+                reply = context.MakeMessage();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                List<Attachment> cards = new List<Attachment>();
-
-                //size of products to show on result(top 3 if >3)
-                var resultSize = 0;
-                if (productsToCompare.Count > 3)
+                reply.Text = String.Format("Top results \n for {0}:\n\n", entry.Key);
+                for (int i = 0; i < resultSize; i++)
                 {
-                    resultSize = 3;
+                    cards.Add(ProductCard.GetProductCard(productsToCompare[entry.Value[i]], ProductCard.CardType.SEARCH).ToAttachment());
                 }
-                else resultSize = productsToCompare.Count;
-                //Sends a reply for each specification compared and shows the products(best ones first)  
-                foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
-                {
-                    reply = context.MakeMessage();
-                    reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                    reply.Text = String.Format("Top results \n for {0}:\n\n", entry.Key);
-                    for (int i = 0; i < resultSize; i++)
-                    {
-                        cards.Add(ProductCard.GetProductCard(productsToCompare[entry.Value[i]], ProductCard.CardType.SEARCH).ToAttachment());
-                    }
-                    reply.Attachments = cards;
-                    context.PostAsync(reply);
-                    cards.Clear();
-                }
-
-
-
-            }
-            catch (Exception e)
-            {
-                Exception baseException = e.GetBaseException();
-                Debug.WriteLine(string.Format("Caught exception! Error ocurred! Message: {0}", e.Message));
-                Debug.WriteLine(string.Format("Stack trace: {0}", e.ToString()));
+                reply.Attachments = cards;
+                context.PostAsync(reply);
+                cards.Clear();
             }
 
-           
-            /*Product product1 = new Product();
-            product1.CPU = "Intel Core i7-6500U";
-            product1.CoreNr = "Dual Core";
-            product1.CPUSpeed = 2.7;
-            product1.RAM = 8;
-
-            Product product2 = new Product();
-            product2.CPU = "Intel Core i7-7820HQ";
-            product2.CoreNr = "Quad Core";
-            product2.CPUSpeed = 2.7;
-            product2.RAM = 4;*/
-
-           
         }
     }
 }
