@@ -57,7 +57,7 @@ namespace SmartKioskBot.Dialogs
             {
                 Brand = details[0],
                 Model = details[1],
-                Price = details[2]
+                Price = Convert.ToDouble(details[2])
             };
         }
     }
