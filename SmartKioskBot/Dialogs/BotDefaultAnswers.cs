@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections;
+using SmartKioskBot.Models;
 
 namespace SmartKioskBot.Dialogs
 {
     public abstract class BotDefaultAnswers
     {
+        public static string[] Yes = new string[] { "sim", "Sim", "Ok", "ok" };
+        public static string[] No = new string[] { "não", "Não" };
         /*
          * Activity Dialog
          */
@@ -32,13 +35,19 @@ namespace SmartKioskBot.Dialogs
         /*
          * Button Click Message
          */
+      
         public static string show_product_details = "Ver detalhes do produto: ";
         public static string add_wish_list = "Adicionar à lista de desejos o produto:";
         public static string add_to_comparator = "Adicionar ao comparador o produto:";
         public static string rem_wish_list = "Remover da lista de desejos o produto:";
         public static string rem_comparator = "Remover do comparador o produto:";
 
-
+        public static string set_customer_email = "SaveEmail";
+        public static string set_customer_card = "SaveCard";
+        public static string add_channel = "AddChannel";
+        public static string set_customer_name = "SaveName";
+        public static string set_customer_country = "SaveCountry";
+      
         /*
          * Intents Dialog
          */
@@ -108,5 +117,71 @@ namespace SmartKioskBot.Dialogs
             };
             return success[new Random().Next(0, success.Length)];
         }
+
+        //IDENTIFICATION
+        public static String getIdentification()
+        {
+            String[] dialog =
+            {
+                "Olá, já nos conhecemos? Pode indicar o seu email ou numero de cliente?"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getCustomerCardOrEmail(String n)
+        {
+            String[] dialog =
+            {
+                "Olá " + n + ", pode introduzir o seu email ou cartão cliente?"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getAddIdentifier(String identifier, String value)
+        {
+            String[] dialog =
+            {
+               "O seu " + identifier + " foi atualizado para : " + value
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getActionCanceled()
+        {
+            String[] dialog =
+            {
+               "Acção cancelada!"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getCustomerInfo(User user)
+        {
+            String[] dialog =
+            {
+               "INFORMAÇÃO DO UTILIZADOR \n\nNome: " + user.Name + "\n\n Email: " + user.Email + "\n\n Cartão cliente: " + user.CustomerCard + "\n\n País: " + user.Country
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getCountry()
+        {
+            String[] dialog =
+            {
+               "Introduza o seu país"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getAddUser()
+        {
+            String[] dialog =
+            {
+               "A sua conta foi criada com sucesso!"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        
     }
 }
