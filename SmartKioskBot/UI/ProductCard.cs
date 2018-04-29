@@ -98,28 +98,28 @@ namespace SmartKioskBot.UI
                 case CardType.SEARCH:
                 case CardType.RECOMMENDATION:
                     {
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + " " + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + id));
                         break;
                     }
                 case CardType.PRODUCT_DETAILS:
                     {
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + " " + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + " " + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Ver Pacotes", value: BotDefaultAnswers.add_to_comparator + " " + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Produtos Relacionados", value: BotDefaultAnswers.add_to_comparator + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Ver Pacotes", value: BotDefaultAnswers.add_to_comparator + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Produtos Relacionados", value: BotDefaultAnswers.add_to_comparator + id));
                         break;
                     }
                 case CardType.WISHLIST:
                     {
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover da Wish List", value: BotDefaultAnswers.rem_wish_list + " " + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover da Wish List", value: BotDefaultAnswers.rem_wish_list + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + id));
                         break;
                     }
                 case CardType.COMPARATOR:
                     {
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + " " + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover do Comparador", value: BotDefaultAnswers.rem_comparator + " " + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover do Comparador", value: BotDefaultAnswers.rem_comparator + id));
                         break;
                     }
             }

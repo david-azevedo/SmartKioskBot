@@ -32,11 +32,11 @@ namespace SmartKioskBot.Dialogs
         /*
          * Button Click Message
          */
-        public static string show_product_details = "Detalhes";
-        public static string add_wish_list = "AdicionarWishList";
-        public static string add_to_comparator = "AdicionarComparador";
-        public static string rem_wish_list = "RemoverWishList";
-        public static string rem_comparator = "RemoverComparador";
+        public static string show_product_details = "Ver detalhes do produto: ";
+        public static string add_wish_list = "Adicionar à lista de desejos o produto:";
+        public static string add_to_comparator = "Adicionar ao comparador o produto:";
+        public static string rem_wish_list = "Remover da lista de desejos o produto:";
+        public static string rem_comparator = "Remover do comparador o produto:";
 
 
         /*

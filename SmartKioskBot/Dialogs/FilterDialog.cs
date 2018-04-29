@@ -16,14 +16,41 @@ using static SmartKioskBot.Models.Context;
 namespace SmartKioskBot.Dialogs
 {
     [Serializable]
-    public class FilterDialog : IDialog<object>
+    public class FilterDialog : LuisDialog<object>
     {
-        private List<FilterDefinition<Product>> filters;
-        private Context context;
 
-        public async Task StartAsync(IDialogContext context)
+        public static IMessageActivity CleanAllFilters(IDialogContext context, User user)
         {
-            context.Wait(MessageReceivedAsync);
+            ContextController.CleanFilters(user);
+            var reply = context.MakeMessage();
+            reply.Text = "";
+            return reply;
+        }
+
+        public static IMessageActivity CleanFilter(IDialogContext _context, User user, Context context, IList<EntityRecommendation> entities)
+        {
+            var filtername = "";
+            
+            foreach(EntityRecommendation e in entities)
+            {
+                if(e.Type == "filter")
+                {
+                    filtername = e.Entity;
+                    break;
+                }
+            }
+
+            ContextController.RemFilter(user, filtername);
+
+            var reply = _context.MakeMessage();
+            reply.Text = "Os filtros que estão a ser aplicados à busca são: \n\n";
+
+            foreach (Filter f in context.Filters)
+            {
+                reply.Text = f.FilterName + "\n\n";
+            }
+            
+            return reply;
         }
 
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
@@ -32,7 +59,7 @@ namespace SmartKioskBot.Dialogs
 
             //fetch context
             var currentUser = UserController.getUser(message.ChannelId);
-            this.context = ContextController.GetContext(currentUser.Id);
+           // this.context = ContextController.GetContext(currentUser.Id);
 
             //parse message ->TEMPORARIO
             var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 4);
@@ -41,7 +68,7 @@ namespace SmartKioskBot.Dialogs
             //FILTER PRODUCT
             if (details[0] == "filter")
             {
-                //parse filters
+              /*  //parse filters
                 this.filters = new List<FilterDefinition<Product>>();
                 foreach (Filter f in this.context.Filters)
                 {
@@ -54,13 +81,13 @@ namespace SmartKioskBot.Dialogs
                 await ShowProducts(products, context);
 
                 //update filters
-                ContextController.AddFilter(currentUser, details[1], details[2], details[3]);
+                ContextController.AddFilter(currentUser, details[1], details[2], details[3]);*/
 
             }
             //REMOVE A FILTER
             else if(details[0] == "filter-rem")
             {
-                ContextController.RemFilter(currentUser, details[1]);
+                /*ContextController.RemFilter(currentUser, details[1]);
 
                 //show products
                 this.filters = new List<FilterDefinition<Product>>();
@@ -71,28 +98,23 @@ namespace SmartKioskBot.Dialogs
 
                 // Get products and create a reply back to the user.
                 List<Product> products = GetProductsForUser();
-                await ShowProducts(products, context);
+                await ShowProducts(products, context);*/
             }
-            //CLEAN ALL FILTERS
-            else if (details[0] == "filter-clean")
-            {
-                ContextController.CleanFilters(currentUser);
-            }
-
-            context.Done<object>(null);
         }
 
         private List<Product> GetProductsForUser()
         {
-            var total_filter = Builders<Product>.Filter.Empty;
+            /* var total_filter = Builders<Product>.Filter.Empty;
 
-            //combine all filters
-            foreach (FilterDefinition<Product> f in filters)
-            {
-                total_filter = total_filter & f;
-            }
+             //combine all filters
+             foreach (FilterDefinition<Product> f in filters)
+             {
+                 total_filter = total_filter & f;
+             }
 
-            return ProductController.getProductsFilter(total_filter);
+             return ProductController.getProductsFilter(total_filter);*/
+
+            return null;
         }
 
         private async Task ShowProducts(List<Product> products, IDialogContext context)
@@ -207,41 +229,42 @@ namespace SmartKioskBot.Dialogs
 
         public IMessageActivity filtering(IList<EntityRecommendation> entities, IMessageActivity reply)
         {
-            this.filters = new List<FilterDefinition<Product>>();
-            if(this.context != null)
-            {
-                foreach (Filter f in this.context.Filters)
-                {
-                    this.filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
-                }
-            }
+            /* this.filters = new List<FilterDefinition<Product>>();
+             if(this.context != null)
+             {
+                 foreach (Filter f in this.context.Filters)
+                 {
+                     this.filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
+                 }
+             }
 
-            // Get products and create a reply back to the user.
-            this.filters.Add(Builders<Product>.Filter.Where(x => x.Brand.ToLower() == entities[0].Entity.ToLower()));
-
-
-            List<Product> products = GetProductsForUser();
+             // Get products and create a reply back to the user.
+             this.filters.Add(Builders<Product>.Filter.Where(x => x.Brand.ToLower() == entities[0].Entity.ToLower()));
 
 
-            if (products.Count == 0)
-            {
-                reply.AttachmentLayout = AttachmentLayoutTypes.List;
-                reply.Text = BotDefaultAnswers.getFilterFail();
-            }
-            else
-            {
-                reply.Text = BotDefaultAnswers.getFilterSuccess();
-                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                List<Attachment> cards = new List<Attachment>();
+             List<Product> products = GetProductsForUser();
 
-                foreach (Product p in products)
-                {
-                    cards.Add(ProductCard.GetProductCard(p, ProductCard.CardType.SEARCH).ToAttachment());
-                }
 
-                reply.Attachments = cards;
-            }
-            return reply;
+             if (products.Count == 0)
+             {
+                 reply.AttachmentLayout = AttachmentLayoutTypes.List;
+                 reply.Text = BotDefaultAnswers.getFilterFail();
+             }
+             else
+             {
+                 reply.Text = BotDefaultAnswers.getFilterSuccess();
+                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                 List<Attachment> cards = new List<Attachment>();
+
+                 foreach (Product p in products)
+                 {
+                     cards.Add(ProductCard.GetProductCard(p, ProductCard.CardType.SEARCH).ToAttachment());
+                 }
+
+                 reply.Attachments = cards;
+             }
+             return reply;*/
+            return null;
         }
 
 
