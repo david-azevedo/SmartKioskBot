@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
+using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using MongoDB.Bson;
 using SmartKioskBot.Controllers;
@@ -13,72 +14,47 @@ using System.Web;
 
 namespace SmartKioskBot.Dialogs
 {
-    [LuisModel(AppSettings.LuisAppId, AppSettings.LuisSubscriptionKey, domain: AppSettings.LuisDomain)]
     [Serializable]
-    public class WishListDialog : LuisDialog<object>
+    public class WishListDialog
     {
-        protected Context userContext;
-        protected Action action;
-        public enum Action { VIEW, ADD, REM };
 
-        public WishListDialog(Action action)
+        public static void AddToWishList(string message, User user)
         {
-            this.action = action;
+            string[] parts = message.Split(':');
+
+            if (parts.Length >= 2)
+                ContextController.AddWishList(user, parts[1]);
         }
 
-        public async Task StartAsync(IDialogContext context)
+        public static void RemoveFromWishList(string message, User user)
         {
-            context.Wait(MessageReceivedAsync);
+            string[] parts = message.Split(':');
+
+            if (parts.Length >= 2)
+                ContextController.RemWishList(user, parts[1]);
         }
 
-        private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
+        public static IMessageActivity ViewWishList(IDialogContext _context, Context context)
         {
-            var message = await activity;
+            //getProducts
+            var products = ProductController.getProducts(context.WishList);
 
-            //fetch user
-            var user = UserController.getUser(message.ChannelId);
+            var reply = _context.MakeMessage();
 
-            var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 2);
-            string[] details = message.Text.Split(' ');
+            if (products.Count == 0)
+                reply.Text = BotDefaultAnswers.getEmptyWishList();
+            else
+                reply.Text = BotDefaultAnswers.getWishList();
+            reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            List<Attachment> cards = new List<Attachment>();
 
-            //TMP - substituir por LUIS
-            if (action.Equals(Action.ADD))
+            foreach (Product p in products)
             {
-                ContextController.AddWishList(user, details[1]);
-                await context.PostAsync(BotDefaultAnswers.getAddWishList());
+                cards.Add(ProductCard.GetProductCard(p, ProductCard.CardType.WISHLIST).ToAttachment());
             }
-            else if (action.Equals(Action.REM))
-            {
-                ContextController.RemWishList(user, details[1]);
-                await context.PostAsync(BotDefaultAnswers.getRemWishList());
 
-            }
-            else if (action.Equals(Action.VIEW))
-            {
-                //fetch context
-                this.userContext = ContextController.GetContext(user.Id);
-
-                //getProducts
-                var products = ProductController.getProducts(userContext.WishList);
-
-                var reply = context.MakeMessage();
-
-                if (products.Count == 0)
-                    reply.Text = BotDefaultAnswers.getEmptyWishList();
-                else
-                    reply.Text = BotDefaultAnswers.getWishList();
-                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                List<Attachment> cards = new List<Attachment>();
-
-                foreach (Product p in products)
-                {
-                    cards.Add(ProductCard.GetProductCard(p, ProductCard.CardType.WISHLIST).ToAttachment());
-                }
-
-                reply.Attachments = cards;
-                await context.PostAsync(reply);
-            }
-            context.Done<object>(null);
+            reply.Attachments = cards;
+            return reply;
         }
     }
 }

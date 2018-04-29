@@ -57,7 +57,6 @@ namespace SmartKioskBot.Dialogs
         {
             string message = $"Sorry, I did not understand '{result.Query}'. Type 'help' if you need assistance.";
             await context.PostAsync(message);
-
             Next(context);
         }
 
@@ -67,9 +66,36 @@ namespace SmartKioskBot.Dialogs
             var reply = context.MakeMessage();
             reply.Text = BotDefaultAnswers.getGreeting(context.Activity.From.Name);
             await context.PostAsync(reply);
-
             Next(context);
         }
+
+        /*
+         * Wish List
+         */
+
+        [LuisIntent("ViewWishList")]
+        public async Task ViewWishList(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync(WishListDialog.ViewWishList(context, this.context));
+            context.Wait(MessageReceived);
+        }
+       [LuisIntent("AddWishList")]
+        public async Task AddWishList(IDialogContext context, LuisResult result)
+        {
+            WishListDialog.AddToWishList(result.Query, user);
+            await context.PostAsync(BotDefaultAnswers.getAddWishList());
+            context.Wait(MessageReceived);
+        }
+        [LuisIntent("RmvWishList")]
+        public async Task RmvWishList(IDialogContext context, LuisResult result)
+        {
+            WishListDialog.RemoveFromWishList(result.Query, user);
+            await context.PostAsync(BotDefaultAnswers.getRemWishList());
+            context.Wait(MessageReceived);
+
+        /*
+         * Filter
+         */
 
         [LuisIntent("Filter")]
         public async Task Filter(IDialogContext context, LuisResult result)
@@ -79,6 +105,40 @@ namespace SmartKioskBot.Dialogs
             await context.PostAsync(r);
             Next(context);
         }
+
+        [LuisIntent("CleanAllFilters")]
+        public async Task CleanAllFilters(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync(FilterDialog.CleanAllFilters(context,user));
+            Next(context);
+        }
+
+        [LuisIntent("RmvFilter")]
+        public async Task RmvFilter(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync(FilterDialog.CleanFilter(context, this.user, this.context, result.Entities));
+            Next(context);
+        }
+
+
+        /*
+        [LuisIntent("Recommendation")]
+        public void Recommendation(IDialogContext context, LuisResult result)
+        {
+
+        }
+
+        [LuisIntent("StoreLocation")]
+        public void StoreLocation(IDialogContext context, LuisResult result)
+        {
+
+        }
+
+        private Task Done(IDialogContext context, IAwaitable<object> result)
+        {
+            context.Done<object>(null);
+            return null;
+        }*/
 
        /* [LuisIntent("Recommendation")]
         public void Recommendation(IDialogContext context, LuisResult result)
