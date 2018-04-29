@@ -118,7 +118,7 @@ namespace SmartKioskBot.Dialogs
         {
             String[] dialog =
             {
-                "Olá, já nos conhecemos? pode indicar o seu email ou numero de cliente?"
+                "Olá, já nos conhecemos? Pode indicar o seu email ou numero de cliente?"
             };
 
             return dialog[new Random().Next(0, dialog.Length)];
