@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using SmartKioskBot.Logic;
+using SmartKioskBot.Models;
 
 namespace SmartKioskBot.Dialogs
 {

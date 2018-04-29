@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using System.Security.Authentication;
 using SmartKioskBot.Helpers;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Connector;
+using SmartKioskBot.UI;
 
 namespace SmartKioskBot.Logic
 {
@@ -205,19 +207,39 @@ namespace SmartKioskBot.Logic
                 var product1 = collection.Find(filter1).FirstOrDefault();
                 var product2 = collection.Find(filter2).FirstOrDefault();
 
-                Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(new List<Product>() { product1, product2 });
+                //list of the products to compares
+                var productsToCompare = new List<Product>() { product1, product2 , product1, product2 };
+
+                Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare);
 
                 var reply = context.MakeMessage();
-                reply.Text = "Comparison results: \n";
+                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                List<Attachment> cards = new List<Attachment>();
 
+                //size of products to show on result(top 3 if >3)
+                var resultSize = 0;
+                if (productsToCompare.Count > 3)
+                {
+                    resultSize = 3;
+                }
+                else resultSize = productsToCompare.Count;
+                //Sends a reply for each specification compared and shows the products(best ones first)  
                 foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
                 {
-                    reply.Text += String.Format("Best {0}:\n\n", entry.Key);
-
-                    entry.Value.ForEach(item => reply.Text += String.Format("\t-{0}\n\n", item));
+                    reply = context.MakeMessage();
+                    reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    reply.Text = String.Format("Top results \n for {0}:\n\n", entry.Key);
+                    for (int i = 0; i < resultSize; i++)
+                    {
+                        cards.Add(ProductCard.GetProductCard(productsToCompare[entry.Value[i]], ProductCard.CardType.SEARCH).ToAttachment());
+                    }
+                    reply.Attachments = cards;
+                    context.PostAsync(reply);
+                    cards.Clear();
                 }
 
-                context.PostAsync(reply);
+
+
             }
             catch (Exception e)
             {
