@@ -132,11 +132,11 @@ namespace SmartKioskBot.Dialogs
 
             return dialog[new Random().Next(0, dialog.Length)];
         }
-        public static String getAddIdentifier(String identifier, String valeu)
+        public static String getAddIdentifier(String identifier, String value)
         {
             String[] dialog =
             {
-               "O seu " + identifier + " foi atualizado para : " + valeu
+               "O seu " + identifier + " foi atualizado para : " + value
             };
 
             return dialog[new Random().Next(0, dialog.Length)];
