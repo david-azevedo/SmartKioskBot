@@ -122,6 +122,21 @@ namespace SmartKioskBot.Dialogs
             {
                 await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
             }
+            //CUSTOMER INFO
+            else if (details[0].Equals("customer-info", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //SET CUSTOMER NAME
+            else if (details[0].Equals("set-customer-name", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //SET CUSTOMER COUNTRY
+            else if (details[0].Equals("set-customer-country", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
             //ADD CUSTOMER CARD CONFIRMATION
             else if (details[0].Equals("SaveCard", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -134,6 +149,16 @@ namespace SmartKioskBot.Dialogs
             }
             //ADD CHANNEL CONFIRMATION
             else if (details[0].Equals("AddChannel", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //ADD CUSTOMER NAME 
+            else if (details[0].Equals("SaveName", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //ADD CUSTOMER COUNTRY 
+            else if (details[0].Equals("SaveCountry", StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
             }

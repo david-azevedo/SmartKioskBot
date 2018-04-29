@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections;
+using SmartKioskBot.Models;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -40,8 +41,8 @@ namespace SmartKioskBot.Dialogs
         public static string set_customer_email = "SaveEmail";
         public static string set_customer_card = "SaveCard";
         public static string add_channel = "AddChannel";
-
-
+        public static string set_customer_name = "SaveName";
+        public static string set_customer_country = "SaveCountry";
         /*
          * Intents Dialog
          */
@@ -149,5 +150,33 @@ namespace SmartKioskBot.Dialogs
 
             return dialog[new Random().Next(0, dialog.Length)];
         }
+        public static String getCustomerInfo(User user)
+        {
+            String[] dialog =
+            {
+               "INFORMAÇÃO DO UTILIZADOR \n\nNome: " + user.Name + "\n\n Email: " + user.Email + "\n\n Cartão cliente: " + user.CustomerCard + "\n\n País: " + user.Country
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getCountry()
+        {
+            String[] dialog =
+            {
+               "Introduza o seu país"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        public static String getAddUser()
+        {
+            String[] dialog =
+            {
+               "A sua conta foi criada com sucesso!"
+            };
+
+            return dialog[new Random().Next(0, dialog.Length)];
+        }
+        
     }
 }
