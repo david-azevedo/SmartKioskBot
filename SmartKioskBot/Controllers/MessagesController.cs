@@ -14,6 +14,8 @@ namespace SmartKioskBot
     [BotAuthentication]
     public class MessagesController : ApiController
     {
+        private Helpers.BotTranslator botTranslator = new Helpers.BotTranslator();
+        
         /// <summary>
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
@@ -22,7 +24,10 @@ namespace SmartKioskBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
+                activity.Text = nt.Item1;
+                activity.Locale = nt.Item2;
+                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog(nt.Item2));
             }
             else
             {

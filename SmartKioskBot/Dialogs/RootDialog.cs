@@ -14,6 +14,13 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public sealed class RootDialog : IDialog<object>
     {
+        private string userLanguageCode = "";
+
+        public RootDialog(string userLanguageCode)
+        {
+            this.userLanguageCode = userLanguageCode;
+        }
+
 #pragma warning disable 1998
         public async Task StartAsync(IDialogContext context)
         {
@@ -29,6 +36,10 @@ namespace SmartKioskBot.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             var message = await activity as Activity;
+
+            var rep = context.MakeMessage();
+            rep.Text = message.Text + userLanguageCode;
+            await context.PostAsync(rep);
 
 
             //USER IDENTIFICATION
@@ -55,15 +66,25 @@ namespace SmartKioskBot.Dialogs
             //testing purposes only: getting the command (filter) and the argument (brand)
             string[] details = message.Text.Split(' ');
 
-            if (details[0].Equals("help", StringComparison.CurrentCultureIgnoreCase))
+            if (details[0].Equals("Ajuda", StringComparison.CurrentCultureIgnoreCase))
             {
                 var reply = context.MakeMessage();
 
-                reply.Text = "Comandos:\n\n" +
-                    "filter [marca/preço/nome] [valor] \n\n" +
-                    "filter-clean \n\n" + 
-                    "wishlist\n\n";
-                await context.PostAsync(reply);
+                /* reply.Text = "Comandos:\n\n" +
+                     "filter [marca/preço/nome] [valor] \n\n" +
+                     "filter-clean \n\n" + 
+                     "wishlist\n\n";*/
+
+                reply.Text = "Olá eu sou um bot";
+
+                Console.WriteLine("User LCode: " + reply.Locale);
+
+                //if(!userLanguageCode.Equals(""))
+                //    await Helpers.BotTranslator.PostTranslated(context, reply.Text, userLanguageCode);
+                await Helpers.BotTranslator.PostTranslated(context, reply.Text, reply.Locale);
+
+                //await context.PostAsync(reply.Text +" - "+ userLanguageCode);
+                //await context.PostAsync(reply);
             }
             //ADD PRODUCT TO DB (TESTING)
             else if(details[0].Equals("add", StringComparison.CurrentCultureIgnoreCase))
