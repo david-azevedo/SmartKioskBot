@@ -14,13 +14,6 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public sealed class RootDialog : IDialog<object>
     {
-        private string userLanguageCode = "";
-
-        public RootDialog(string userLanguageCode)
-        {
-            this.userLanguageCode = userLanguageCode;
-        }
-
 #pragma warning disable 1998
         public async Task StartAsync(IDialogContext context)
         {
@@ -37,9 +30,9 @@ namespace SmartKioskBot.Dialogs
         {
             var message = await activity as Activity;
 
-            var rep = context.MakeMessage();
-            rep.Text = message.Text + userLanguageCode;
-            await context.PostAsync(rep);
+            //var rep = context.MakeMessage();
+            //rep.Text = message.Text + userLanguageCode;
+            //await context.PostAsync(rep);
 
 
             //USER IDENTIFICATION
