@@ -37,9 +37,8 @@ namespace SmartKioskBot.Dialogs
         //USAR ISTO EM VEZ DE CONTEXT.WAIT NO FINAL
         private void Next(IDialogContext context)
         {
-            if (!identification){
+            if (!identification)
                 context.Call(new IdentificationDialog(), ResumeAfterIdent);
-            }
             else
                  context.Wait(this.MessageReceived);
         }
@@ -77,21 +76,22 @@ namespace SmartKioskBot.Dialogs
         public async Task ViewWishList(IDialogContext context, LuisResult result)
         {
             await context.PostAsync(WishListDialog.ViewWishList(context, this.context));
-            context.Wait(MessageReceived);
+            Next(context);
         }
-       [LuisIntent("AddWishList")]
+        [LuisIntent("AddWishList")]
         public async Task AddWishList(IDialogContext context, LuisResult result)
         {
             WishListDialog.AddToWishList(result.Query, user);
             await context.PostAsync(BotDefaultAnswers.getAddWishList());
-            context.Wait(MessageReceived);
+            Next(context);
         }
         [LuisIntent("RmvWishList")]
         public async Task RmvWishList(IDialogContext context, LuisResult result)
         {
             WishListDialog.RemoveFromWishList(result.Query, user);
             await context.PostAsync(BotDefaultAnswers.getRemWishList());
-            context.Wait(MessageReceived);
+            Next(context);
+        }
 
         /*
          * Filter
@@ -100,8 +100,7 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("Filter")]
         public async Task Filter(IDialogContext context, LuisResult result)
         {
-            FilterDialog w = new FilterDialog();
-            IMessageActivity r = w.filtering(result.Entities, context.MakeMessage());
+            IMessageActivity r = FilterDialog.Filter(context, this.user, this.context, result.Entities);
             await context.PostAsync(r);
             Next(context);
         }

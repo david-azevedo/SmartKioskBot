@@ -9,8 +9,10 @@ using SmartKioskBot.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Dialogs
@@ -53,58 +55,44 @@ namespace SmartKioskBot.Dialogs
             return reply;
         }
 
-        public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
+        public static IMessageActivity Filter(IDialogContext _context, User user, Context context, IList<EntityRecommendation> entities)
         {
-            var message = await activity;
+            var filters = new List<FilterDefinition<Product>>();
 
-            //fetch context
-            var currentUser = UserController.getUser(message.ChannelId);
-           // this.context = ContextController.GetContext(currentUser.Id);
+            /*var reply = _context.MakeMessage();
 
-            //parse message ->TEMPORARIO
-            var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 4);
-            string[] details = message.Text.Split(' ');
-
-            //FILTER PRODUCT
-            if (details[0] == "filter")
+            foreach(EntityRecommendation e in entities)
             {
-              /*  //parse filters
-                this.filters = new List<FilterDefinition<Product>>();
-                foreach (Filter f in this.context.Filters)
-                {
-                    this.filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
-                }
+                reply.Text += e.Type + "\n\n" +
+                    e.Entity + "\n\n" +
+                    "\n\n";
+            }*/
 
-                // Get products and create a reply back to the user.
-                this.filters.Add(GetFilter(details[1], details[2], details[3]));
-                List<Product> products = GetProductsForUser();
-                await ShowProducts(products, context);
-
-                //update filters
-                ContextController.AddFilter(currentUser, details[1], details[2], details[3]);*/
-
-            }
-            //REMOVE A FILTER
-            else if(details[0] == "filter-rem")
+            //Filters from context
+            foreach (Filter f in context.Filters)
             {
-                /*ContextController.RemFilter(currentUser, details[1]);
-
-                //show products
-                this.filters = new List<FilterDefinition<Product>>();
-                foreach (Filter f in this.context.Filters)
-                {
-                    this.filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
-                }
-
-                // Get products and create a reply back to the user.
-                List<Product> products = GetProductsForUser();
-                await ShowProducts(products, context);*/
+                filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
             }
+
+            //Filters from search
+            foreach(Filter f in GetEntitiesFilter(entities.ToList()))
+            {
+                var filtername = f.FilterName;
+                var op = f.Operator;
+                var v = f.Value;
+                filters.Add(GetFilter(f.FilterName,f.Operator,f.Value));
+                ContextController.AddFilter(user,f.FilterName,f.Operator,f.Value);
+            }
+
+            List<Product> products = GetProductsForUser(filters);
+
+            return ShowProducts(products, _context);
+           //return reply;
         }
 
-        private List<Product> GetProductsForUser()
+        private static List<Product> GetProductsForUser(List<FilterDefinition<Product>> filters)
         {
-            /* var total_filter = Builders<Product>.Filter.Empty;
+             var total_filter = Builders<Product>.Filter.Empty;
 
              //combine all filters
              foreach (FilterDefinition<Product> f in filters)
@@ -112,12 +100,10 @@ namespace SmartKioskBot.Dialogs
                  total_filter = total_filter & f;
              }
 
-             return ProductController.getProductsFilter(total_filter);*/
-
-            return null;
+            return ProductController.getProductsFilter(total_filter);
         }
 
-        private async Task ShowProducts(List<Product> products, IDialogContext context)
+        private static IMessageActivity ShowProducts(List<Product> products, IDialogContext context)
         {
             var reply = context.MakeMessage();
 
@@ -139,32 +125,235 @@ namespace SmartKioskBot.Dialogs
 
                 reply.Attachments = cards;
             }
-            await context.PostAsync(reply);
+            return reply;
         }
 
-        private FilterDefinition<Product> GetFilter(string filter, string op,string value){
+        private static List<Filter> GetEntitiesFilter(List<EntityRecommendation> entities)
+        {
+            var filters = new List<Filter>();
+
+            bool price = false;
+            bool brand = false;
+            bool cpu = false;
+            bool storage_type = false;
+            bool graphics = false;
+            bool type = false;
+
+            for (int i = 0; i < entities.Count; i++)
+            {
+
+                if (entities[i].Type == "filter")
+                {
+                    switch (entities[i].Entity.ToLower())
+                    {
+                        //number values
+                        case "preço":
+                        case "ram":
+                        case "armazenamento":
+                        case "autonomia":
+                        case "ecrã":
+                            if (!(entities[i].Entity == "preço" && !price)) {
+                                var f = new Filter();
+                                f.FilterName = entities[i].Entity.ToString();
+                                f.Operator = "=";
+                                //Tries to find the value and the position
+                                for (int j = i + 1; j < entities.Count; j++)
+                                {
+                                    if (entities[j].Type == "position::min")
+                                        f.Operator = ">";
+                                    else if (entities[j].Type == "position::max")
+                                        f.Operator = "<";
+                                    else if (entities[j].Type == "buildin.number")
+                                    {
+                                        f.Value = entities[j].Entity;
+                                        filters.Add(f);
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case "marca":
+                            if (!brand)
+                            {
+                                var f = new Filter();
+                                f.FilterName = "marca";
+                                f.Operator = "=";
+                                for (int j = i+1; j < entities.Count; j++)
+                                {
+                                    if (entities[j].Type == "brands")
+                                    {
+                                        f.Value = entities[j].Entity;
+                                        filters.Add(f);
+                                        brand = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case "cpu":
+                            if (!cpu)
+                            {
+                                var f = new Filter();
+                                f.Operator = "=";
+                                f.FilterName = "familia_cpu";
+                                for (int j = i + 1; j < entities.Count; j++)
+                                {
+                                    if (entities[j].Type == "CPU")
+                                    {
+                                        f.Value = entities[j].Entity.ToString();
+                                        filters.Add(f);
+                                        cpu = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case "tipo de armazenamento":
+                            if (!storage_type) { 
+                                var f = new Filter();
+                                f.Operator = "=";
+                                f.FilterName = "tipo_armazenamento";
+                                for (int j = i + 1; j < entities.Count; j++)
+                                {
+                                    if (entities[j].Type == "memoryType")
+                                    {
+                                        f.Value = entities[j].Entity.ToString();
+                                        filters.Add(f);
+                                        storage_type = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case "gráfica":
+                            if (!graphics)
+                            {
+                                var f = new Filter();
+                                f.Operator = "=";
+                                f.FilterName = "placa_grafica";
+                                for (int j = 0; j < entities.Count; j++)
+                                {
+                                    if (entities[j].Type == "GPU")
+                                    {
+                                        f.Value = entities[j].Entity.ToString();
+                                        filters.Add(f);
+                                        graphics = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case "tipo":
+                            if (!type)
+                            {
+                                var f = new Filter();
+                                f.Operator = "=";
+                                f.FilterName = "tipo";
+                                for (int j = 0; j < entities.Count; j++)
+                                {
+                                    if (entities[j].Type == "pcType")
+                                    {
+                                        f.Value = entities[j].Resolution.Values.ElementAt(0).ToString();
+                                        filters.Add(f);
+                                        type = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+
+                }
+                else if (entities[i].Type == "builtin.money" && !price)
+                {
+                    var f = new Filter();
+                    f.FilterName = "preço";
+                    for(var j = i-1; j< entities.Count; j++)
+                    {
+                        if (entities[j].Type == "position::min")
+                            f.Operator = "<";
+                        else if (entities[j].Type == "position::max")
+                            f.Operator = ">";
+                    }
+                    f.Value = Regex.Match(entities[i].Entity, @"\d+").Value; 
+                    filters.Add(f);
+                    price = true;
+                }
+                else if (entities[i].Type == "brands" && !brand)
+                {
+                    var f = new Filter();
+                    f.FilterName = "marca";
+                    f.Operator = "=";
+                    f.Value = entities[i].Entity;
+                    filters.Add(f);
+                    brand = true;
+                }
+                else if (entities[i].Type == "CPU" && !cpu)
+                {
+                    var f = new Filter();
+                    f.FilterName = "familia_cpu";
+                    f.Operator = "=";
+                    f.Value = entities[i].Entity;
+                    filters.Add(f);
+                    cpu = true;
+                }
+                else if (entities[i].Type == "memoryType" && !storage_type)
+                {
+                    var f = new Filter();
+                    f.FilterName = "tipo_armazenamento";
+                    f.Operator = "=";
+                    f.Value = entities[i].Entity;
+                    filters.Add(f);
+                    storage_type = true;
+                }
+                else if (entities[i].Type == "GPU" && !graphics)
+                {
+                    var f = new Filter();
+                    f.FilterName = "placa_grafica";
+                    f.Operator = "=";
+                    f.Value = entities[i].Entity;
+                    filters.Add(f);
+                    graphics = true;
+                }
+                else if (entities[i].Type == "pcType" && !type)
+                {
+                    var f = new Filter();
+                    f.FilterName = "tipo";
+                    f.Operator = "=";
+                    /*if (entities[i].Resolution.Count > 0)
+                    {
+                        var a = entities[i];
+                        var b = a.Resolution;
+                        var c = b.Values.ToList();
+                        var d = c[0];
+                        f.Value = d.ToString();
+                    }
+                    else
+                        f.Value = entities[i].Entity;
+                    filters.Add(f);*/
+                    f.Value = entities[i].Entity;
+                    graphics = true;
+                }
+            }
+
+            return filters;
+        }
+
+        private static FilterDefinition<Product> GetFilter(string filter, string op,string value){
             switch (filter.ToLower())
             {
-                case "nome":
-                    return Builders<Product>.Filter.Where(x => x.Name.ToLower() == value.ToLower());
                 case "preço":
                        if (op == "=")
                             return Builders<Product>.Filter.Eq(x => x.Price, Convert.ToDouble(value));
-                        else if (op == ">") 
+                        if (op == ">") 
                             return Builders<Product>.Filter.Gte(x => x.Price, Convert.ToDouble(value));
                         else if (op == "<")
                             return Builders<Product>.Filter.Lte(x => x.Price, Convert.ToDouble(value));
                         break;
                 case "marca":
                     return Builders<Product>.Filter.Where(x => x.Brand.ToLower() == value.ToLower());
-                case "processador":
-                    return Builders<Product>.Filter.Where(x => x.CPU.ToLower() == value.ToLower());
                 case "familia_cpu":
-                    return Builders<Product>.Filter.Where(x => x.CPUFamily.ToLower() == value.ToLower()); ;
-                case "velocidade_cpu":
-                    return Builders<Product>.Filter.Eq(x => x.CPUSpeed.ToString(), value.ToLower());
-                case "nrNucleos":
-                    return Builders<Product>.Filter.Where(x => x.CoreNr.ToLower() == value.ToLower());
+                    return Builders<Product>.Filter.Where(x => x.CPUFamily.ToLower() == value.ToLower());
                 case "ram":
                     if (op == "=")
                         return Builders<Product>.Filter.Eq(x => x.RAM, Convert.ToDouble(value));
@@ -193,14 +382,6 @@ namespace SmartKioskBot.Dialogs
                     else if (op == "<")
                         return Builders<Product>.Filter.Lte(x => x.Autonomy, Convert.ToDouble(value));
                     break;
-                case "placa_som":
-                    return Builders<Product>.Filter.Where(x => x.SoundCard.ToLower() == value.ToLower());
-                case "camera":
-                    return Builders<Product>.Filter.Where(x => x.HasCamera.ToLower() == value.ToLower());
-                case "software":
-                    return Builders<Product>.Filter.Where(x => x.Software.ToLower() == value.ToLower());
-                case "os":
-                    return Builders<Product>.Filter.Where(x => x.OS.ToLower() == value.ToLower());
                 case "tamanho_ecra":
                     if (op == "=")
                         return Builders<Product>.Filter.Eq(x => x.ScreenDiagonal, Convert.ToDouble(value));
@@ -209,64 +390,11 @@ namespace SmartKioskBot.Dialogs
                     else if (op == "<")
                         return Builders<Product>.Filter.Lte(x => x.ScreenDiagonal, Convert.ToDouble(value));
                     break;
-                case "ecra_tactil":
-                    return Builders<Product>.Filter.Where(x => x.TouchScreen.ToLower() == value.ToLower());
-                case "garantia":
-                    if (op == "=")
-                        return Builders<Product>.Filter.Eq(x => x.Warranty, Convert.ToDouble(value));
-                    else if (op == ">")
-                        return Builders<Product>.Filter.Gte(x => x.Warranty, Convert.ToDouble(value));
-                    else if (op == "<")
-                        return Builders<Product>.Filter.Lte(x => x.Warranty, Convert.ToDouble(value));
-                    break;
-                case "cor":
-                    return Builders<Product>.Filter.Where(x => x.Colour.ToLower() == value.ToLower());
+                case "tipo":
+                    return Builders<Product>.Filter.Where(x => x.Type.ToLower() == value.ToLower());
             }
 
             return null;
         }
-
-
-        public IMessageActivity filtering(IList<EntityRecommendation> entities, IMessageActivity reply)
-        {
-            /* this.filters = new List<FilterDefinition<Product>>();
-             if(this.context != null)
-             {
-                 foreach (Filter f in this.context.Filters)
-                 {
-                     this.filters.Add(GetFilter(f.FilterName, f.Operator, f.Value));
-                 }
-             }
-
-             // Get products and create a reply back to the user.
-             this.filters.Add(Builders<Product>.Filter.Where(x => x.Brand.ToLower() == entities[0].Entity.ToLower()));
-
-
-             List<Product> products = GetProductsForUser();
-
-
-             if (products.Count == 0)
-             {
-                 reply.AttachmentLayout = AttachmentLayoutTypes.List;
-                 reply.Text = BotDefaultAnswers.getFilterFail();
-             }
-             else
-             {
-                 reply.Text = BotDefaultAnswers.getFilterSuccess();
-                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                 List<Attachment> cards = new List<Attachment>();
-
-                 foreach (Product p in products)
-                 {
-                     cards.Add(ProductCard.GetProductCard(p, ProductCard.CardType.SEARCH).ToAttachment());
-                 }
-
-                 reply.Attachments = cards;
-             }
-             return reply;*/
-            return null;
-        }
-
-
     }
 }

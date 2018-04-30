@@ -86,6 +86,10 @@ namespace SmartKioskBot.Dialogs
                     var customerCardDialog = FormDialog.FromForm(this.BuildCustomerCardDialog, FormOptions.PromptInStart);
                     context.Call(customerCardDialog, this.ResumeAfterCardUpdate);
                 }
+                else
+                {
+                    context.Done<object>(null);
+                }
             }
             catch (TooManyAttemptsException ex)
             {
