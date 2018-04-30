@@ -31,7 +31,7 @@ namespace SmartKioskBot.Dialogs
             /*var activity = await result as IMessageActivity;
 
             var reply = context.MakeMessage();
-            reply.Text = "Estou a analisar os computadores...";
+            reply.Text = BotDefaultAnswers.getOngoinComp();
             await context.PostAsync(reply);
 
             // OBTER PRODUTOS -- INÍCIO
@@ -56,9 +56,9 @@ namespace SmartKioskBot.Dialogs
             Comparator.ShowProductComparison(context, productsToCompare);
 
             context.Wait(MessageReceivedAsync);*/
-            
+
             // TODO check comparator, not working when retrieving products from Context.Comparator
-            
+
             var activity = await result as IMessageActivity;
 
             //fetch context
@@ -68,10 +68,10 @@ namespace SmartKioskBot.Dialogs
             var userInput = (activity.Text != null ? activity.Text : "").Split(new[] { ' ' }, 4);
             string[] details = activity.Text.Split(' ');
 
-            if (details[0] == "compare")
+            if (details[0] == BotDefaultAnswers.do_comparator)
             {
                 var reply = context.MakeMessage();
-                reply.Text = "Estou a analisar os computadores...";
+                reply.Text = BotDefaultAnswers.getOngoingComp();
                 await context.PostAsync(reply);
                 // OBTER PRODUTOS
                 this.productsToCompare = new List<Product>();
@@ -83,13 +83,13 @@ namespace SmartKioskBot.Dialogs
                 context.Wait(MessageReceivedAsync);
 
             }
-            else if (details[0] == "AdicionarComparador")
+            else if (details[0] == BotDefaultAnswers.add_to_comparator)
             {
                 Product productToAdd = ProductController.getProduct(details[1]);
                 //MOSTRA PRODUTO ADICIONADO
                 var reply = context.MakeMessage();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                reply.Text = String.Format("Produto Adicionado:");
+                reply.Text = String.Format(BotDefaultAnswers.getAddComparator());
                 reply.Attachments = new List<Attachment>() { ProductCard.GetProductCard(productToAdd, ProductCard.CardType.SEARCH).ToAttachment() };
 
                 await context.PostAsync(reply);
@@ -97,10 +97,10 @@ namespace SmartKioskBot.Dialogs
                 //UPDATE AO COMPARADOR DO USER
                 ContextController.AddComparator(currentUser, details[1]);
             }
-            else if (details[0] == "RemoverComparador")
+            else if (details[0] == BotDefaultAnswers.rem_comparator)
             {
                 var reply = context.MakeMessage();
-                reply.Text = "Tirar o computador do comparador...";
+                reply.Text = BotDefaultAnswers.getRemComparator();
                 await context.PostAsync(reply);
                 //REMOVER PRODUTO
                 ContextController.RemComparator(currentUser, details[1]);

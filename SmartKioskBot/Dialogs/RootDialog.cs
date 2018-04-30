@@ -163,12 +163,12 @@ namespace SmartKioskBot.Dialogs
                 await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
             }
             //COMPARE
-            else if (details[0].Equals("compare", StringComparison.CurrentCultureIgnoreCase))
+            else if (details[0].Equals(BotDefaultAnswers.do_comparator, StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new CompareDialog(), this.StartAsync, message, CancellationToken.None);
             }
             //REMOVE COMPARATOR
-            else if (details[0].Equals("RemoverComparador", StringComparison.CurrentCultureIgnoreCase))
+            else if (details[0].Equals(BotDefaultAnswers.rem_comparator, StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new CompareDialog(), this.StartAsync, message, CancellationToken.None);
             }

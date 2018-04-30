@@ -11,6 +11,7 @@ using SmartKioskBot.Helpers;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using SmartKioskBot.UI;
+using SmartKioskBot.Dialogs;
 
 namespace SmartKioskBot.Logic
 {
