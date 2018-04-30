@@ -192,7 +192,7 @@ namespace SmartKioskBot.Logic
 
         public static void ShowProductComparison(IDialogContext context, List<Product> productsToCompare)
         {
-            Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare);
+            Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare); //TODO VERIFICAR RESULTS
 
             var reply = context.MakeMessage();
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
@@ -205,7 +205,7 @@ namespace SmartKioskBot.Logic
                 resultSize = 3;
             }
             else resultSize = productsToCompare.Count;
-            //Sends a reply for each specification compared and shows the products(best ones first)  
+            //Sends a reply for each specification compared and shows the products(best ones first)
             foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
             {
                 reply = context.MakeMessage();
@@ -219,7 +219,6 @@ namespace SmartKioskBot.Logic
                 context.PostAsync(reply);
                 cards.Clear();
             }
-
-        }
+        }     
     }
 }
