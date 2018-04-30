@@ -14,14 +14,6 @@ namespace SmartKioskBot.Helpers
     class BotTranslator
     {
 
-        const string TEXT_TRANSLATION_API_SUBSCRIPTION_KEY = "3857a4b96cfe4f77981bad9911a820e8";
-        const string TEXT_ANALYTICS_API_SUBSCRIPTION_KEY = "a3d7916391904f0c85ce50d4dae582dd";
-        const string BING_SPELL_CHECK_API_SUBSCRIPTION_KEY = "fc3b8ec4609742028551d85793300af3";
-
-        const string TEXT_TRANSLATION_API_ENDPOINT = "https://api.microsofttranslator.com/v2/Http.svc/";
-        const string TEXT_ANALYTICS_API_ENDPOINT = "https://northeurope.api.cognitive.microsoft.com/text/analytics/v2.0/";
-        const string BING_SPELL_CHECK_API_ENDPOINT = "https://api.cognitive.microsoft.com/bing/v7.0/spellcheck/";
-
         private string[] languageCodes;     // array of language codes
 
         // Dictionary to map language code from friendly name (sorted case-insensitively on language name)
@@ -30,9 +22,9 @@ namespace SmartKioskBot.Helpers
 
         public BotTranslator()
         {
-            if (TEXT_TRANSLATION_API_SUBSCRIPTION_KEY.Length != 32
-                || TEXT_ANALYTICS_API_SUBSCRIPTION_KEY.Length != 32
-                || BING_SPELL_CHECK_API_SUBSCRIPTION_KEY.Length != 32)
+            if (AppSettings.TEXT_TRANSLATION_API_SUBSCRIPTION_KEY.Length != 32
+                || AppSettings.TEXT_ANALYTICS_API_SUBSCRIPTION_KEY.Length != 32
+                || AppSettings.BING_SPELL_CHECK_API_SUBSCRIPTION_KEY.Length != 32)
             {
                 //TODO Raise exception
             }
@@ -51,11 +43,11 @@ namespace SmartKioskBot.Helpers
         // ***** DETECT LANGUAGE OF TEXT TO BE TRANSLATED
         private string DetectLanguage(string text)
         {
-            string uri = TEXT_ANALYTICS_API_ENDPOINT + "languages?numberOfLanguagesToDetect=1";
+            string uri = AppSettings.TEXT_ANALYTICS_API_ENDPOINT + "languages?numberOfLanguagesToDetect=1";
 
             // create request to Text Analytics API
             HttpWebRequest detectLanguageWebRequest = (HttpWebRequest)WebRequest.Create(uri);
-            detectLanguageWebRequest.Headers.Add("Ocp-Apim-Subscription-Key", TEXT_ANALYTICS_API_SUBSCRIPTION_KEY);
+            detectLanguageWebRequest.Headers.Add("Ocp-Apim-Subscription-Key", AppSettings.TEXT_ANALYTICS_API_SUBSCRIPTION_KEY);
             detectLanguageWebRequest.Method = "POST";
 
             // create and send body of request
@@ -87,11 +79,11 @@ namespace SmartKioskBot.Helpers
         // ***** CORRECT SPELLING OF TEXT TO BE TRANSLATED
         private string CorrectSpelling(string text)
         {
-            string uri = BING_SPELL_CHECK_API_ENDPOINT + "?mode=spell&mkt=en-US";
+            string uri = AppSettings.BING_SPELL_CHECK_API_ENDPOINT + "?mode=spell&mkt=en-US";
 
             // create request to Bing Spell Check API
             HttpWebRequest spellCheckWebRequest = (HttpWebRequest)WebRequest.Create(uri);
-            spellCheckWebRequest.Headers.Add("Ocp-Apim-Subscription-Key", BING_SPELL_CHECK_API_SUBSCRIPTION_KEY);
+            spellCheckWebRequest.Headers.Add("Ocp-Apim-Subscription-Key", AppSettings.BING_SPELL_CHECK_API_SUBSCRIPTION_KEY);
             spellCheckWebRequest.Method = "POST";
             spellCheckWebRequest.ContentType = "application/x-www-form-urlencoded"; // doesn't work without this
 
@@ -142,9 +134,9 @@ namespace SmartKioskBot.Helpers
         private void GetLanguagesForTranslate()
         {
             // send request to get supported language codes
-            string uri = TEXT_TRANSLATION_API_ENDPOINT + "GetLanguagesForTranslate?scope=text";
+            string uri = AppSettings.TEXT_TRANSLATION_API_ENDPOINT + "GetLanguagesForTranslate?scope=text";
             WebRequest WebRequest = WebRequest.Create(uri);
-            WebRequest.Headers.Add("Ocp-Apim-Subscription-Key", TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
+            WebRequest.Headers.Add("Ocp-Apim-Subscription-Key", AppSettings.TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
             WebResponse response = null;
 
 
@@ -172,9 +164,9 @@ namespace SmartKioskBot.Helpers
             try
             {
                 // send request to get supported language names in English
-                string uri = TEXT_TRANSLATION_API_ENDPOINT + "GetLanguageNames?locale=en";
+                string uri = AppSettings.TEXT_TRANSLATION_API_ENDPOINT + "GetLanguageNames?locale=en";
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-                request.Headers.Add("Ocp-Apim-Subscription-Key", TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
+                request.Headers.Add("Ocp-Apim-Subscription-Key", AppSettings.TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
                 request.ContentType = "text/xml";
                 request.Method = "POST";
                 System.Runtime.Serialization.DataContractSerializer dcs =
@@ -234,10 +226,10 @@ namespace SmartKioskBot.Helpers
             }
 
             // send HTTP request to perform the translation
-            string uri = string.Format(TEXT_TRANSLATION_API_ENDPOINT + "Translate?text=" +
+            string uri = string.Format(AppSettings.TEXT_TRANSLATION_API_ENDPOINT + "Translate?text=" +
                 System.Web.HttpUtility.UrlEncode(textToTranslate) + "&from={0}&to={1}", fromLanguageCode, toLanguageCode);
             var translationWebRequest = HttpWebRequest.Create(uri);
-            translationWebRequest.Headers.Add("Ocp-Apim-Subscription-Key", TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
+            translationWebRequest.Headers.Add("Ocp-Apim-Subscription-Key", AppSettings.TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
             WebResponse response = null;
             response = translationWebRequest.GetResponse();
 
@@ -262,10 +254,10 @@ namespace SmartKioskBot.Helpers
         // ***** DETECT LANGUAGE OF TEXT TO BE TRANSLATED
         private async Task<string> DetectLanguageAsync(string text)
         {
-            string uri = TEXT_ANALYTICS_API_ENDPOINT + "languages?numberOfLanguagesToDetect=1";
+            string uri = AppSettings.TEXT_ANALYTICS_API_ENDPOINT + "languages?numberOfLanguagesToDetect=1";
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", TEXT_ANALYTICS_API_SUBSCRIPTION_KEY);
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", AppSettings.TEXT_ANALYTICS_API_SUBSCRIPTION_KEY);
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
                 var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -303,13 +295,13 @@ namespace SmartKioskBot.Helpers
         // ***** CORRECT SPELLING OF TEXT TO BE TRANSLATED
         private async Task<string> CorrectSpellingAsync(string text, string languageCode)
         {
-            string uri = BING_SPELL_CHECK_API_ENDPOINT + "?mode=spell&mkt=" + languageCode;
+            string uri = AppSettings.BING_SPELL_CHECK_API_ENDPOINT + "?mode=spell&mkt=" + languageCode;
 
             Console.WriteLine("Starting Correct Spelling");
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BING_SPELL_CHECK_API_SUBSCRIPTION_KEY);
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", AppSettings.BING_SPELL_CHECK_API_SUBSCRIPTION_KEY);
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
 
                 var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -403,7 +395,7 @@ namespace SmartKioskBot.Helpers
 
 
             // send HTTP request to perform the translation
-            string uri = string.Format(TEXT_TRANSLATION_API_ENDPOINT + "Translate?text=" +
+            string uri = string.Format(AppSettings.TEXT_TRANSLATION_API_ENDPOINT + "Translate?text=" +
                 System.Web.HttpUtility.UrlEncode(textToTranslate) + "&from={0}&to={1}", fromLanguageCode, toLanguageCode);
 
 
@@ -414,7 +406,7 @@ namespace SmartKioskBot.Helpers
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", AppSettings.TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
 
                 HttpResponseMessage response = await client.GetAsync(uri);
 
@@ -447,7 +439,7 @@ namespace SmartKioskBot.Helpers
 
 
             // send HTTP request to perform the translation
-            string uri = string.Format(TEXT_TRANSLATION_API_ENDPOINT + "Translate?text=" +
+            string uri = string.Format(AppSettings.TEXT_TRANSLATION_API_ENDPOINT + "Translate?text=" +
                 System.Web.HttpUtility.UrlEncode(textToTranslate) + "&from={0}&to={1}", fromLanguageCode, toLanguageCode);
 
 
@@ -458,7 +450,7 @@ namespace SmartKioskBot.Helpers
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", AppSettings.TEXT_TRANSLATION_API_SUBSCRIPTION_KEY);
 
                 HttpResponseMessage response = await client.GetAsync(uri);
 
@@ -484,11 +476,5 @@ namespace SmartKioskBot.Helpers
             await context.PostAsync(text);
 
         }
-
-
-
-
-
-
     }
 }
