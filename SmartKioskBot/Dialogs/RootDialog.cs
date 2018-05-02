@@ -95,7 +95,7 @@ namespace SmartKioskBot.Dialogs
             //ADD PRODUCT TO COMPARATOR
             else if (details[0].Equals(BotDefaultAnswers.add_to_comparator, StringComparison.CurrentCultureIgnoreCase))
             {
-                //TODO
+                await context.Forward(new CompareDialog(), this.StartAsync, message, CancellationToken.None);
             }
             //ADD CUSTOMER CARD
             else if (details[0].Equals("set-customer-card", StringComparison.CurrentCultureIgnoreCase))
@@ -161,6 +161,16 @@ namespace SmartKioskBot.Dialogs
             else if (details[0].Equals("SaveCountry", StringComparison.CurrentCultureIgnoreCase))
             {
                 await context.Forward(new IdentificationDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //COMPARE
+            else if (details[0].Equals(BotDefaultAnswers.do_comparator, StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new CompareDialog(), this.StartAsync, message, CancellationToken.None);
+            }
+            //REMOVE COMPARATOR
+            else if (details[0].Equals(BotDefaultAnswers.rem_comparator, StringComparison.CurrentCultureIgnoreCase))
+            {
+                await context.Forward(new CompareDialog(), this.StartAsync, message, CancellationToken.None);
             }
             else
             {

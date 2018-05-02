@@ -38,6 +38,7 @@ namespace SmartKioskBot.Dialogs
         public static string add_to_comparator = "AdicionarComparador";
         public static string rem_wish_list = "RemoverWishList";
         public static string rem_comparator = "RemoverComparador";
+        public static string do_comparator = "Comparar";
         public static string set_customer_email = "SaveEmail";
         public static string set_customer_card = "SaveCard";
         public static string add_channel = "AddChannel";
@@ -177,6 +178,42 @@ namespace SmartKioskBot.Dialogs
 
             return dialog[new Random().Next(0, dialog.Length)];
         }
-        
+
+        //COMPARATOR
+        public static String getOngoingComp()
+        {
+            String[] success =
+            {
+                "Estou a analisar os computadores..."
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+        public static String getResultComp()
+        {
+            String[] success =
+            {
+                "Aqui está o resultado da comparação:\n\n"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
+        public static String getAddComparator()
+        {
+            String[] success =
+            {
+                "Produto adicionado com sucesso ao comparador!\n\n"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
+        public static String getRemComparator()
+        {
+            String[] success =
+            {
+                "Produto removido com sucesso do comparador!"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
     }
 }
