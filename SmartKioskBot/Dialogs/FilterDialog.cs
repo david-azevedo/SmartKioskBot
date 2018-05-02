@@ -35,10 +35,14 @@ namespace SmartKioskBot.Dialogs
             
             foreach(EntityRecommendation e in entities)
             {
-                if(e.Type == "filter")
+                if(e.Type.Contains("filter-type")) //--> alterar
                 {
-                    filtername = e.Entity;
-                    break;
+                    filtername = e.Type.Remove(0, e.Type.LastIndexOf(":") + 1);
+                }
+                else if(e.Type == "memory-type")
+                {
+                    if (e.Entity == "ram") filtername = "ram";
+                    else filtername = "tipo_armazenamento";
                 }
             }
 
@@ -55,17 +59,28 @@ namespace SmartKioskBot.Dialogs
             return reply;
         }
 
-        public static IMessageActivity Filter(IDialogContext _context, User user, Context context, IList<EntityRecommendation> entities)
+        public static IMessageActivity Filter(IDialogContext _context, User user, Context context, LuisResult result)
         {
             var filters = new List<FilterDefinition<Product>>();
 
-            /*var reply = _context.MakeMessage();
+           /* var reply = _context.MakeMessage();
 
-            foreach(EntityRecommendation e in entities)
+            foreach (CompositeEntity c in result.CompositeEntities)
+            {
+                reply.Text += c.ParentType + "\n\n";
+                foreach(CompositeChild ch in c.Children)
+                {
+                    reply.Text += ch.Type + "\n\n";
+                    reply.Text += ch.Value + "\n\n";
+                }
+            }
+            reply.Text += "====================";
+
+            foreach (EntityRecommendation e in result.Entities)
             {
                 reply.Text += e.Type + "\n\n" +
-                    e.Entity + "\n\n" +
-                    "\n\n";
+                    e.Entity + "\n\n";
+                reply.Text += "\n\n\n\n";
             }*/
 
             //Filters from context
@@ -75,7 +90,7 @@ namespace SmartKioskBot.Dialogs
             }
 
             //Filters from search
-            foreach(Filter f in GetEntitiesFilter(entities.ToList()))
+            foreach(Filter f in GetEntitiesFilter(result))
             {
                 var filtername = f.FilterName;
                 var op = f.Operator;
@@ -128,215 +143,197 @@ namespace SmartKioskBot.Dialogs
             return reply;
         }
 
-        private static List<Filter> GetEntitiesFilter(List<EntityRecommendation> entities)
+        private static List<Filter> GetEntitiesFilter(LuisResult result)
         {
+            var composite = result.CompositeEntities.ToList();
+            var entities = result.Entities.ToList();
+
             var filters = new List<Filter>();
 
-            bool price = false;
-            bool brand = false;
-            bool cpu = false;
-            bool storage_type = false;
-            bool graphics = false;
-            bool type = false;
+            //Handle composite entities
+            for (int i = 0; i < composite.Count; i++)
+            {
+                var c = composite[i];
 
+                Filter f1 = new Filter();
+                Filter f2 = new Filter();
+                bool between = false;
+                f1.FilterName = "";
+                f1.Operator = "=";
+                f1.Value = "";
+
+                f2.FilterName = "";
+                f2.Operator = "";
+                f2.Value = "";
+
+                //check entities
+                for (int j = 0; j < c.Children.Count(); j++){
+                    var ch = c.Children[j];
+
+                    switch (ch.Type)
+                    {
+                        case "memory-type":
+                            {
+                                if (ch.Value == "ram")
+                                    f1.FilterName = "ram";
+                                else
+                                {
+                                    f1.FilterName = "tipo_armazenamento";
+                                    f1.Value = ch.Value;
+                                }
+                                break;
+                            }
+                        case "filter-type":
+                            {
+                                f1.FilterName = ch.Value.ToString();
+                                break;
+                            }
+                        case "position::between":
+                            {
+                                between = true;
+                                f1.Operator = ">";
+                                f2.Operator = "<";
+                                break;
+                            }
+                        case "position::lower":
+                            {
+                                f1.Operator = "<";
+                                break;
+                            }
+                        case "position::higher":
+                            {
+                                f1.Operator = ">";
+                                break;
+                            }
+                        case "builtin.number":
+                        case "builtin.money":
+                        case "storage":
+                            {
+                                var v = ch.Value;
+
+                                if(ch.Type == "storage" || ch.Type == "builtin.money" || ch.Type == "builtin.number")
+                                    v = Regex.Match(ch.Value, @"[\d]*([\,,\.][\d]*)?").Value;    //extract number
+
+                                if (v == "")
+                                    break;
+
+                                if (ch.Type == "builtin.money" && f1.FilterName == "")
+                                    f1.FilterName = "preço";
+
+                                if (ch.Type == "storage" && f1.FilterName == "")
+                                    f1.FilterName = "armazenamento";
+                                
+                                if (f1.FilterName == "tipo_armazenamento")
+                                {
+                                    filters.Add(f1);
+                                    f1 = new Filter();
+                                    f1.FilterName = "armazenamento";
+                                    f1.Operator = "=";
+                                }
+
+                                if (f1.Value == "")
+                                    f1.Value = v;
+                                else if(Double.Parse(f1.Value) <= Double.Parse(v))
+                                    f2.Value = v;
+                                else if (Double.Parse(f1.Value) >= Double.Parse(v))
+                                {
+                                    f2.Value = f1.Value;
+                                    f1.Value = v;
+                                }
+                                break;
+                            }
+                    }
+                    //remove from the list of the single entities
+                    RemoveProcessedEntity(entities, ch.Type, ch.Value);
+                }
+                filters.Add(f1);
+                if (between)
+                {
+                    f2.FilterName = f1.FilterName;
+                    filters.Add(f2);
+                }
+
+                //remove from the list of single entities
+                RemoveProcessedEntity(entities, c.ParentType, c.Value);
+            }
+
+            //Handle single entities
             for (int i = 0; i < entities.Count; i++)
             {
-
-                if (entities[i].Type == "filter")
-                {
-                    switch (entities[i].Entity.ToLower())
-                    {
-                        //number values
-                        case "preço":
-                        case "ram":
-                        case "armazenamento":
-                        case "autonomia":
-                        case "ecrã":
-                            if (!(entities[i].Entity == "preço" && !price)) {
-                                var f = new Filter();
-                                f.FilterName = entities[i].Entity.ToString();
-                                f.Operator = "=";
-                                //Tries to find the value and the position
-                                for (int j = i + 1; j < entities.Count; j++)
-                                {
-                                    if (entities[j].Type == "position::min")
-                                        f.Operator = ">";
-                                    else if (entities[j].Type == "position::max")
-                                        f.Operator = "<";
-                                    else if (entities[j].Type == "buildin.number")
-                                    {
-                                        f.Value = entities[j].Entity;
-                                        filters.Add(f);
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        case "marca":
-                            if (!brand)
-                            {
-                                var f = new Filter();
-                                f.FilterName = "marca";
-                                f.Operator = "=";
-                                for (int j = i+1; j < entities.Count; j++)
-                                {
-                                    if (entities[j].Type == "brands")
-                                    {
-                                        f.Value = entities[j].Entity;
-                                        filters.Add(f);
-                                        brand = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        case "cpu":
-                            if (!cpu)
-                            {
-                                var f = new Filter();
-                                f.Operator = "=";
-                                f.FilterName = "familia_cpu";
-                                for (int j = i + 1; j < entities.Count; j++)
-                                {
-                                    if (entities[j].Type == "CPU")
-                                    {
-                                        f.Value = entities[j].Entity.ToString();
-                                        filters.Add(f);
-                                        cpu = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        case "tipo de armazenamento":
-                            if (!storage_type) { 
-                                var f = new Filter();
-                                f.Operator = "=";
-                                f.FilterName = "tipo_armazenamento";
-                                for (int j = i + 1; j < entities.Count; j++)
-                                {
-                                    if (entities[j].Type == "memoryType")
-                                    {
-                                        f.Value = entities[j].Entity.ToString();
-                                        filters.Add(f);
-                                        storage_type = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        case "gráfica":
-                            if (!graphics)
-                            {
-                                var f = new Filter();
-                                f.Operator = "=";
-                                f.FilterName = "placa_grafica";
-                                for (int j = 0; j < entities.Count; j++)
-                                {
-                                    if (entities[j].Type == "GPU")
-                                    {
-                                        f.Value = entities[j].Entity.ToString();
-                                        filters.Add(f);
-                                        graphics = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        case "tipo":
-                            if (!type)
-                            {
-                                var f = new Filter();
-                                f.Operator = "=";
-                                f.FilterName = "tipo";
-                                for (int j = 0; j < entities.Count; j++)
-                                {
-                                    if (entities[j].Type == "pcType")
-                                    {
-                                        f.Value = entities[j].Resolution.Values.ElementAt(0).ToString();
-                                        filters.Add(f);
-                                        type = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                    }
-
+                var f = new Filter();
+                f.FilterName = "";
+                f.Operator = "=";
+                f.Value = entities[i].Entity;
+                switch(entities[i].Type.ToLower()){
+                    case "cpu":
+                        f.FilterName = "cpu";
+                        break;
+                    case "gpu":
+                        f.FilterName = "gpu";
+                        break;
+                    case "builtin::money":
+                        f.FilterName = "preço";
+                        f.Value = Regex.Match(entities[i].Entity, @"[\d]*([\,,\.][\d]*)?").Value;
+                        break;
+                    case "storage":
+                        f.FilterName = "armazenamento";
+                        f.Value = Regex.Match(entities[i].Entity, @"[\d]*([\,,\.][\d]*)?").Value;
+                        break;
+                    case "brand":
+                        f.FilterName = "marca";
+                        break;
+                    case "pc-type::advanced":
+                        f.FilterName = "tipo";
+                        f.Value = "avançado";
+                        break;
+                    case "pc-type::convertible":
+                        f.FilterName = "tipo";
+                        f.Value = "convertível 2 em 1";
+                        break;
+                    case "pc-type::essencial":
+                        f.FilterName = "tipo";
+                        f.Value = "essencial";
+                        break;
+                    case "pc-type::gaming":
+                        f.FilterName = "tipo";
+                        f.Value = "gaming";
+                        break;
+                    case "pc-type::mobility":
+                        f.FilterName = "tipo";
+                        f.Value = "mobilidade";
+                        break;
+                    case "pc-type::performance":
+                        f.FilterName = "tipo";
+                        f.Value = "performance";
+                        break;
+                    case "pc-type::slim":
+                        f.FilterName = "tipo";
+                        f.Value = "ultra fino";
+                        break;
                 }
-                else if (entities[i].Type == "builtin.money" && !price)
-                {
-                    var f = new Filter();
-                    f.FilterName = "preço";
-                    for(var j = i-1; j< entities.Count; j++)
-                    {
-                        if (entities[j].Type == "position::min")
-                            f.Operator = "<";
-                        else if (entities[j].Type == "position::max")
-                            f.Operator = ">";
-                    }
-                    f.Value = Regex.Match(entities[i].Entity, @"\d+").Value; 
+                if (f.FilterName != "" && f.Operator != "" && f.Value != "")
                     filters.Add(f);
-                    price = true;
-                }
-                else if (entities[i].Type == "brands" && !brand)
-                {
-                    var f = new Filter();
-                    f.FilterName = "marca";
-                    f.Operator = "=";
-                    f.Value = entities[i].Entity;
-                    filters.Add(f);
-                    brand = true;
-                }
-                else if (entities[i].Type == "CPU" && !cpu)
-                {
-                    var f = new Filter();
-                    f.FilterName = "familia_cpu";
-                    f.Operator = "=";
-                    f.Value = entities[i].Entity;
-                    filters.Add(f);
-                    cpu = true;
-                }
-                else if (entities[i].Type == "memoryType" && !storage_type)
-                {
-                    var f = new Filter();
-                    f.FilterName = "tipo_armazenamento";
-                    f.Operator = "=";
-                    f.Value = entities[i].Entity;
-                    filters.Add(f);
-                    storage_type = true;
-                }
-                else if (entities[i].Type == "GPU" && !graphics)
-                {
-                    var f = new Filter();
-                    f.FilterName = "placa_grafica";
-                    f.Operator = "=";
-                    f.Value = entities[i].Entity;
-                    filters.Add(f);
-                    graphics = true;
-                }
-                else if (entities[i].Type == "pcType" && !type)
-                {
-                    var f = new Filter();
-                    f.FilterName = "tipo";
-                    f.Operator = "=";
-                    /*if (entities[i].Resolution.Count > 0)
-                    {
-                        var a = entities[i];
-                        var b = a.Resolution;
-                        var c = b.Values.ToList();
-                        var d = c[0];
-                        f.Value = d.ToString();
-                    }
-                    else
-                        f.Value = entities[i].Entity;
-                    filters.Add(f);*/
-                    f.Value = entities[i].Entity;
-                    graphics = true;
-                }
             }
 
             return filters;
+        }
+
+        public static void RemoveProcessedEntity(List<EntityRecommendation> entities, string type,string value)
+        {
+            int i = 0;
+
+            for(i = 0; i < entities.Count(); i++)
+            {
+                var a = entities[i].Type;
+                var b = type;
+                var c = entities[i].Entity;
+                var d = value;
+
+                if (entities[i].Type == type && entities[i].Entity == value)
+                    break;                    
+            }
+            if(i != entities.Count())
+                entities.RemoveAt(i);
         }
 
         private static FilterDefinition<Product> GetFilter(string filter, string op,string value){

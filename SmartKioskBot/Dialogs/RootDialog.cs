@@ -100,7 +100,7 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("Filter")]
         public async Task Filter(IDialogContext context, LuisResult result)
         {
-            IMessageActivity r = FilterDialog.Filter(context, this.user, this.context, result.Entities);
+            IMessageActivity r = FilterDialog.Filter(context, this.user, this.context, result);
             await context.PostAsync(r);
             Next(context);
         }
@@ -119,6 +119,17 @@ namespace SmartKioskBot.Dialogs
             Next(context);
         }
 
+        /*
+         * Product
+         */
+         [LuisIntent("ViewProductDetails")]
+        public async Task ViewProductDetails(IDialogContext context, LuisResult result)
+        {
+            var idx = result.Query.LastIndexOf(":");
+            string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
+            await ProductDetails.ShowProductMessage(context, id);
+            Next(context);
+        }
 
         /*
         [LuisIntent("Recommendation")]
@@ -139,26 +150,26 @@ namespace SmartKioskBot.Dialogs
             return null;
         }*/
 
-       /* [LuisIntent("Recommendation")]
-        public void Recommendation(IDialogContext context, LuisResult result)
-        {
-            Next(context);
-        }*/
+        /* [LuisIntent("Recommendation")]
+         public void Recommendation(IDialogContext context, LuisResult result)
+         {
+             Next(context);
+         }*/
 
-       /* [LuisIntent("StoreLocation")]
-        public void StoreLocation(IDialogContext context, LuisResult result)
-        {
-            Next(context);
-        }*/
+        /* [LuisIntent("StoreLocation")]
+         public void StoreLocation(IDialogContext context, LuisResult result)
+         {
+             Next(context);
+         }*/
 
-       /* [LuisIntent("ViewWishList")]
-        public void ViewWishList(IDialogContext context, LuisResult result)
-        {
-            FilterDialog w = new FilterDialog();
-            IMessageActivity r = w.filtering(result.Entities, context.MakeMessage());
+        /* [LuisIntent("ViewWishList")]
+         public void ViewWishList(IDialogContext context, LuisResult result)
+         {
+             FilterDialog w = new FilterDialog();
+             IMessageActivity r = w.filtering(result.Entities, context.MakeMessage());
 
-            Next(context);
-        }*/
+             Next(context);
+         }*/
 
 
         /*
