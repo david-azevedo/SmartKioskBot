@@ -190,14 +190,30 @@ namespace SmartKioskBot.Controllers
             return new ObjectId[] { };
         }
 
-        public static void AddComparator(string productId)
+        public static void AddComparator(User user, string productId)
         {
-            //TODO
+            var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
+
+            var filter = Builders<Context>.Filter.And(
+                Builders<Context>.Filter.Eq(o => o.UserId, user.Id),                                        //same user id
+                Builders<Context>.Filter.Eq(o => o.Country, user.Country),                                  //same country (shard)
+                Builders<Context>.Filter.Not(
+                    Builders<Context>.Filter.AnyEq(o => o.Comparator, ObjectId.Parse(productId))));  //don't contain the product already     
+            var update = Builders<Context>.Update.Push(o => o.Comparator, ObjectId.Parse(productId));     //push new wish 
+
+            contextCollection.UpdateOne(filter, update);
         }
 
-        public static void RemComparator(string productId)
+        public static void RemComparator(User user, string productId)
         {
-            //TODO
+            var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
+
+            var filter = Builders<Context>.Filter.And(
+                Builders<Context>.Filter.Eq(o => o.UserId, user.Id),           //same user id
+                Builders<Context>.Filter.Eq(o => o.Country, user.Country));    //same country (shard)
+
+            var update = Builders<Context>.Update.Pull(o => o.Comparator, ObjectId.Parse(productId));
+            contextCollection.UpdateOne(filter, update);
         }
     }
 }
