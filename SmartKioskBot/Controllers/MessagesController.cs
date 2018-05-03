@@ -23,7 +23,7 @@ namespace SmartKioskBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog(activity));
             }
             else
             {
@@ -48,27 +48,8 @@ namespace SmartKioskBot
 
                 // text activation
                 if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id)) {
-
-                    var reply = message.CreateReply(BotDefaultAnswers.getMemberAdded());
-                    
-                    //USER IDENTIFICATION
-                    var channelId = message.ChannelId;
-                    var currentUser = UserController.getUser(channelId);
-
-                    //user doesn't exist
-                    if (currentUser == null)
-                    {
-                        reply = message.CreateReply(BotDefaultAnswers.getIdentification());
-                    }
-                    // IDENTIFICATION
-                    else if (currentUser.CustomerCard == "" && currentUser.Email == "")
-                    {
-                        reply = message.CreateReply(BotDefaultAnswers.getCustomerCardOrEmail(currentUser.Name));
-                    }
-                    
-
+                    var reply = message.CreateReply(BotDefaultAnswers.getMemberAdded());     
                     ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
-
                     connector.Conversations.ReplyToActivity(reply);
                 }
             }

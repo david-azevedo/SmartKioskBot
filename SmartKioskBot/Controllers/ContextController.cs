@@ -21,7 +21,7 @@ namespace SmartKioskBot.Controllers
         {
 
             var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
-            var filter = MongoDB.Driver.Builders<Context>.Filter.Eq(c => c.UserId, userId);
+            var filter = Builders<Context>.Filter.Eq(c => c.UserId, userId);
 
             List<Context> context = contextCollection.Find(filter).ToList();
 
@@ -31,6 +31,19 @@ namespace SmartKioskBot.Controllers
                 return context[0];
         }
 
+        /// <summary>
+        /// Delete context
+        /// </summary>
+        /// <param name="userId"></param>
+        public static void DeleteContext(Context context)
+        {
+            var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
+            var filter = Builders<Context>.Filter.And(
+                Builders<Context>.Filter.Eq(o=>o.Country,context.Country),
+                Builders<Context>.Filter.Eq(o => o.Id, context.Id)
+                );
+            contextCollection.DeleteOne(filter);
+        }
         /// <summary>
         /// Create a context related to a user.
         /// </summary>

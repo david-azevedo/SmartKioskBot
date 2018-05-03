@@ -49,6 +49,19 @@ namespace SmartKioskBot.Controllers
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        public static void DeleteUser(User user)
+        {
+            var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(o => o.Country, user.Country),
+                Builders<User>.Filter.Eq(o => o.Id, user.Id));
+            userCollection.DeleteOne(filter);
+        }
+
+        /// <summary>
         /// Get user by customer card.
         /// </summary>
         /// <param name="customerCard"></param>
@@ -105,6 +118,24 @@ namespace SmartKioskBot.Controllers
 
                 userCollection.UpdateOne(filter, update);
             }
+        }
+
+        /// <summary>
+        /// Sets the user information.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="customerId"></param>
+        public static void SetUserInfo(User user, string name, string email, string customerId)
+        {
+            var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
+            var update = Builders<User>.Update.Set(o => o.Name, name).Set(o => o.Email, email).Set(o => customerId, customerId);
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(o => o.Id, user.Id),
+                Builders<User>.Filter.Eq(o => o.Country, user.Country));
+
+            userCollection.UpdateOne(filter, update);
         }
 
         /// <summary>

@@ -9,6 +9,8 @@ namespace SmartKioskBot.Dialogs
 {
     public abstract class BotDefaultAnswers
     {
+        public static string[] Yes = new string[] { "sim", "Sim", "Ok", "ok" };
+        public static string[] No = new string[] { "não", "Não" };
         /*
          * Activity Dialog
          */
@@ -33,9 +35,10 @@ namespace SmartKioskBot.Dialogs
         /*
          * Button Click Message
          */
-        public static string show_product_details = "Detalhes";
-        public static string add_wish_list = "AdicionarWishList";
-        public static string add_to_comparator = "AdicionarComparador";
+      
+        public static string show_product_details = "Ver detalhes do produto: ";
+        public static string add_wish_list = "Adicionar à lista de desejos o produto:";
+        public static string add_to_comparator = "Adicionar ao comparador o produto:";
         public static string rem_wish_list = "RemoverWishList";
         public static string rem_comparator = "RemoverComparador";
         public static string do_comparator = "Comparar";
@@ -44,6 +47,7 @@ namespace SmartKioskBot.Dialogs
         public static string add_channel = "AddChannel";
         public static string set_customer_name = "SaveName";
         public static string set_customer_country = "SaveCountry";
+      
         /*
          * Intents Dialog
          */
