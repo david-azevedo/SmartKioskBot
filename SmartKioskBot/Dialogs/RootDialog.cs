@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
@@ -7,7 +8,9 @@ using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using SmartKioskBot.Controllers;
+using SmartKioskBot.Dialogs.QnA;
 using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 
@@ -54,8 +57,19 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("")]
         public async Task None(IDialogContext context, LuisResult result)
         {
-            string message = $"Sorry, I did not understand '{result.Query}'. Type 'help' if you need assistance.";
-            await context.PostAsync(message);
+
+            // Chamar QnA Maker
+            QnAMakerResult qnaResult = await QnADialog.MakeRequest(result.Query);
+
+            if (qnaResult != null)
+            {
+                await context.PostAsync(qnaResult.Answer);
+            }
+            else {
+                string message = $"Sorry, I did not understand '{result.Query}'. Type 'help' if you need assistance.";
+                await context.PostAsync(message);
+            }
+
             Next(context);
         }
 
