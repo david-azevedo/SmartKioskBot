@@ -18,7 +18,6 @@ namespace SmartKioskBot.Dialogs
     public sealed class RootDialog : LuisDialog<object>
     {
         private User user;
-        private Context context;
         private bool identification;
 
         public RootDialog(Activity activity)
@@ -27,10 +26,7 @@ namespace SmartKioskBot.Dialogs
             if (user == null)
                 identification = false;
             else
-            {
                 identification = true;
-                context = ContextController.GetContext(user.Id);
-            }
         }
 
         //ATENÇÃO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
@@ -46,7 +42,6 @@ namespace SmartKioskBot.Dialogs
         private async Task ResumeAfterIdent(IDialogContext context, IAwaitable<object> result)
         {
             this.user = UserController.getUser(context.Activity.ChannelId);
-            this.context = ContextController.GetContext(user.Id);
             this.identification = true;
             context.Wait(this.MessageReceived);
         }
@@ -75,7 +70,7 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("ViewWishList")]
         public async Task ViewWishList(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync(WishListDialog.ViewWishList(context, this.context));
+            await context.PostAsync(WishListDialog.ViewWishList(context, ContextController.GetContext(user.Id)));
             Next(context);
         }
         [LuisIntent("AddWishList")]
@@ -100,7 +95,7 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("Filter")]
         public async Task Filter(IDialogContext context, LuisResult result)
         {
-            IMessageActivity r = FilterDialog.Filter(context, this.user, this.context, result);
+            IMessageActivity r = FilterDialog.Filter(context, this.user, ContextController.GetContext(user.Id), result);
             await context.PostAsync(r);
             Next(context);
         }
@@ -115,7 +110,7 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("RmvFilter")]
         public async Task RmvFilter(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync(FilterDialog.CleanFilter(context, this.user, this.context, result.Entities));
+            await context.PostAsync(FilterDialog.CleanFilter(context, this.user, ContextController.GetContext(user.Id), result.Entities));
             Next(context);
         }
 
