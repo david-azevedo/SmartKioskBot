@@ -123,5 +123,54 @@ namespace SmartKioskBot.Controllers
 
             }
         }
+
+        public string[] GetMostPopularFilters(ObjectId customerId, int maxNumOfFilters)
+        {
+            Customer customer = GetCustomer(customerId);
+
+            List<KeyValuePair<string, int>> list = customer.FiltersCount.ToList();
+            list.Sort(
+                // 'delegate' passes a method as argument to another method. 
+                // In this case, I believe it passes the function comparing to pairs to the Sort function.
+                delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                {
+                    return pair1.Value.CompareTo(pair2.Value);
+                }
+            );
+
+            List<string> filters = new List<string>();
+
+            for(int i = 0; i < maxNumOfFilters; i++)
+            {
+                filters.Add(list[i].Key);
+            }
+
+            return filters.ToArray();
+        }
+
+        public ObjectId[] GetMostClickedProducts(ObjectId customerId, int maxNumOfProducts)
+        {
+            Customer customer = GetCustomer(customerId);
+
+            List<Customer.ProductClicks> list = customer.ProductsClicks.ToList();
+
+            list.Sort(
+                // 'delegate' passes a method as argument to another method. 
+                // In this case, I believe it passes the function comparing to pairs to the Sort function.
+                delegate (Customer.ProductClicks l1, Customer.ProductClicks l2)
+                {
+                    return l1.NClicks.CompareTo(l2.NClicks);
+                }
+            );
+
+            List<ObjectId> filters = new List<ObjectId>();
+
+            for (int i = 0; i < maxNumOfProducts; i++)
+            {
+                filters.Add(list[i].ProductId);
+            }
+
+            return filters.ToArray();
+        }
     }
 }
