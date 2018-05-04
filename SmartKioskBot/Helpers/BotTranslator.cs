@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Connector;
 
 namespace SmartKioskBot.Helpers
 {
@@ -474,6 +475,25 @@ namespace SmartKioskBot.Helpers
             // Traduzir
             string text = await DirectTranslateAsync(reply, "pt", userLanguageCode);
             await context.PostAsync(text);
+
+        }
+        public static async Task PostTranslated(IDialogContext context, IMessageActivity reply, string userLanguageCode)
+        {
+            // Traduzir
+            reply.Text = await DirectTranslateAsync(reply.Text, "pt", userLanguageCode);
+            /*foreach(Attachment a in reply.Attachments)
+            {
+                if(a.ContentType == HeroCard.ContentType)
+                {
+                    foreach(CardAction b in ((HeroCard)a.Content).Buttons)
+                    {
+                        b.Text = await DirectTranslateAsync(b.Text, "pt", userLanguageCode);
+                    }
+                }
+            }*/
+
+
+            await context.PostAsync(reply);
 
         }
     }

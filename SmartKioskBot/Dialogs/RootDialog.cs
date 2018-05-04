@@ -59,7 +59,7 @@ namespace SmartKioskBot.Dialogs
         {
             var reply = context.MakeMessage();
             reply.Text = BotDefaultAnswers.getGreeting(context.Activity.From.Name);
-            await context.PostAsync(reply);
+            await Helpers.BotTranslator.PostTranslated(context, reply, reply.Locale);
             Next(context);
         }
 
@@ -70,21 +70,24 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("ViewWishList")]
         public async Task ViewWishList(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync(WishListDialog.ViewWishList(context, ContextController.GetContext(user.Id)));
+            var reply = WishListDialog.ViewWishList(context, ContextController.GetContext(user.Id));
+            await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             Next(context);
         }
         [LuisIntent("AddWishList")]
         public async Task AddWishList(IDialogContext context, LuisResult result)
         {
             WishListDialog.AddToWishList(result.Query, user);
-            await context.PostAsync(BotDefaultAnswers.getAddWishList());
+            var reply = BotDefaultAnswers.getAddWishList();
+            await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             Next(context);
         }
         [LuisIntent("RmvWishList")]
         public async Task RmvWishList(IDialogContext context, LuisResult result)
         {
             WishListDialog.RemoveFromWishList(result.Query, user);
-            await context.PostAsync(BotDefaultAnswers.getRemWishList());
+            var reply = BotDefaultAnswers.getRemWishList();
+            await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             Next(context);
         }
 
@@ -96,21 +99,23 @@ namespace SmartKioskBot.Dialogs
         public async Task Filter(IDialogContext context, LuisResult result)
         {
             IMessageActivity r = FilterDialog.Filter(context, this.user, ContextController.GetContext(user.Id), result);
-            await context.PostAsync(r);
+            await Helpers.BotTranslator.PostTranslated(context, r, context.MakeMessage().Locale);
             Next(context);
         }
 
         [LuisIntent("CleanAllFilters")]
         public async Task CleanAllFilters(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync(FilterDialog.CleanAllFilters(context,user));
+            var reply = FilterDialog.CleanAllFilters(context, user);
+            await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             Next(context);
         }
 
         [LuisIntent("RmvFilter")]
         public async Task RmvFilter(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync(FilterDialog.CleanFilter(context, this.user, ContextController.GetContext(user.Id), result.Entities));
+            var reply = FilterDialog.CleanFilter(context, this.user, ContextController.GetContext(user.Id), result.Entities);
+            await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             Next(context);
         }
 
