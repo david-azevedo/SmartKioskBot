@@ -8,9 +8,17 @@ using System.Web;
 
 namespace SmartKioskBot.Models
 {
+    /**
+     * Customer vs User
+     * 
+     * A Customer is an object belonging to the CRM while a User is related to a dialog. 
+     * 
+     * A Customer contains information about the purchasing activity of a person.
+     * A User contains information about the interaction of a person with the bot.
+     */
 
     [Serializable, JsonObject]
-    public class CRM
+    public class Customer
     {
         [BsonId]
         public ObjectId Id { get; set; }

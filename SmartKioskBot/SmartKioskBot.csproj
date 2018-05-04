@@ -202,7 +202,7 @@
     <Compile Include="Logic\Comparator.cs" />
     <Compile Include="Logic\Part.cs" />
     <Compile Include="Models\Context.cs" />
-    <Compile Include="Models\CRM.cs" />
+    <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\Store.cs" />
     <Compile Include="Models\User.cs" />
@@ -225,6 +225,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
