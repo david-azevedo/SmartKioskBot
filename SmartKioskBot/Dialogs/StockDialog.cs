@@ -18,35 +18,14 @@ namespace SmartKioskBot.Dialogs
     public class StockDialog
     {
 
-        public static void AddToWishList(string message, User user)
+        public static List<string> CheckAvailability(string message)
         {
             string[] parts = message.Split(':');
 
             if (parts.Length >= 2)
-                ContextController.AddWishList(user, parts[1]);
-        }
+                return ContextController.CheckAvailability(parts[1]);
 
-        public static IMessageActivity ViewWishList(IDialogContext _context, Context context)
-        {
-            //getProducts
-            var products = ProductController.getProducts(context.WishList);
-
-            var reply = _context.MakeMessage();
-
-            if (products.Count == 0)
-                reply.Text = BotDefaultAnswers.getEmptyWishList();
-            else
-                reply.Text = BotDefaultAnswers.getWishList();
-            reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-            List<Attachment> cards = new List<Attachment>();
-
-            foreach (Product p in products)
-            {
-                cards.Add(ProductCard.GetProductCard(p, ProductCard.CardType.WISHLIST).ToAttachment());
-            }
-
-            reply.Attachments = cards;
-            return reply;
+            return new List<string>();
         }
     }
 }

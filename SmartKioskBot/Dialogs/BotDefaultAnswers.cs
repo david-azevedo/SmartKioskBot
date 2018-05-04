@@ -47,7 +47,7 @@ namespace SmartKioskBot.Dialogs
         public static string add_channel = "AddChannel";
         public static string set_customer_name = "SaveName";
         public static string set_customer_country = "SaveCountry";
-        public static string show_store_with_stock = "Verificar disponibilidade do produto:";
+        public static string show_store_with_stock = "Stock:";
       
         /*
          * Intents Dialog
@@ -220,13 +220,20 @@ namespace SmartKioskBot.Dialogs
             return success[new Random().Next(0, success.Length)];
         }
 
-        public static String getStoresWithStore()
+        public static String getStoresWithStock(List<string> stores)
         {
+            string storeNames = "";
+
+            for (int i = 0; i < stores.Count(); i++)
+            {
+                storeNames += "\n- " + stores[i];
+            }
+
             String[] success =
             {
-                "Produto disponivel nas seguintes lojas:\n"
+                "Produto disponivel nas seguintes lojas:"
             };
-            return success[new Random().Next(0, success.Length)];
+            return success[new Random().Next(0, success.Length)] + storeNames;
         }
 
     }
