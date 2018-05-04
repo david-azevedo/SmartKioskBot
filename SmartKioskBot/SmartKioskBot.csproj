@@ -194,6 +194,8 @@
     <Compile Include="Dialogs\FilterDialog.cs" />
     <Compile Include="Dialogs\IdentificationDialog.cs" />
     <Compile Include="Dialogs\ProductDetails.cs" />
+    <Compile Include="Dialogs\QnA\QnADialog.cs" />
+    <Compile Include="Dialogs\QnA\QnAMakerResult.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Dialogs\WishListDialog.cs" />
     <Compile Include="Global.asax.cs">
