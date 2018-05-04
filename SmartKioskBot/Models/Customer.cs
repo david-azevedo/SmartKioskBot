@@ -30,7 +30,7 @@ namespace SmartKioskBot.Models
         public ProductBought[] ProductsBought { get; set; }
 
         [BsonElement("filtersCount")]
-        public string[] FiltersCount { get; set; }
+        public Dictionary<string, int> FiltersCount { get; set; }
 
         [BsonElement("productsClick")]
         public ProductClicks[] ProductsClicks { get; set; }

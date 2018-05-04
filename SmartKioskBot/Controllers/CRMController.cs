@@ -93,5 +93,35 @@ namespace SmartKioskBot.Controllers
 
             }
         }
+
+        public void AddFilterUsage(ObjectId customerId, string filterString)
+        {
+            var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
+            var filter = Builders<Customer>.Filter.Eq(c => c.Id, customerId);
+            UpdateDefinition<Customer> update;
+
+            Customer customer = GetCustomer(customerId);
+
+            if (customer != null)
+            {
+                foreach (KeyValuePair<string, int> item in customer.FiltersCount)
+                {
+                    if (item.Key.Equals(filterString))
+                    {
+                        int newFiltersCount = item.Value + 1;
+                        update = Builders<Customer>.Update.Set(c => c.FiltersCount[item.Key], newFiltersCount);
+                        collection.UpdateOne(filter, update);
+
+                        return;
+                    }
+                }
+
+                KeyValuePair<string, int> kvp = new KeyValuePair<string, int>(filterString, 1);
+
+                update = Builders<Customer>.Update.Push(c => c.FiltersCount, kvp);
+                collection.UpdateOne(filter, update);
+
+            }
+        }
     }
 }
