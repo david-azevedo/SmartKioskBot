@@ -132,6 +132,17 @@ namespace SmartKioskBot.Dialogs
         }
 
         /*
+         * Stock
+         */
+        [LuisIntent("StockInStore")]
+        public async Task StockInStore(IDialogContext context, LuisResult result)
+        {
+            WishListDialog.AddToWishList(result.Query, user);
+            await context.PostAsync(BotDefaultAnswers.getAddWishList());
+            Next(context);
+        }
+
+        /*
         [LuisIntent("Recommendation")]
         public void Recommendation(IDialogContext context, LuisResult result)
         {

@@ -124,6 +124,7 @@ namespace SmartKioskBot.UI
                     }
             }
 
+            buttons.Add(new CardAction(ActionTypes.ImBack, "Verificar Disponibilidade", value: BotDefaultAnswers.show_store_with_stock + id));
 
             return buttons;
         }
