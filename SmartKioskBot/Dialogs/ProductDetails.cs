@@ -14,20 +14,10 @@ using System.Web;
 namespace SmartKioskBot.Dialogs
 {
     [Serializable]
-    public class ProductDetails : IDialog<object> { 
+    public class ProductDetails : LuisDialog<object> {
 
-        public async Task StartAsync(IDialogContext context) {
-            context.Wait(ShowProductMessage);
-        }
-
-        public async Task ShowProductMessage(IDialogContext context, IAwaitable<IMessageActivity> activity)
+        public async static Task ShowProductMessage(IDialogContext context, string id)
         {
-            var message = await activity;
-            
-            var userInput = (message.Text != null ? message.Text : "").Split(new[] { ' ' }, 2);
-            string[] details = message.Text.Split(' ');
-            var id = details[1];
-
             var collection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
 
             //get product
@@ -43,9 +33,6 @@ namespace SmartKioskBot.Dialogs
             reply.Attachments = cards;
 
             await context.PostAsync(reply);
-
-            context.Done<object>(new object());
-
         }
     }
 }
