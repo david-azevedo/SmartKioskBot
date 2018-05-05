@@ -48,7 +48,8 @@ namespace SmartKioskBot.Dialogs
         public static string set_customer_name = "SaveName";
         public static string set_customer_country = "SaveCountry";
         public static string show_store_with_stock = "Stock:";
-      
+        public static string show_store_details = "Store Details:";
+
         /*
          * Intents Dialog
          */
@@ -220,13 +221,13 @@ namespace SmartKioskBot.Dialogs
             return success[new Random().Next(0, success.Length)];
         }
 
-        public static String getStoresWithStock(List<string> stores)
+        public static String getStoresWithStock(SortedDictionary<string, string> stores)
         {
             string storeNames = "";
 
-            for (int i = 0; i < stores.Count(); i++)
+            foreach (KeyValuePair<string, string> kvp in stores)
             {
-                storeNames += "\n- " + stores[i];
+                storeNames += "\n- " + kvp.Value;
             }
 
             String[] success =

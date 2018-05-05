@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using SmartKioskBot.Dialogs;
+using SmartKioskBot.Controllers;
 using MongoDB.Driver;
 using static SmartKioskBot.UI.ProductCard;
 
@@ -86,6 +87,26 @@ namespace SmartKioskBot.UI
                 Images = new List<CardImage> { new CardImage(p.Photo) },
                 // list of buttons   
                 Buttons = getButtonsCardType(CardType.PRODUCT_DETAILS, p.Id.ToString())
+            };
+        }
+
+        public static HeroCard getStoresCard(Product p)
+        {
+            SortedDictionary<string, string> stores = StockDialog.CheckAvailability(p.Id.ToString());
+
+            List<CardAction> buttons = new List<CardAction>();
+
+            foreach (KeyValuePair<string, string> kvp in stores)
+            {
+                string id = kvp.Key;
+                string storeName = kvp.Value;
+                buttons.Add(new CardAction(ActionTypes.ImBack, storeName, value: BotDefaultAnswers.show_store_details + id));
+            }
+
+            return new HeroCard
+            {
+                Title = p.Brand + " " + p.Model + " disponivel em:",
+                Buttons = buttons
             };
         }
 

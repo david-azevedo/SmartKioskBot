@@ -137,7 +137,16 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("StockInStore")]
         public async Task StockInStore(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync(BotDefaultAnswers.getStoresWithStock(StockDialog.CheckAvailability(result.Query)));
+            
+            var idx = result.Query.LastIndexOf(":");
+            string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
+            
+            //hero card
+            await StoreDetails.ShowStoresMessage(context, id);
+            
+            //texto -> working
+            //await context.PostAsync(BotDefaultAnswers.getStoresWithStock(StockDialog.CheckAvailability(id)));
+
             Next(context);
         }
 

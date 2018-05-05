@@ -5,12 +5,14 @@ using Microsoft.Bot.Connector;
 using MongoDB.Bson;
 using SmartKioskBot.Controllers;
 using SmartKioskBot.Models;
+using SmartKioskBot.Helpers;
 using SmartKioskBot.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using MongoDB.Driver;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -18,14 +20,30 @@ namespace SmartKioskBot.Dialogs
     public class StockDialog
     {
 
-        public static List<string> CheckAvailability(string message)
+        public static SortedDictionary<string, string> CheckAvailability(string productId)
         {
-            string[] parts = message.Split(':');
+            var storeCollection = DbSingleton.GetDatabase().GetCollection<Store>(AppSettings.StoreCollection);
+            var filter = Builders<Store>.Filter.Empty;
 
-            if (parts.Length >= 2)
-                return ContextController.CheckAvailability(parts[1]);
+            List<Store> stores = storeCollection.Find(filter).ToList();
+            SortedDictionary<string, string> storeNames = new SortedDictionary<string, string>();
 
-            return new List<string>();
+            for (int i = 0; i < stores.Count(); i++)
+            {
+                for (int j = 0; j < stores[i].ProductsInStock.Count(); j++)
+                {
+                    if (stores[i].ProductsInStock[j].ProductId.ToString().Equals(productId))
+                    {
+                        if (stores[i].ProductsInStock[j].Stock > 0)
+                        {
+                            storeNames.Add(stores[i].Id.ToString(), stores[i].Name);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return storeNames;
         }
     }
 }

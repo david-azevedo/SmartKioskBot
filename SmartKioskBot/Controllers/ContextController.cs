@@ -215,31 +215,5 @@ namespace SmartKioskBot.Controllers
             var update = Builders<Context>.Update.Pull(o => o.Comparator, ObjectId.Parse(productId));
             contextCollection.UpdateOne(filter, update);
         }
-
-        public static List<string> CheckAvailability(string productId)
-        {
-            var storeCollection = DbSingleton.GetDatabase().GetCollection<Store>(AppSettings.StoreCollection);
-            var filter = Builders<Store>.Filter.Empty;
-
-            List<Store> stores = storeCollection.Find(filter).ToList();
-            List<string> storeNames = new List<string>();
-
-            for (int i = 0; i < stores.Count(); i++)
-            {
-                for (int j = 0; j < stores[i].ProductsInStock.Count(); j++)
-                {
-                    if (stores[i].ProductsInStock[j].ProductId.ToString().Equals(productId))
-                    {
-                        if (stores[i].ProductsInStock[j].Stock > 0)
-                        {
-                            storeNames.Add(stores[i].Name);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return storeNames;
-        }
     }
 }
