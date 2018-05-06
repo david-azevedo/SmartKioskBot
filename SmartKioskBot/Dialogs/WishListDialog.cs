@@ -23,7 +23,7 @@ namespace SmartKioskBot.Dialogs
             string[] parts = message.Split(':');
 
             if (parts.Length >= 2)
-                ContextController.AddWishList(user, parts[1]);
+                ContextController.AddWishList(user, parts[1].Remove(' '));
         }
 
         public static void RemoveFromWishList(string message, User user)
@@ -31,7 +31,7 @@ namespace SmartKioskBot.Dialogs
             string[] parts = message.Split(':');
 
             if (parts.Length >= 2)
-                ContextController.RemWishList(user, parts[1]);
+                ContextController.RemWishList(user, parts[1].Remove(' '));
         }
 
         public static IMessageActivity ViewWishList(IDialogContext _context, Context context)
@@ -42,9 +42,9 @@ namespace SmartKioskBot.Dialogs
             var reply = _context.MakeMessage();
 
             if (products.Count == 0)
-                reply.Text = BotDefaultAnswers.getEmptyWishList();
+                reply.Text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.FAIL);
             else
-                reply.Text = BotDefaultAnswers.getWishList();
+                reply.Text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS);
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
             List<Attachment> cards = new List<Attachment>();
 
