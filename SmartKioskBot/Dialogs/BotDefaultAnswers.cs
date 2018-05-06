@@ -38,11 +38,11 @@ namespace SmartKioskBot.Dialogs
          */
       
         public static string show_product_details = "Ver detalhes do produto: ";
-        public static string add_wish_list = "Adicionar à lista de desejos o produto:";
-        public static string add_to_comparator = "Adicionar ao comparador o produto:";
+        public static string add_wish_list = "Adicionar à lista de desejos o produto: ";
+        public static string add_to_comparator = "Adicionar ao comparador o produto: ";
         public static string rem_wish_list = "Remover da lista de desejos o produto: ";
-        public static string rem_comparator = "RemoverComparador";
-        public static string do_comparator = "Comparar";
+        public static string rem_comparator = "Remover do comparador o produto: ";
+        public static string add_comparator = "Adicionar ao comparador o produto: ";
         public static string set_customer_email = "SaveEmail";
         public static string set_customer_card = "SaveCard";
         public static string add_channel = "AddChannel";
@@ -163,6 +163,16 @@ namespace SmartKioskBot.Dialogs
             String[] success =
             {
                 "Produto removido com sucesso da sua lista de desejos!"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
+        //COMPARATOR
+        public static String getComparator(string comparison)
+        {
+            String[] success =
+            {
+                "Top score para " + comparison + ":"
             };
             return success[new Random().Next(0, success.Length)];
         }

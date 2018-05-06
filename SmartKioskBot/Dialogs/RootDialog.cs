@@ -73,6 +73,10 @@ namespace SmartKioskBot.Dialogs
             Next(context);
         }
 
+        /*
+         * Others
+         */
+
         [LuisIntent("Greeting")]
         public async Task Greeting(IDialogContext context, LuisResult result)
         {
@@ -117,6 +121,41 @@ namespace SmartKioskBot.Dialogs
             await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             Next(context);
         }
+
+        /*
+         * Comparator
+         */
+
+        [LuisIntent("AddComparator")]
+        public async Task AddComparator(IDialogContext context, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+
+            CompareDialog.AddComparator(context, result.Query);
+
+            Next(context);
+        }
+
+        [LuisIntent("RmvComparator")]
+        public async Task RmvComparator(IDialogContext context, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+
+            CompareDialog.RmvComparator(context, result.Query);
+
+            Next(context);
+        }
+
+        [LuisIntent("ViewComparator")]
+        public async Task ViewComparator(IDialogContext context, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+
+            await CompareDialog.ViewComparator(context);
+
+            Next(context);
+        }
+
 
         /*
          * Filter

@@ -191,6 +191,7 @@
     <Compile Include="Controllers\CRMController.cs" />
     <Compile Include="Dialogs\AddProductDialog.cs" />
     <Compile Include="Dialogs\BotDefaultAnswers.cs" />
+    <Compile Include="Dialogs\CompareDialog.cs" />
     <Compile Include="Dialogs\FilterDialog.cs" />
     <Compile Include="Dialogs\IdentificationDialog.cs" />
     <Compile Include="Dialogs\ProductDetails.cs" />
@@ -203,6 +204,8 @@
     </Compile>
     <Compile Include="Helpers\BotTranslator.cs" />
     <Compile Include="Helpers\DbSingleton.cs" />
+    <Compile Include="Logic\Comparator.cs" />
+    <Compile Include="Logic\Part.cs" />
     <Compile Include="Models\Context.cs" />
     <Compile Include="Models\CRM.cs" />
     <Compile Include="Models\Product.cs" />
@@ -222,6 +225,9 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Logic\rankings\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
