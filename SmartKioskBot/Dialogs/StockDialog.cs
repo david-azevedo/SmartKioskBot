@@ -17,16 +17,18 @@ using MongoDB.Driver;
 namespace SmartKioskBot.Dialogs
 {
     [Serializable]
-    public class StockDialog
+    public class StockDialog : LuisDialog<object>
     {
 
-        public static SortedDictionary<string, string> CheckAvailability(string productId)
+        public static IMessageActivity ShowStores(IDialogContext context, string productId)
         {
+            var reply = context.MakeMessage();
+
             var storeCollection = DbSingleton.GetDatabase().GetCollection<Store>(AppSettings.StoreCollection);
             var filter = Builders<Store>.Filter.Empty;
 
             List<Store> stores = storeCollection.Find(filter).ToList();
-            SortedDictionary<string, string> storeNames = new SortedDictionary<string, string>();
+            List<Store> storesWStock = new List<Store>();
 
             for (int i = 0; i < stores.Count(); i++)
             {
@@ -36,14 +38,32 @@ namespace SmartKioskBot.Dialogs
                     {
                         if (stores[i].ProductsInStock[j].Stock > 0)
                         {
-                            storeNames.Add(stores[i].Id.ToString(), stores[i].Name);
+                            storesWStock.Add(stores[i]);
                             break;
                         }
                     }
                 }
             }
 
-            return storeNames;
+            if (storesWStock.Count() == 0)
+            {
+                reply.AttachmentLayout = AttachmentLayoutTypes.List;
+                reply.Text = BotDefaultAnswers.getStockFail();
+            }
+            else
+            {
+                reply.Text = BotDefaultAnswers.getStockSuccess();
+                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                List<Attachment> cards = new List<Attachment>();
+
+                foreach (Store s in storesWStock)
+                {
+                    cards.Add(ProductCard.getStoreDetailsCard(s).ToAttachment());
+                }
+
+                reply.Attachments = cards;
+            }
+            return reply;
         }
     }
 }

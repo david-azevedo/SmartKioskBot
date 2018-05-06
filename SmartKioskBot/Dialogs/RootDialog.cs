@@ -140,13 +140,10 @@ namespace SmartKioskBot.Dialogs
             
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
-            
-            //hero card
-            await StoreDetails.ShowStoresMessage(context, id);
-            
-            //texto -> working
-            //await context.PostAsync(BotDefaultAnswers.getStoresWithStock(StockDialog.CheckAvailability(id)));
 
+            //hero card
+            IMessageActivity r = StockDialog.ShowStores(context, id);
+            await context.PostAsync(r);
             Next(context);
         }
 

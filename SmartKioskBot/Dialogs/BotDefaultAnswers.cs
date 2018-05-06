@@ -47,9 +47,8 @@ namespace SmartKioskBot.Dialogs
         public static string add_channel = "AddChannel";
         public static string set_customer_name = "SaveName";
         public static string set_customer_country = "SaveCountry";
-        public static string show_store_with_stock = "Stock:";
-        public static string show_store_details = "Store Details:";
-
+        public static string show_store_with_stock = "verificar disponibilidade do produto:";
+        
         /*
          * Intents Dialog
          */
@@ -221,21 +220,22 @@ namespace SmartKioskBot.Dialogs
             return success[new Random().Next(0, success.Length)];
         }
 
-        public static String getStoresWithStock(SortedDictionary<string, string> stores)
+        //STOCK
+        public static String getStockFail()
         {
-            string storeNames = "";
-
-            foreach (KeyValuePair<string, string> kvp in stores)
-            {
-                storeNames += "\n- " + kvp.Value;
-            }
-
-            String[] success =
-            {
-                "Produto disponivel nas seguintes lojas:"
+            String[] fail = {
+                "Nenhuma das nossas lojas tem esse produto em stock.",
             };
-            return success[new Random().Next(0, success.Length)] + storeNames;
+            return fail[new Random().Next(0, fail.Length)];
         }
 
+        public static String getStockSuccess()
+        {
+            String[] success = {
+                "Temos esse produto em stock nas seguintes lojas:",
+                "As seguintes lojas têm esse produto em stock:"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
     }
 }
