@@ -201,6 +201,7 @@
     <Compile Include="Helpers\DbSingleton.cs" />
     <Compile Include="Logic\Comparator.cs" />
     <Compile Include="Logic\Part.cs" />
+    <Compile Include="Logic\Recommendations.cs" />
     <Compile Include="Models\Context.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\Product.cs" />
