@@ -29,7 +29,7 @@ namespace SmartKioskBot.Controllers
                 return customer[0];
         }
 
-        public static void AddCustomer(User user)
+        public static ObjectId AddCustomer(User user)
         {
             Customer c = new Customer
             {
@@ -47,6 +47,8 @@ namespace SmartKioskBot.Controllers
 
             var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
             collection.InsertOne(c);
+
+            return c.Id;
         }
 
         public static void DeleteCustomer(ObjectId userId)
@@ -211,6 +213,11 @@ namespace SmartKioskBot.Controllers
             return filters.ToArray();
         }
 
+        public static void AddRandomCustomer()
+        {
+
+        }
+
         public static void Test()
         {
             ObjectId id = new ObjectId("111111111111111111111111");
@@ -222,7 +229,7 @@ namespace SmartKioskBot.Controllers
                 Name = "José"
             };
 
-            AddCustomer(u);
+            ObjectId insertedCustomer = AddCustomer(u);
 
             Customer c1 = GetCustomer(id);
 
@@ -237,7 +244,7 @@ namespace SmartKioskBot.Controllers
 
             c1 = GetCustomer(id);
 
-            //DeleteCustomer(new ObjectId("5af06e7f30ea411e44f50938"));
+            DeleteCustomer(id);
 
         }
     }
