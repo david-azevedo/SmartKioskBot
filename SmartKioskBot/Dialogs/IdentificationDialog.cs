@@ -134,6 +134,7 @@ namespace SmartKioskBot.Dialogs
                 UserController.CreateUser(context.Activity.ChannelId, state.Email, state.Name, state.Country);
                 this.user = UserController.getUser(context.Activity.ChannelId);
                 ContextController.CreateContext(user);
+                CRMController.AddCustomer(this.user);
             };
 
             var form = new FormBuilder<UserQuery>()
