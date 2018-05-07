@@ -13,11 +13,13 @@ namespace SmartKioskBot.Controllers
     {
         public static string CRM_COLLECTION = "CRM";
 
-        public static Customer GetCustomer(ObjectId customerId)
+
+
+        public static Customer GetCustomer(ObjectId userId)
         {
 
             var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
-            var filter = Builders<Customer>.Filter.Eq(c => c.Id, customerId);
+            var filter = Builders<Customer>.Filter.Eq(c => c.UserId, userId);
 
             List<Customer> customer = collection.Find(filter).ToList();
 
@@ -27,21 +29,35 @@ namespace SmartKioskBot.Controllers
                 return customer[0];
         }
 
-        public static void AddCustomer(Customer c)
+        public static void AddCustomer(User user)
         {
+            Customer c = new Customer
+            {
+                Country = user.Country,
+                UserId = user.Id,
+                FiltersCount = new Customer.FilterCount[] { },
+                ProductsBought = new Customer.ProductBought[] { },
+                ProductsClicks = new Customer.ProductClicks[] { }
+            };
+
+            if(c.Country == null)
+            {
+                throw new Exception("A customer must contain a non-null country field, because 'country' is a shard key in Mongo.");
+            }
+
             var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
             collection.InsertOne(c);
         }
 
-        public static void DeleteCustomer(ObjectId customerId)
+        public static void DeleteCustomer(ObjectId userId)
         {
             var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
-            var filter = Builders<Customer>.Filter.Eq(c => c.Id, customerId);
+            var filter = Builders<Customer>.Filter.Eq(c => c.UserId, userId);
 
             collection.DeleteOne(filter);
         }
 
-        public static void AddPurchase(ObjectId customerId, ObjectId boughtProductId)
+        public static void AddPurchase(ObjectId userId, string country, ObjectId boughtProductId)
         {
             var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
 
@@ -52,18 +68,22 @@ namespace SmartKioskBot.Controllers
             };
 
             var update = Builders<Customer>.Update.Push(c => c.ProductsBought, productBought);
-            var filter = Builders<Customer>.Filter.Eq(c => c.Id, customerId);
-
+            var filter = Builders<Customer>.Filter.And(
+               Builders<Customer>.Filter.Eq(c => c.UserId, userId),
+               Builders<Customer>.Filter.Eq(c => c.Country, country));
+            
             collection.UpdateOne(filter, update);
         }
 
-        public static void AddProductClick(ObjectId customerId, ObjectId clickedProductId)
+        public static void AddProductClick(ObjectId userId, string country, ObjectId clickedProductId)
         {
             var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
-            var filter = Builders<Customer>.Filter.Eq(c => c.Id, customerId);
+            var filter = Builders<Customer>.Filter.And(
+               Builders<Customer>.Filter.Eq(c => c.UserId, userId),
+               Builders<Customer>.Filter.Eq(c => c.Country, country));
             UpdateDefinition<Customer> update;
 
-            Customer customer = GetCustomer(customerId);
+            Customer customer = GetCustomer(userId);
 
             if(customer != null)
             {
@@ -92,63 +112,81 @@ namespace SmartKioskBot.Controllers
                 collection.UpdateOne(filter, update);
 
             }
+            else
+            {
+                throw new Exception("Customer not found.");
+            }
         }
 
-        public void AddFilterUsage(ObjectId customerId, string filterString)
+        public static void AddFilterUsage(ObjectId customerId, string country, string filterString)
         {
             var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
-            var filter = Builders<Customer>.Filter.Eq(c => c.Id, customerId);
+            var filter = Builders<Customer>.Filter.And(
+               Builders<Customer>.Filter.Eq(c => c.UserId, customerId),
+               Builders<Customer>.Filter.Eq(c => c.Country, country));
             UpdateDefinition<Customer> update;
 
             Customer customer = GetCustomer(customerId);
 
             if (customer != null)
             {
-                foreach (KeyValuePair<string, int> item in customer.FiltersCount)
+                for (int i = 0; i < customer.FiltersCount.Length; i++)
                 {
-                    if (item.Key.Equals(filterString))
+                    if (customer.FiltersCount[i].Filter.Equals(filterString))
                     {
-                        int newFiltersCount = item.Value + 1;
-                        update = Builders<Customer>.Update.Set(c => c.FiltersCount[item.Key], newFiltersCount);
+                        var currentFilterSearches = customer.FiltersCount[i];
+                        var newNumberOfSearches = currentFilterSearches.NSearches + 1;
+
+                        update = Builders<Customer>.Update.Set(c => c.FiltersCount[i].NSearches, newNumberOfSearches);
                         collection.UpdateOne(filter, update);
 
                         return;
                     }
                 }
 
-                KeyValuePair<string, int> kvp = new KeyValuePair<string, int>(filterString, 1);
+                // if the product has not been clicked before
 
-                update = Builders<Customer>.Update.Push(c => c.FiltersCount, kvp);
+                Customer.FilterCount filterCount = new Customer.FilterCount
+                {
+                    Filter = filterString,
+                    NSearches = 1
+                };
+
+                update = Builders<Customer>.Update.Push(c => c.FiltersCount, filterCount);
                 collection.UpdateOne(filter, update);
 
             }
+            else
+            {
+                throw new Exception("Customer not found.");
+            }
         }
 
-        public string[] GetMostPopularFilters(ObjectId customerId, int maxNumOfFilters)
+        public static string[] GetMostPopularFilters(ObjectId customerId, int maxNumOfFilters)
         {
             Customer customer = GetCustomer(customerId);
 
-            List<KeyValuePair<string, int>> list = customer.FiltersCount.ToList();
+            List<Customer.FilterCount> list = customer.FiltersCount.ToList();
             list.Sort(
                 // 'delegate' passes a method as argument to another method. 
                 // In this case, I believe it passes the function comparing to pairs to the Sort function.
-                delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                delegate (Customer.FilterCount l1, Customer.FilterCount l2)
                 {
-                    return pair1.Value.CompareTo(pair2.Value);
+                    return l1.NSearches.CompareTo(l2.NSearches);
                 }
             );
 
             List<string> filters = new List<string>();
 
-            for(int i = 0; i < maxNumOfFilters; i++)
+            for (int i = 0; i < maxNumOfFilters; i++)
             {
-                filters.Add(list[i].Key);
+                filters.Add(list[i].Filter);
             }
 
             return filters.ToArray();
         }
 
-        public ObjectId[] GetMostClickedProducts(ObjectId customerId, int maxNumOfProducts)
+        public static ObjectId[] GetMostClickedProducts(ObjectId customerId, int maxNumOfProducts)
         {
             Customer customer = GetCustomer(customerId);
 
@@ -171,6 +209,36 @@ namespace SmartKioskBot.Controllers
             }
 
             return filters.ToArray();
+        }
+
+        public static void Test()
+        {
+            ObjectId id = new ObjectId("111111111111111111111111");
+
+            User u = new User()
+            {
+                Id = id,
+                Country = "Portugal",
+                Name = "José"
+            };
+
+            AddCustomer(u);
+
+            Customer c1 = GetCustomer(id);
+
+            AddPurchase(id, c1.Country, new ObjectId("111111111111111111111111"));
+            AddPurchase(id, c1.Country, new ObjectId("222222222222222222222222"));
+
+            AddFilterUsage(id, c1.Country, "asus");
+            AddFilterUsage(id, c1.Country, "lenovo");
+            AddFilterUsage(id, c1.Country, "asus");
+
+            AddProductClick(id, c1.Country, new ObjectId("111111111111111111111111"));
+
+            c1 = GetCustomer(id);
+
+            //DeleteCustomer(new ObjectId("5af06e7f30ea411e44f50938"));
+
         }
     }
 }

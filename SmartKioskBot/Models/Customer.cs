@@ -26,14 +26,27 @@ namespace SmartKioskBot.Models
         [BsonElement("userId")]
         public ObjectId UserId{ get; set; }
 
+        [BsonElement("country")]
+        public string Country { get; set; }
+
         [BsonElement("productsBought")]
         public ProductBought[] ProductsBought { get; set; }
 
         [BsonElement("filtersCount")]
-        public Dictionary<string, int> FiltersCount { get; set; }
+        public FilterCount[] FiltersCount { get; set; }
 
         [BsonElement("productsClick")]
         public ProductClicks[] ProductsClicks { get; set; }
+
+        [Serializable, JsonObject]
+        public class FilterCount
+        {
+            [BsonElement("filter")]
+            public string Filter { get; set; }
+
+            [BsonElement("nSearches")]
+            public int NSearches { get; set; }
+        }
 
         [Serializable, JsonObject]
         public class ProductClicks
