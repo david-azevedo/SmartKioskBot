@@ -180,7 +180,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppSettings.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\LuisController.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
