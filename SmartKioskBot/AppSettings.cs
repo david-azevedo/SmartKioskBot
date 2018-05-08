@@ -7,6 +7,7 @@
         public static string ProductsCollection => "Products";
         public static string UserCollection => "User";
         public static string ContextCollection => "Context";
+        public static string StoreCollection => "Store";
         public static string MongoDBConnectionString => "mongodb://skb-cosmos-mongo-v1:mD9P6JY7iA863jozlyaXWjTdkvEMJyG6N3mHFF9iTCYyUfN0dYfrLQXx3Fkg4meW9EVGnwWSMlJGNpg34OepnA==@skb-cosmos-mongo-v1.documents.azure.com:10255/?ssl=true&replicaSet=globaldb";
         
         public const string LuisAppId = "e597ae7c-2c5a-45ec-a117-446b58bfdc05";
