@@ -166,6 +166,22 @@ namespace SmartKioskBot.Dialogs
         }
 
         /*
+         * Stock
+         */
+        [LuisIntent("StockInStore")]
+        public async Task StockInStore(IDialogContext context, LuisResult result)
+        {
+            
+            var idx = result.Query.LastIndexOf(":");
+            string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
+
+            //hero card
+            IMessageActivity r = StockDialog.ShowStores(context, id);
+            await context.PostAsync(r);
+            Next(context);
+        }
+
+        /*
         [LuisIntent("Recommendation")]
         public void Recommendation(IDialogContext context, LuisResult result)
         {
