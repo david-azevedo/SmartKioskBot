@@ -70,12 +70,12 @@ namespace SmartKioskBot.Dialogs
             // Chamar QnA Maker
             QnAMakerResult qnaResult = await QnADialog.MakeRequest(result.Query);
             
-            if (qnaResult != null)
+            if (qnaResult != null && result.TopScoringIntent.Score >= INTENT_SCORE_THRESHOLD)
             {
                 await context.PostAsync(qnaResult.Answer);
             }
             else {
-                string message = $"Sorry, I did not understand '{result.Query}'. Type 'help' if you need assistance.";
+                string message = "Desculpa mas não entendi aquilo que disseste. Podes refrasear por favor? :)";
                 await context.PostAsync(message);
             }
 
