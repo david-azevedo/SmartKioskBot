@@ -37,6 +37,23 @@ namespace SmartKioskBot.Models
 
             [BsonElement("stock")]
             public int Stock { get; set; }
+
+            [BsonElement("InStoreLocation")]
+            public ProductLocation InStoreLocation { get; set; }
+
+        }
+
+        [Serializable, JsonObject]
+        public class ProductLocation
+        {
+            [BsonElement("Corridor")]
+            public int Corridor { get; set; }
+
+            [BsonElement("Section")]
+            public int Section { get; set; }
+
+            [BsonElement("Shelf")]
+            public int Shelf { get; set; }
         }
     }
 }
