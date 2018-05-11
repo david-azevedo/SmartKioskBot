@@ -15,18 +15,25 @@ namespace SmartKioskBot.Dialogs
     public sealed class RootDialog : LuisDialog<object>
     {
         // We will only accept intents which score higher than this value
-        private static double INTENT_SCORE_THRESHOLD = 0.6;
+        private static double INTENT_SCORE_THRESHOLD = 0.4;
 
         private User user;
-        private bool identification;
+        private bool identified;
 
         public RootDialog(Activity activity)
         {
             user = UserController.getUser(activity.ChannelId);
             if (user == null)
-                identification = false;
+            {
+                var r = new Random();
+                UserController.CreateUser(activity.ChannelId, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString());
+                user = UserController.getUser(activity.ChannelId);
+                ContextController.CreateContext(user);
+                //TODO: CRMController.
+                identified = false;
+            }
             else
-                identification = true;
+                identified = true;
         }
 
         //ATENÇÃO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -42,16 +49,18 @@ namespace SmartKioskBot.Dialogs
         //USAR ISTO EM VEZ DE CONTEXT.WAIT NO FINAL
         private void Next(IDialogContext context)
         {
-            if (!identification)
+            if (identified == false)
+            {
                 context.Call(new IdentificationDialog(), ResumeAfterIdent);
+                identified = true;
+            }
             else
-                 context.Wait(this.MessageReceived);
+                context.Done<object>(null);
         }
 
         private async Task ResumeAfterIdent(IDialogContext context, IAwaitable<object> result)
         {
             this.user = UserController.getUser(context.Activity.ChannelId);
-            this.identification = true;
             context.Wait(this.MessageReceived);
         }
 

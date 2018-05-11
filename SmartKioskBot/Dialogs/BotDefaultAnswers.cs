@@ -9,9 +9,15 @@ namespace SmartKioskBot.Dialogs
 {
     public abstract class BotDefaultAnswers
     {
-        public static string[] Yes = new string[] { "sim", "Sim", "Ok", "ok" };
-        public static string[] No = new string[] { "não", "Não" };
+        /*
+         * Forms
+         */
+        public const string invalid_option = "Opção Inválida";
+        public const string tries_exceeded = "Ooops! Ultrapassou o número máximo de tentativas!";
+        public static List<string> Yes = new List<string> { "sim", "Sim", "Ok", "ok" };
+        public static List<string> No = new List<string> { "não", "Não" };
         public enum State { SUCCESS, FAIL };
+
         /*
          * Activity Dialog
          */
@@ -25,12 +31,6 @@ namespace SmartKioskBot.Dialogs
             };
 
             return welcomes[new Random().Next(0, welcomes.Length)];
-        }
-
-        public static String getMemberRem()
-        {
-            //TODO
-            return null;
         }
 
         /*
@@ -47,9 +47,52 @@ namespace SmartKioskBot.Dialogs
         public static string set_customer_card = "SaveCard";
         public static string add_channel = "AddChannel";
         public static string set_customer_name = "SaveName";
-        public static string set_customer_country = "SaveCountry";
         public static string show_store_with_stock = "verificar disponibilidade do produto:";
-        
+
+        /*
+         * Identificação
+         */
+
+        public const string identification_name = "Qual é o seu nome?";
+        public const string identigication_email = "Qual é o seu email?";
+        public const string identification_storeCard = "Qual é o seu número de cartão da loja?";
+
+        public const string identication = "Não me lembro de falar consigo, gostaria de se identificar?";
+        public const string identification_option = "De que forma deseja ser reconhecido?";
+        public const string identification_identified = "Já falou comigo num outro canal de comunicação?";
+        public const string identification_fail = "Não me lembro de falar com alguém com esse email.";
+        public const string identification_start_registration = "Vamos proceder para o registo dos seus dados para que seja possível eu me lembrar de si em outros canais de comunicação.";
+        public const string identification_end_registration = "Os seus dados foram registados!";
+        public const string identification_card = "Quer associar o seu cartão da loja?";
+        public const string identification_conversation_retrieved = "Agora já me lembrei de você pelas nossas outras conversas!";
+        public const string identification_card_saved = "O seu cartão da loja já foi associado.";
+        public const string identification_tryAgain = "Deseja tentar de novo?";
+
+        public const string email = "Email";
+        public const string store_card = "Cartão da Loja";
+
+        public static string UserInfoConfirmation(string name, string email)
+        {
+            return "É esta a sua informação? \n\n" +
+                    "Nome: " + name + " \n\n" +
+                    "Email: " + email + " \n\n" +
+                    "{||}"; 
+        }
+
+        public static string UserInfoConfirmation(string email)
+        {
+            return "É esta a sua informação? \n\n" +
+                   "Email: " + email + " \n\n" +
+                   "{||}"; 
+        }
+
+        public static string UserCardConfirmation(string card)
+        {
+            return "É este o seu cartão da loja? \n\n" +
+                    "Nome: " + card + " \n\n" +
+                    "{||}";
+        }
+
         /*
          * Intents Dialog
          */
@@ -224,15 +267,7 @@ namespace SmartKioskBot.Dialogs
 
             return dialog[new Random().Next(0, dialog.Length)];
         }
-        public static String getCountry()
-        {
-            String[] dialog =
-            {
-               "Introduza o seu país"
-            };
 
-            return dialog[new Random().Next(0, dialog.Length)];
-        }
         public static String getAddUser()
         {
             String[] dialog =
