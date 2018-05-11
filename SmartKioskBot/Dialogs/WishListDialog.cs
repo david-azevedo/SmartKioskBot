@@ -21,17 +21,19 @@ namespace SmartKioskBot.Dialogs
         public static void AddToWishList(string message, User user)
         {
             string[] parts = message.Split(':');
+            var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
-                ContextController.AddWishList(user, parts[1].Remove(' '));
+                ContextController.AddWishList(user, product);
         }
 
         public static void RemoveFromWishList(string message, User user)
         {
             string[] parts = message.Split(':');
+            var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
-                ContextController.RemWishList(user, parts[1].Remove(' '));
+                ContextController.RemWishList(user, product);
         }
 
         public static IMessageActivity ViewWishList(IDialogContext _context, Context context)

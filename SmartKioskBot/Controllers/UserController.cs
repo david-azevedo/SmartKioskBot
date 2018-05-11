@@ -49,6 +49,24 @@ namespace SmartKioskBot.Controllers
         }
 
         /// <summary>
+        /// Gets a user by store card
+        /// </summary>
+        /// <param name="card"></param>
+        /// <returns></returns>
+        public static User getUserByCard(string card)
+        {
+            var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
+            var filter = Builders<User>.Filter.Eq(u => u.CustomerCard, card);
+
+            List<User> user = userCollection.Find(filter).ToList();
+
+            if (user.Count() == 0)
+                return null;
+            else
+                return user[0];
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
@@ -184,6 +202,28 @@ namespace SmartKioskBot.Controllers
                 Builders<User>.Filter.Eq(o => o.Country, user.Country));
 
             userCollection.UpdateOne(filter, update);
+        }
+
+        public static void MergeUsers(User from_user, User into_user)
+        {
+            var from_context = ContextController.GetContext(from_user.Id);
+
+            //Merge Context
+            foreach (var f in from_context.Filters)
+                ContextController.AddFilter(into_user, f.FilterName, f.Operator, f.Value);
+
+            foreach (var w in from_context.WishList)
+            {
+                ContextController.AddWishList(into_user, w.ToString());
+            }
+
+            foreach (var c in from_context.Comparator)
+            {
+                ContextController.AddComparator(into_user, c.ToString());
+            }
+
+            //Merge CRM
+            //TODO
         }
 
         /// <summary>
