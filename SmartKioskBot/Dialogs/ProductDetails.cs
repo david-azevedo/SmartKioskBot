@@ -34,5 +34,28 @@ namespace SmartKioskBot.Dialogs
 
             await context.PostAsync(reply);
         }
+
+        public async static Task ShowInStoreLocation(IDialogContext context, string productId, string storeId)
+        {
+            var collection = DbSingleton.GetDatabase().GetCollection<Store>(AppSettings.StoreCollection);
+
+            //get store
+            var query_id = Builders<Store>.Filter.Eq("_id", ObjectId.Parse(storeId));
+            var entity = collection.Find(query_id).ToList();
+
+            var store = entity[0];
+            var message = "";
+
+            for (int i = 0; i < store.ProductsInStock.Count(); i++)
+            {
+                if (store.ProductsInStock[i].ProductId.ToString().Equals(productId)) {
+                    message += "Corredor(" + store.ProductsInStock[i].InStoreLocation.Corridor + "), ";
+                    message += "Secção(" + store.ProductsInStock[i].InStoreLocation.Section + "), ";
+                    message += "Prateleira(" + store.ProductsInStock[i].InStoreLocation.Shelf + "). ";
+                }
+            }
+
+            await context.PostAsync(message);
+        }
     }
 }

@@ -211,10 +211,10 @@ namespace SmartKioskBot.Logic
             {
                 reply = context.MakeMessage();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                reply.Text = String.Format("Top results \n for {0}:\n\n", entry.Key);
+                reply.Text = BotDefaultAnswers.getComparator(entry.Key.ToString()) + "\n\n";
                 for (int i = 0; i < resultSize; i++)
                 {
-                    cards.Add(ProductCard.GetProductCard(productsToCompare[entry.Value[i]], ProductCard.CardType.SEARCH).ToAttachment());
+                    cards.Add(ProductCard.GetProductCard(productsToCompare[entry.Value[i]], ProductCard.CardType.COMPARATOR).ToAttachment());
                 }
                 reply.Attachments = cards;
                 context.PostAsync(reply);

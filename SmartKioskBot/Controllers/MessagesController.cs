@@ -25,9 +25,10 @@ namespace SmartKioskBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
-                activity.Text = nt.Item1;
-                activity.Locale = nt.Item2;
+                activity.Conversation.Properties.Add("originalText", activity.Text);
+               // Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
+               // activity.Text = nt.Item1;
+               // activity.Locale = nt.Item2;
                 await Conversation.SendAsync(activity, () => new Dialogs.RootDialog(activity));
             }
             else

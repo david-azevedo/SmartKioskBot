@@ -90,18 +90,21 @@ namespace SmartKioskBot.UI
             };
         }
 
-        public static HeroCard getStoreDetailsCard(Store s)
+        public static HeroCard getStoreDetailsCard(Store s, string productId)
         {
             string details = "";
             details += "- Nome: " + s.Name + "\n\n" +
                         "- Morada: " + s.Address + "\n\n" +
                         "- Telefone: " + s.PhoneNumber + "\n\n";
 
+            var buttons = new List<CardAction>();
+            buttons.Add(new CardAction(ActionTypes.ImBack, "Encontrar produto dentro da loja", value: BotDefaultAnswers.in_store_location1 + productId + ":" + s.Id.ToString()));
+
             return new HeroCard
             {
                 Title = s.Name,
                 Text = details,
-                Buttons = getButtonsCardType(CardType.STORE_DETAILS, s.Id.ToString())
+                Buttons = buttons
             };
         }
 

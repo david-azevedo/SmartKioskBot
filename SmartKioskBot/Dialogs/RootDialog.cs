@@ -17,18 +17,25 @@ namespace SmartKioskBot.Dialogs
     public sealed class RootDialog : LuisDialog<object>
     {
         // We will only accept intents which score higher than this value
-        private static double INTENT_SCORE_THRESHOLD = 0.6;
+        private static double INTENT_SCORE_THRESHOLD = 0.4;
 
         private User user;
-        private bool identification;
+        private bool identified;
 
         public RootDialog(Activity activity)
         {
             user = UserController.getUser(activity.ChannelId);
             if (user == null)
-                identification = false;
+            {
+                var r = new Random();
+                UserController.CreateUser(activity.ChannelId, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString());
+                user = UserController.getUser(activity.ChannelId);
+                ContextController.CreateContext(user);
+                //TODO: CRMController.
+                identified = false;
+            }
             else
-                identification = true;
+                identified = true;
         }
 
         //ATENÇÃO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -44,16 +51,18 @@ namespace SmartKioskBot.Dialogs
         //USAR ISTO EM VEZ DE CONTEXT.WAIT NO FINAL
         private void Next(IDialogContext context)
         {
-            if (!identification)
+            if (identified == false)
+            {
                 context.Call(new IdentificationDialog(), ResumeAfterIdent);
+                identified = true;
+            }
             else
-                 context.Wait(this.MessageReceived);
+                context.Done<object>(null);
         }
 
         private async Task ResumeAfterIdent(IDialogContext context, IAwaitable<object> result)
         {
             this.user = UserController.getUser(context.Activity.ChannelId);
-            this.identification = true;
             context.Wait(this.MessageReceived);
         }
 
@@ -63,17 +72,21 @@ namespace SmartKioskBot.Dialogs
             // Chamar QnA Maker
             QnAMakerResult qnaResult = await QnADialog.MakeRequest(result.Query);
             
-            if (qnaResult != null)
+            if (qnaResult != null && result.TopScoringIntent.Score >= INTENT_SCORE_THRESHOLD)
             {
                 await context.PostAsync(qnaResult.Answer);
             }
             else {
-                string message = $"Sorry, I did not understand '{result.Query}'. Type 'help' if you need assistance.";
+                string message = "Desculpa mas não entendi aquilo que disseste. Podes refrasear por favor? :)";
                 await context.PostAsync(message);
             }
 
             Next(context);
         }
+
+        /*
+         * Others
+         */
 
         [LuisIntent("Greeting")]
         public async Task Greeting(IDialogContext context, LuisResult result)
@@ -119,6 +132,41 @@ namespace SmartKioskBot.Dialogs
             await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             Next(context);
         }
+
+        /*
+         * Comparator
+         */
+
+        [LuisIntent("AddComparator")]
+        public async Task AddComparator(IDialogContext context, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+
+            CompareDialog.AddComparator(context, result.Query);
+
+            Next(context);
+        }
+
+        [LuisIntent("RmvComparator")]
+        public async Task RmvComparator(IDialogContext context, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+
+            CompareDialog.RmvComparator(context, result.Query);
+
+            Next(context);
+        }
+
+        [LuisIntent("ViewComparator")]
+        public async Task ViewComparator(IDialogContext context, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+
+            await CompareDialog.ViewComparator(context);
+
+            Next(context);
+        }
+
 
         /*
          * Filter
@@ -184,6 +232,20 @@ namespace SmartKioskBot.Dialogs
             IMessageActivity r = StockDialog.ShowStores(context, id);
             await context.PostAsync(r);
             Next(context);
+        }
+
+        /*
+         * InStoreLocation
+         */
+        [LuisIntent("InStoreLocation")]
+        public async Task InStoreLocation(IDialogContext context, LuisResult result)
+        {
+            var args = result.Query.Split(':');
+            string productId = args[1];
+            string storeId = args[2];
+            await ProductDetails.ShowInStoreLocation(context, productId, storeId);
+            Next(context);
+
         }
 
         
