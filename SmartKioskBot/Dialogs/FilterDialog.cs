@@ -121,7 +121,7 @@ namespace SmartKioskBot.Dialogs
             return reply;
         }
 
-        private static List<Product> GetProductsForUser(List<Filter> filters)
+        public static List<Product> GetProductsForUser(List<Filter> filters)
         {
             var total_filter = Builders<Product>.Filter.Empty;
             List<int> treatedIdx = new List<int>();

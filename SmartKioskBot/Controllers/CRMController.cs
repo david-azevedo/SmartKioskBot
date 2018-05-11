@@ -163,9 +163,9 @@ namespace SmartKioskBot.Controllers
             }
         }
 
-        public static Filter[] GetMostPopularFilters(ObjectId customerId, int maxNumOfFilters)
+        public static Filter[] GetMostPopularFilters(ObjectId userId, int maxNumOfFilters)
         {
-            Customer customer = GetCustomer(customerId);
+            Customer customer = GetCustomer(userId);
 
             List<Customer.FilterCount> list = customer.FiltersCount.ToList();
             list.Sort(

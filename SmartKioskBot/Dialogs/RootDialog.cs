@@ -176,7 +176,6 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("StockInStore")]
         public async Task StockInStore(IDialogContext context, LuisResult result)
         {
-            
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
 
@@ -188,10 +187,13 @@ namespace SmartKioskBot.Dialogs
 
         
         [LuisIntent("Recommendation")]
-        public void Recommendation(IDialogContext context, LuisResult result)
+        public async Task Recommendation(IDialogContext context, LuisResult result)
         {
             FilterIntentScore(context, result);
-            
+
+            var reply = RecommendationDialog.ShowRecommendations(context, this.user);
+            await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
+
             Next(context);
         }
 
