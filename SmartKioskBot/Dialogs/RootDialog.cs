@@ -4,6 +4,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
+using MongoDB.Bson;
 using SmartKioskBot.Controllers;
 using SmartKioskBot.Dialogs.QnA;
 using SmartKioskBot.Models;
@@ -161,6 +162,10 @@ namespace SmartKioskBot.Dialogs
 
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
+
+            // Add click to CRM
+            CRMController.AddProductClick(this.user.Id, this.user.Country, ObjectId.Parse(id));
+
             await ProductDetails.ShowProductMessage(context, id);
             Next(context);
         }
@@ -181,7 +186,7 @@ namespace SmartKioskBot.Dialogs
             Next(context);
         }
 
-        /*
+        
         [LuisIntent("Recommendation")]
         public void Recommendation(IDialogContext context, LuisResult result)
         {
@@ -190,6 +195,7 @@ namespace SmartKioskBot.Dialogs
             Next(context);
         }
 
+        /*
         [LuisIntent("StoreLocation")]
         public void StoreLocation(IDialogContext context, LuisResult result)
         {

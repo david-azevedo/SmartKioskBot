@@ -6,14 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Controllers
 {
     public abstract class CRMController
     {
         public static string CRM_COLLECTION = "CRM";
-
-
 
         public static Customer GetCustomer(ObjectId userId)
         {
@@ -120,7 +119,7 @@ namespace SmartKioskBot.Controllers
             }
         }
 
-        public static void AddFilterUsage(ObjectId customerId, string country, string filterString)
+        public static void AddFilterUsage(ObjectId customerId, string country, Filter productFilter)
         {
             var collection = DbSingleton.GetDatabase().GetCollection<Customer>(CRM_COLLECTION);
             var filter = Builders<Customer>.Filter.And(
@@ -134,7 +133,7 @@ namespace SmartKioskBot.Controllers
             {
                 for (int i = 0; i < customer.FiltersCount.Length; i++)
                 {
-                    if (customer.FiltersCount[i].Filter.Equals(filterString))
+                    if (customer.FiltersCount[i].Filter.Equals(productFilter))
                     {
                         var currentFilterSearches = customer.FiltersCount[i];
                         var newNumberOfSearches = currentFilterSearches.NSearches + 1;
@@ -150,7 +149,7 @@ namespace SmartKioskBot.Controllers
 
                 Customer.FilterCount filterCount = new Customer.FilterCount
                 {
-                    Filter = filterString,
+                    Filter = productFilter,
                     NSearches = 1
                 };
 
@@ -164,7 +163,7 @@ namespace SmartKioskBot.Controllers
             }
         }
 
-        public static string[] GetMostPopularFilters(ObjectId customerId, int maxNumOfFilters)
+        public static Filter[] GetMostPopularFilters(ObjectId customerId, int maxNumOfFilters)
         {
             Customer customer = GetCustomer(customerId);
 
@@ -178,7 +177,7 @@ namespace SmartKioskBot.Controllers
                 }
             );
 
-            List<string> filters = new List<string>();
+            List<Filter> filters = new List<Filter>();
 
             for (int i = 0; i < maxNumOfFilters; i++)
             {
@@ -235,10 +234,6 @@ namespace SmartKioskBot.Controllers
 
             AddPurchase(id, c1.Country, new ObjectId("111111111111111111111111"));
             AddPurchase(id, c1.Country, new ObjectId("222222222222222222222222"));
-
-            AddFilterUsage(id, c1.Country, "asus");
-            AddFilterUsage(id, c1.Country, "lenovo");
-            AddFilterUsage(id, c1.Country, "asus");
 
             AddProductClick(id, c1.Country, new ObjectId("111111111111111111111111"));
 

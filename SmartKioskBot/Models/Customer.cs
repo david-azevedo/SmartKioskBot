@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Models
 {
@@ -42,7 +43,7 @@ namespace SmartKioskBot.Models
         public class FilterCount
         {
             [BsonElement("filter")]
-            public string Filter { get; set; }
+            public Filter Filter { get; set; }
 
             [BsonElement("nSearches")]
             public int NSearches { get; set; }
