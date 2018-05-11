@@ -13,12 +13,32 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class RecommendationDialog
     {
+        public static Filter DEFAULT_RECOMMENDATION_FILTER = new Filter()
+        {
+            FilterName = "marca",
+            Operator = "=",
+            Value = "asus"
+        };
+
         public static IMessageActivity ShowRecommendations(IDialogContext context, User user)
         {
             //fetch context
             Context myContext = ContextController.GetContext(user.Id);
 
-            List<Filter> userMostPopularFilters = new List<Filter>(CRMController.GetMostPopularFilters(user.Id, 10));
+            Filter[] userMostPopularFiltersArray = CRMController.GetMostPopularFilters(user.Id, 10);
+            List<Filter> userMostPopularFilters;
+
+            if(userMostPopularFiltersArray == null || userMostPopularFiltersArray.Length == 0)
+            {
+                userMostPopularFilters = new List<Filter>
+                {
+                    DEFAULT_RECOMMENDATION_FILTER
+                };
+            }
+            else
+            {
+                userMostPopularFilters = new List<Filter>(userMostPopularFiltersArray);
+            }
                 
             List<Product> productsToRecommend = FilterDialog.GetProductsForUser(userMostPopularFilters);
 

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
@@ -189,12 +190,19 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("Recommendation")]
         public async Task Recommendation(IDialogContext context, LuisResult result)
         {
-            FilterIntentScore(context, result);
+            try
+            {
+                FilterIntentScore(context, result);
 
-            var reply = RecommendationDialog.ShowRecommendations(context, this.user);
-            await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
+                var reply = RecommendationDialog.ShowRecommendations(context, this.user);
+                await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
 
-            Next(context);
+                Next(context);
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e.ToString());
+            }
         }
 
         /*

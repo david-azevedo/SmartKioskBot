@@ -167,6 +167,11 @@ namespace SmartKioskBot.Controllers
         {
             Customer customer = GetCustomer(userId);
 
+            if(customer == null)
+            {
+                return null;
+            }
+
             List<Customer.FilterCount> list = customer.FiltersCount.ToList();
             list.Sort(
                 // 'delegate' passes a method as argument to another method. 
