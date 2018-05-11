@@ -49,6 +49,7 @@ namespace SmartKioskBot.Dialogs
         public static string set_customer_name = "SaveName";
         public static string set_customer_country = "SaveCountry";
         public static string show_store_with_stock = "verificar disponibilidade do produto:";
+        public static string in_store_location1 = "localização dentro da loja:";
         
         /*
          * Intents Dialog

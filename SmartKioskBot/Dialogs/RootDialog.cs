@@ -182,6 +182,20 @@ namespace SmartKioskBot.Dialogs
         }
 
         /*
+         * InStoreLocation
+         */
+        [LuisIntent("InStoreLocation")]
+        public async Task InStoreLocation(IDialogContext context, LuisResult result)
+        { 
+
+            string message = "InStoreLocation. Ainda não implementado";
+            await context.PostAsync(message);
+
+            Next(context);
+
+        }
+
+        /*
         [LuisIntent("Recommendation")]
         public void Recommendation(IDialogContext context, LuisResult result)
         {
