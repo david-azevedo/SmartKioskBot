@@ -11,6 +11,7 @@ namespace SmartKioskBot.Dialogs
     {
         public static string[] Yes = new string[] { "sim", "Sim", "Ok", "ok" };
         public static string[] No = new string[] { "não", "Não" };
+        public enum State { SUCCESS, FAIL };
         /*
          * Activity Dialog
          */
@@ -39,7 +40,7 @@ namespace SmartKioskBot.Dialogs
         public static string show_product_details = "Ver detalhes do produto: ";
         public static string add_wish_list = "Adicionar à lista de desejos o produto:";
         public static string add_to_comparator = "Adicionar ao comparador o produto:";
-        public static string rem_wish_list = "RemoverWishList";
+        public static string rem_wish_list = "Remover da lista de desejos o produto: ";
         public static string rem_comparator = "RemoverComparador";
         public static string do_comparator = "Comparar";
         public static string set_customer_email = "SaveEmail";
@@ -47,7 +48,8 @@ namespace SmartKioskBot.Dialogs
         public static string add_channel = "AddChannel";
         public static string set_customer_name = "SaveName";
         public static string set_customer_country = "SaveCountry";
-      
+        public static string show_store_with_stock = "verificar disponibilidade do produto:";
+        
         /*
          * Intents Dialog
          */
@@ -63,43 +65,92 @@ namespace SmartKioskBot.Dialogs
         }
 
         //FILTERS
-        public static String getFilterFail()
+        public static String getViewFilters(State state)
         {
-            String[] fail = {
-                "Não temos nenhum produto com tais características.",
-                "Não existem produtos com essas especificações"
-            };
-            return fail[new Random().Next(0, fail.Length)];
+            String[] result = new string[] { };
+            if(state == State.SUCCESS)
+            {
+                result = new string[]{
+                    "Os filtros que estão a ser aplicados na pesquisa são:"
+                };
+            }
+            else
+            {
+                result = new string[]{
+                    "Não tem filtros aplicados na pesquisa."
+                };
+            }
+            return result[new Random().Next(0, result.Length)];
         }
-
-        public static String getFilterSuccess()
+        public static String getFilter(State state)
         {
-            String[] success = {
-                "Temos os seguintes produtos com essas características:",
+            String[] result = new string[] { };
+
+            if(state == State.SUCCESS)
+            {
+                result = new string[]{
+                    "Temos os seguintes produtos com essas características:",
                 "Temos várias opções com essas especificações:"
             };
-            return success[new Random().Next(0, success.Length)];
+            }
+            else
+            {
+                result = new string[]{
+                    "Não temos nenhum produto com tais características.",
+                "Não existem produtos com essas especificações"
+            };
+            }
+            return result[new Random().Next(0, result.Length)];
+        }
+        public static String getRemovedFilter(State state, string filtername)
+        {
+            String[] result = new string[] { };
+
+            if (state == State.SUCCESS)
+            {
+                result = new string[]{
+                    "O filtro " + filtername + " foi removido com successo da pesquisa."
+            };
+            }
+            else
+            {
+                result = new string[]{
+                    "Não existe nenhum filtro " + filtername + " aplicado na pesquisa."
+            };
+            }
+            return result[new Random().Next(0, result.Length)];
+        }
+        public static String getCleanAllFilters()
+        {
+            String[] result  = new string[]{
+                    "Todos os filtros foram removidos.",
+                    "Todos os filtros foram retirados."
+            };
+            
+            return result[new Random().Next(0, result.Length)];
         }
 
         //WISHLIST
-        public static String getWishList()
+        public static String getWishList(State state)
         {
-            String[] success =
-            {
-                "Aqui está a sua lista de desejos:"
-            };
-            return success[new Random().Next(0, success.Length)];
-        }
+            String[] result = new String[] { };
 
-        public static String getEmptyWishList()
-        {
-            String[] success =
+            if(state == State.SUCCESS)
             {
-                "De momentos não tem nada na sua lista de desejos."
-            };
-            return success[new Random().Next(0, success.Length)];
-        }
+                result = new string[]{
+                    "Aqui está a sua lista de desejos:"
+               };
 
+            }
+            else
+            {
+                result = new string[] {
+                    "De momentos não tem nada na sua lista de desejos."
+                };
+            }
+
+            return result[new Random().Next(0, result.Length)];
+        }
         public static String getAddWishList()
         {
             String[] success =
@@ -108,7 +159,6 @@ namespace SmartKioskBot.Dialogs
             };
             return success[new Random().Next(0, success.Length)];
         }
-
         public static String getRemWishList()
         {
             String[] success =
@@ -200,7 +250,6 @@ namespace SmartKioskBot.Dialogs
             };
             return success[new Random().Next(0, success.Length)];
         }
-
         public static String getAddComparator()
         {
             String[] success =
@@ -209,7 +258,6 @@ namespace SmartKioskBot.Dialogs
             };
             return success[new Random().Next(0, success.Length)];
         }
-
         public static String getRemComparator()
         {
             String[] success =
@@ -219,5 +267,22 @@ namespace SmartKioskBot.Dialogs
             return success[new Random().Next(0, success.Length)];
         }
 
+        //STOCK
+        public static String getStockFail()
+        {
+            String[] fail = {
+                "Nenhuma das nossas lojas tem esse produto em stock.",
+            };
+            return fail[new Random().Next(0, fail.Length)];
+        }
+
+        public static String getStockSuccess()
+        {
+            String[] success = {
+                "Temos esse produto em stock nas seguintes lojas:",
+                "As seguintes lojas têm esse produto em stock:"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
     }
 }
