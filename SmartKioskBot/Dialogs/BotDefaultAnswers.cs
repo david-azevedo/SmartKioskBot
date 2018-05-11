@@ -48,10 +48,7 @@ namespace SmartKioskBot.Dialogs
         public static string add_channel = "AddChannel";
         public static string set_customer_name = "SaveName";
         public static string show_store_with_stock = "verificar disponibilidade do produto:";
-
-        /*
-         * Identificação
-         */
+        public static string in_store_location1 = "localização dentro da loja:";
 
         public const string identification_name = "Qual é o seu nome?";
         public const string identigication_email = "Qual é o seu email?";

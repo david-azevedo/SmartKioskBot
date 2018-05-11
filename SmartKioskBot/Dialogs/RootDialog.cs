@@ -230,6 +230,20 @@ namespace SmartKioskBot.Dialogs
         }
 
         /*
+         * InStoreLocation
+         */
+        [LuisIntent("InStoreLocation")]
+        public async Task InStoreLocation(IDialogContext context, LuisResult result)
+        {
+            var args = result.Query.Split(':');
+            string productId = args[1];
+            string storeId = args[2];
+            await ProductDetails.ShowInStoreLocation(context, productId, storeId);
+            Next(context);
+
+        }
+
+        /*
         [LuisIntent("Recommendation")]
         public void Recommendation(IDialogContext context, LuisResult result)
         {
