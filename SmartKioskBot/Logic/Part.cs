@@ -380,11 +380,11 @@ namespace SmartKioskBot.Logic
 
                 if (this.value > price.value)
                 {
-                    result--;
+                    result++;
                 }
                 else if (this.value < price.value)
                 {
-                    result++;
+                    result--;
                 }
 
 

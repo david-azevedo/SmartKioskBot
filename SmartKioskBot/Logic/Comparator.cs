@@ -17,7 +17,7 @@ namespace SmartKioskBot.Logic
 {
     public static class Comparator
     {
-        public enum Parts { CPU, GPU, RAM, Screen };
+        public enum Parts { CPU, GPU, RAM, Screen, Price };
 
         public static Dictionary<Parts, List<int>> GetBestProduct(List<Product> products)
         {
@@ -37,8 +37,8 @@ namespace SmartKioskBot.Logic
             List<int> bestSortedScreenIndex = GetSortedBestScreens(products);
             partToSortedBestProducts.Add(Parts.Screen, bestSortedScreenIndex);
 
-            /*List<int> bestSortedPriceIndex = GetSortedBestPrices(products);
-            partToSortedBestProducts.Add(Parts.Price, bestSortedPriceIndex);*/
+            List<int> bestSortedPriceIndex = GetSortedBestPrices(products);
+            partToSortedBestProducts.Add(Parts.Price, bestSortedPriceIndex);
 
             return partToSortedBestProducts;
         }
@@ -235,7 +235,7 @@ namespace SmartKioskBot.Logic
                 replyText += "\n\n";
             }
 
-            List<int> overallBest = new List<int>(new int[productsToCompare.Count]);
+            List<double> overallBest = new List<double>(new double[productsToCompare.Count]);
             var bestInPart = new Product();
             var product = new Product();
             //calculate score for each product
@@ -252,21 +252,19 @@ namespace SmartKioskBot.Logic
                             bestInPart = productsToCompare[entry.Value[i]];
                         }
 
-                        overallBest[entry.Value[i]] += (int)(product.RAM * 0.25 / bestInPart.RAM);
+                        overallBest[entry.Value[i]] += (double)(product.RAM * 0.2 / bestInPart.RAM);
                     }
-                    /*else if(entry.Key == Comparator.Parts.Price)
+                    else if (entry.Key == Comparator.Parts.Price)
                     {
                         product = productsToCompare[entry.Value[i]];
-                        if(i == 0)
+                        if (i == 0)
                         {
                             bestInPart = productsToCompare[entry.Value[i]];
                         }
-                        overallBest[entry.Value[i]] += (int)(Math.Abs(bestInPart.Price - product.Price) * 0.25 / bestInPart.Price);
-
-                    }*/
-                    else 
-                    { 
-                        overallBest[entry.Value[i]] += (int)((entry.Value.Capacity - i) * 0.25);
+                            overallBest[entry.Value[i]] += (double)(1-(Math.Abs(bestInPart.Price - product.Price) * 0.2 / bestInPart.Price));
+                    } else
+                    {
+                        overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.2);
                     }
                 }
             }
@@ -274,13 +272,20 @@ namespace SmartKioskBot.Logic
             replyText += "Overall best:\n\n";
             reply.Text = replyText;
             List<Attachment> cards = new List<Attachment>();
+            Dictionary<int, double> result = new Dictionary<int, double>();
+
+            for(int i = 0; i < overallBest.Count; i++)
+            {
+                result.Add(i, overallBest[i]);
+            }
 
             //sort by descending score
-            overallBest.Sort((a, b) => -1 * a.CompareTo(b));
+            IEnumerable<KeyValuePair< int, double>> sortedResult = result.OrderByDescending(i => i.Key);
+
             //add products to cards
-            for (int i = 0; i < overallBest.Count; i++)
-            { 
-                cards.Add(ProductCard.GetProductCard(productsToCompare[i], ProductCard.CardType.SEARCH).ToAttachment());
+            foreach (KeyValuePair<int, double> kvp in sortedResult)
+            {
+                cards.Add(ProductCard.GetProductCard(productsToCompare[kvp.Key], ProductCard.CardType.SEARCH).ToAttachment());
             }
             reply.Attachments = cards;
             context.PostAsync(reply);
