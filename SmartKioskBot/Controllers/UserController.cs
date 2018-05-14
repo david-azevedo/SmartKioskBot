@@ -49,6 +49,37 @@ namespace SmartKioskBot.Controllers
         }
 
         /// <summary>
+        /// Gets a user by store card
+        /// </summary>
+        /// <param name="card"></param>
+        /// <returns></returns>
+        public static User getUserByCard(string card)
+        {
+            var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
+            var filter = Builders<User>.Filter.Eq(u => u.CustomerCard, card);
+
+            List<User> user = userCollection.Find(filter).ToList();
+
+            if (user.Count() == 0)
+                return null;
+            else
+                return user[0];
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        public static void DeleteUser(User user)
+        {
+            var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(o => o.Country, user.Country),
+                Builders<User>.Filter.Eq(o => o.Id, user.Id));
+            userCollection.DeleteOne(filter);
+        }
+
+        /// <summary>
         /// Get user by customer card.
         /// </summary>
         /// <param name="customerCard"></param>
@@ -108,6 +139,24 @@ namespace SmartKioskBot.Controllers
         }
 
         /// <summary>
+        /// Sets the user information.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="customerId"></param>
+        public static void SetUserInfo(User user, string name, string email, string customerId)
+        {
+            var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
+            var update = Builders<User>.Update.Set(o => o.Name, name).Set(o => o.Email, email).Set(o => customerId, customerId);
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(o => o.Id, user.Id),
+                Builders<User>.Filter.Eq(o => o.Country, user.Country));
+
+            userCollection.UpdateOne(filter, update);
+        }
+
+        /// <summary>
         /// Sets the user customer card id.
         /// </summary>
         /// <param name="user"></param>
@@ -153,6 +202,28 @@ namespace SmartKioskBot.Controllers
                 Builders<User>.Filter.Eq(o => o.Country, user.Country));
 
             userCollection.UpdateOne(filter, update);
+        }
+
+        public static void MergeUsers(User from_user, User into_user)
+        {
+            var from_context = ContextController.GetContext(from_user.Id);
+
+            //Merge Context
+            foreach (var f in from_context.Filters)
+                ContextController.AddFilter(into_user, f.FilterName, f.Operator, f.Value);
+
+            foreach (var w in from_context.WishList)
+            {
+                ContextController.AddWishList(into_user, w.ToString());
+            }
+
+            foreach (var c in from_context.Comparator)
+            {
+                ContextController.AddComparator(into_user, c.ToString());
+            }
+
+            //Merge CRM
+            //TODO
         }
 
         /// <summary>

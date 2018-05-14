@@ -3,8 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-#Database credentials and details
-SmartKioskBot/AppSettings.cs
 
 # User-specific files
 *.suo

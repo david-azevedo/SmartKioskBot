@@ -14,9 +14,7 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class AddProductDialog : IDialog<object>
     {
-#pragma warning disable 1998
         public async Task StartAsync(IDialogContext context)
-#pragma warning restore 1998
         {
             context.Wait(MessageReceivedAsync);
         }
