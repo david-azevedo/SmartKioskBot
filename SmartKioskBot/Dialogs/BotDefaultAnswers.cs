@@ -309,7 +309,7 @@ namespace SmartKioskBot.Dialogs
             return success[new Random().Next(0, success.Length)];
         }
 
-        //STOCK
+        //Store info
         public static String getStockFail()
         {
             String[] fail = {
@@ -323,6 +323,14 @@ namespace SmartKioskBot.Dialogs
             String[] success = {
                 "Temos esse produto em stock nas seguintes lojas:",
                 "As seguintes lojas têm esse produto em stock:"
+            };
+            return success[new Random().Next(0, success.Length)];
+        }
+
+        public static String getClosesStore()
+        {
+            String[] success = {
+                "Estas são as lojas mais próximas de si:"
             };
             return success[new Random().Next(0, success.Length)];
         }
