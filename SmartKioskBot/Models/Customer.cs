@@ -5,12 +5,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Models
 {
+    /**
+     * Customer vs User
+     * 
+     * A Customer is an object belonging to the CRM while a User is related to a dialog. 
+     * 
+     * A Customer contains information about the purchasing activity of a person.
+     * A User contains information about the interaction of a person with the bot.
+     */
 
     [Serializable, JsonObject]
-    public class CRM
+    public class Customer
     {
         [BsonId]
         public ObjectId Id { get; set; }
@@ -18,14 +27,27 @@ namespace SmartKioskBot.Models
         [BsonElement("userId")]
         public ObjectId UserId{ get; set; }
 
+        [BsonElement("country")]
+        public string Country { get; set; }
+
         [BsonElement("productsBought")]
         public ProductBought[] ProductsBought { get; set; }
 
         [BsonElement("filtersCount")]
-        public string[] FiltersCount { get; set; }
+        public FilterCount[] FiltersCount { get; set; }
 
         [BsonElement("productsClick")]
         public ProductClicks[] ProductsClicks { get; set; }
+
+        [Serializable, JsonObject]
+        public class FilterCount
+        {
+            [BsonElement("filter")]
+            public Filter Filter { get; set; }
+
+            [BsonElement("nSearches")]
+            public int NSearches { get; set; }
+        }
 
         [Serializable, JsonObject]
         public class ProductClicks

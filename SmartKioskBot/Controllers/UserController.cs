@@ -210,7 +210,9 @@ namespace SmartKioskBot.Controllers
 
             //Merge Context
             foreach (var f in from_context.Filters)
+            {
                 ContextController.AddFilter(into_user, f.FilterName, f.Operator, f.Value);
+            }
 
             foreach (var w in from_context.WishList)
             {
@@ -223,7 +225,21 @@ namespace SmartKioskBot.Controllers
             }
 
             //Merge CRM
-            //TODO
+            var from_customer = CRMController.GetCustomer(from_user.Id);
+            foreach (var f in from_customer.FiltersCount)
+            {
+                CRMController.AddFilterUsage(into_user.Id, into_user.Country, f.Filter);
+            }
+
+            foreach (var pb in from_customer.ProductsBought)
+            {
+                CRMController.AddPurchase(into_user.Id, into_user.Country, pb.ProductId);
+            }
+
+            foreach (var pc in from_customer.ProductsClicks)
+            {
+                CRMController.AddPurchase(into_user.Id, into_user.Country, pc.ProductId);
+            }
         }
 
         /// <summary>
