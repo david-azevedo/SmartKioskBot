@@ -58,7 +58,7 @@ namespace SmartKioskBot.Dialogs
 
                 foreach (Store s in storesWStock)
                 {
-                    cards.Add(ProductCard.getStoreDetailsCard(s, productId).ToAttachment());
+                    cards.Add(StoreCard.GetStoreDetailsCard(s, productId).ToAttachment());
                 }
 
                 reply.Attachments = cards;

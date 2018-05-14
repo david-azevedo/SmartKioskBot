@@ -191,6 +191,7 @@
     <Compile Include="Controllers\CRMController.cs" />
     <Compile Include="Dialogs\AddProductDialog.cs" />
     <Compile Include="Dialogs\BotDefaultAnswers.cs" />
+    <Compile Include="Dialogs\ClosestStoresDialog.cs" />
     <Compile Include="Dialogs\CompareDialog.cs" />
     <Compile Include="Dialogs\FilterDialog.cs" />
     <Compile Include="Dialogs\IdentificationDialog.cs" />
@@ -217,6 +218,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\IdentificationCards.cs" />
     <Compile Include="UI\ProductCard.cs" />
+    <Compile Include="UI\StoreCard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">

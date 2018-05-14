@@ -219,9 +219,6 @@ namespace SmartKioskBot.Dialogs
             Next(context);
         }
 
-        /*
-         * Stock
-         */
         [LuisIntent("StockInStore")]
         public async Task StockInStore(IDialogContext context, LuisResult result)
         {
@@ -235,7 +232,7 @@ namespace SmartKioskBot.Dialogs
         }
 
         /*
-         * InStoreLocation
+         * Store Information
          */
         [LuisIntent("InStoreLocation")]
         public async Task InStoreLocation(IDialogContext context, LuisResult result)
@@ -248,7 +245,22 @@ namespace SmartKioskBot.Dialogs
 
         }
 
-        
+        [LuisIntent("ClosestStores")]
+        public async Task ClosestStores(IDialogContext context, LuisResult result)
+        {
+            //FilterIntentScore(context, result);
+
+            //simulate user position
+            Random r = new Random();
+            Double[] coords = new Double[]{
+                r.NextDouble() * 180 - 90,
+                r.NextDouble() * 180 - 90
+             };
+
+            await ClosestStoresDialog.ShowClosestStores(context, coords, 3);
+            Next(context);
+        }
+
         [LuisIntent("Recommendation")]
         public async Task Recommendation(IDialogContext context, LuisResult result)
         {
