@@ -31,7 +31,7 @@ namespace SmartKioskBot.Dialogs
                 UserController.CreateUser(activity.ChannelId, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString());
                 user = UserController.getUser(activity.ChannelId);
                 ContextController.CreateContext(user);
-                //TODO: CRMController.
+                CRMController.AddCustomer(user);
                 identified = false;
             }
             else
