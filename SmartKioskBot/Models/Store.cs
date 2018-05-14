@@ -17,8 +17,10 @@ namespace SmartKioskBot.Models
         [BsonElement("name")]
         public string Name { get; set; }
 
+        public Double proximity { get; set; }
+
         [BsonElement("coordinates")]
-        public string[] Coordinates { get; set; }
+        public Double[] Coordinates { get; set; }
 
         [BsonElement("productsInStock")]
         public ProductStock[] ProductsInStock { get; set; }
@@ -41,6 +43,11 @@ namespace SmartKioskBot.Models
             [BsonElement("InStoreLocation")]
             public ProductLocation InStoreLocation { get; set; }
 
+        }
+
+        public Double calculateProximity(Double[] position)
+        {
+            return (proximity = Math.Abs(Coordinates[0] - position[0]) + Math.Abs(Coordinates[1] - position[1]));
         }
 
         [Serializable, JsonObject]
