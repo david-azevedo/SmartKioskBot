@@ -252,7 +252,7 @@ namespace SmartKioskBot.Logic
                             bestInPart = productsToCompare[entry.Value[i]];
                         }
 
-                        overallBest[entry.Value[i]] += (double)(product.RAM * 0.2 / bestInPart.RAM);
+                        overallBest[entry.Value[i]] += (double)(product.RAM * 0.15 / bestInPart.RAM);
                     }
                     else if (entry.Key == Comparator.Parts.Price)
                     {
@@ -261,10 +261,19 @@ namespace SmartKioskBot.Logic
                         {
                             bestInPart = productsToCompare[entry.Value[i]];
                         }
-                            overallBest[entry.Value[i]] += (double)(1-(Math.Abs(bestInPart.Price - product.Price) * 0.2 / bestInPart.Price));
-                    } else
+                            overallBest[entry.Value[i]] += (double)(1-(Math.Abs(bestInPart.Price - product.Price) * 0.3 / bestInPart.Price));
+                    }
+                    else if (entry.Key == Comparator.Parts.GPU)
                     {
                         overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.2);
+                    }
+                    else if (entry.Key == Comparator.Parts.CPU)
+                    {
+                        overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.25);
+                    }
+                    else if (entry.Key == Comparator.Parts.Screen)
+                    {
+                        overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.1);
                     }
                 }
             }
