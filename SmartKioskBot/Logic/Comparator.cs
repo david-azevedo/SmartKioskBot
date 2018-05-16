@@ -17,7 +17,7 @@ namespace SmartKioskBot.Logic
 {
     public static class Comparator
     {
-        public enum Parts { CPU, GPU, RAM, Screen };
+        public enum Parts { CPU, GPU, RAM, Screen, Price };
 
         public static Dictionary<Parts, List<int>> GetBestProduct(List<Product> products)
         {
@@ -36,6 +36,9 @@ namespace SmartKioskBot.Logic
 
             List<int> bestSortedScreenIndex = GetSortedBestScreens(products);
             partToSortedBestProducts.Add(Parts.Screen, bestSortedScreenIndex);
+
+            List<int> bestSortedPriceIndex = GetSortedBestPrices(products);
+            partToSortedBestProducts.Add(Parts.Price, bestSortedPriceIndex);
 
             return partToSortedBestProducts;
         }
@@ -167,6 +170,21 @@ namespace SmartKioskBot.Logic
             return GetSortedParts(screens);
         }
 
+        private static List<int> GetSortedBestPrices(List<Product> products)
+        {
+            List<Part.Price> prices = new List<Part.Price>();
+
+            for (int i = 0; i < products.Count; i++)
+            {
+                Product currentProduct = products[i];
+                int price = 0;
+
+                price = (int)currentProduct.Price;              
+                prices.Add(new Part.Price(price));
+            }
+
+            return GetSortedParts(prices);
+        }
         public static List<int> GetSortedParts<T>(List<T> comparables) where T : Part
         {
             Dictionary<T, int> partToIndexOfProduct = new Dictionary<T, int>();
@@ -197,7 +215,6 @@ namespace SmartKioskBot.Logic
 
             var reply = context.MakeMessage();
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-            List<Attachment> cards = new List<Attachment>();
 
             //size of products to show on result(top 3 if >3)
             var resultSize = 0;
@@ -207,19 +224,81 @@ namespace SmartKioskBot.Logic
             }
             else resultSize = productsToCompare.Count;
             //Sends a reply for each specification compared and shows the products(best ones first)
+            String replyText="Top results\n\n";
             foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
             {
-                reply = context.MakeMessage();
-                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                reply.Text = BotDefaultAnswers.getComparator(entry.Key.ToString()) + "\n\n";
+                replyText += String.Format("For {0}:\n\n", entry.Key);
                 for (int i = 0; i < resultSize; i++)
                 {
-                    cards.Add(ProductCard.GetProductCard(productsToCompare[entry.Value[i]], ProductCard.CardType.COMPARATOR).ToAttachment());
+                    replyText += i+1 + ". "  + productsToCompare[entry.Value[i]].Brand + " "  + productsToCompare[entry.Value[i]].Model + "; ";
                 }
-                reply.Attachments = cards;
-                context.PostAsync(reply);
-                cards.Clear();
+                replyText += "\n\n";
             }
-        }     
+
+            List<double> overallBest = new List<double>(new double[productsToCompare.Count]);
+            var bestInPart = new Product();
+            var product = new Product();
+            //calculate score for each product
+            foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
+            {
+                for (int i = 0; i < productsToCompare.Count; i++)
+                {
+                    
+                    if (entry.Key == Comparator.Parts.RAM)
+                    {
+                        product = productsToCompare[entry.Value[i]];
+                        if (i == 0)
+                        {
+                            bestInPart = productsToCompare[entry.Value[i]];
+                        }
+
+                        overallBest[entry.Value[i]] += (double)(product.RAM * 0.15 / bestInPart.RAM);
+                    }
+                    else if (entry.Key == Comparator.Parts.Price)
+                    {
+                        product = productsToCompare[entry.Value[i]];
+                        if (i == 0)
+                        {
+                            bestInPart = productsToCompare[entry.Value[i]];
+                        }
+                            overallBest[entry.Value[i]] += (double)(1-(Math.Abs(bestInPart.Price - product.Price) * 0.3 / bestInPart.Price));
+                    }
+                    else if (entry.Key == Comparator.Parts.GPU)
+                    {
+                        overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.2);
+                    }
+                    else if (entry.Key == Comparator.Parts.CPU)
+                    {
+                        overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.25);
+                    }
+                    else if (entry.Key == Comparator.Parts.Screen)
+                    {
+                        overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.1);
+                    }
+                }
+            }
+
+            replyText += "Overall best:\n\n";
+            reply.Text = replyText;
+            List<Attachment> cards = new List<Attachment>();
+            Dictionary<int, double> result = new Dictionary<int, double>();
+
+            for(int i = 0; i < overallBest.Count; i++)
+            {
+                result.Add(i, overallBest[i]);
+            }
+
+            //sort by descending score
+            IEnumerable<KeyValuePair< int, double>> sortedResult = result.OrderByDescending(i => i.Key);
+
+            //add products to cards
+            foreach (KeyValuePair<int, double> kvp in sortedResult)
+            {
+                cards.Add(ProductCard.GetProductCard(productsToCompare[kvp.Key], ProductCard.CardType.SEARCH).ToAttachment());
+            }
+            reply.Attachments = cards;
+            context.PostAsync(reply);
+            cards.Clear();
+        }
     }
 }
