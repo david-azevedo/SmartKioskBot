@@ -473,14 +473,14 @@ namespace SmartKioskBot.Helpers
         public static async Task PostTranslated(IDialogContext context, string reply, string userLanguageCode)
         {
             // Traduzir
-            string text = await DirectTranslateAsync(reply, "pt", userLanguageCode);
-            await context.PostAsync(text);
+            //string text = await DirectTranslateAsync(reply, "pt", userLanguageCode);
+            await context.PostAsync(reply);
 
         }
         public static async Task PostTranslated(IDialogContext context, IMessageActivity reply, string userLanguageCode)
         {
             // Traduzir
-            reply.Text = await DirectTranslateAsync(reply.Text, "pt", userLanguageCode);
+            //reply.Text = await DirectTranslateAsync(reply.Text, "pt", userLanguageCode);
             /*foreach(Attachment a in reply.Attachments)
             {
                 if(a.ContentType == HeroCard.ContentType)
