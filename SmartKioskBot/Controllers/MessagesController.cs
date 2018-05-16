@@ -22,7 +22,7 @@ namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
     {
         public Dictionary<string, string> credentials = new Dictionary<string, string>
         {
-            { "347f0de7-3c0c-44c7-9788-4ec424eb943b", "wsCZRX34!$uwcbkZPR347$;" }
+            { "347f0de7-3c0c-44c7-9788-4ec424eb943b", "gwbzILZ83@;cguIZSH028;[" }
         };
 
         public Task<bool> IsValidAppIdAsync(string appId)

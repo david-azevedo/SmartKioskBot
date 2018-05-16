@@ -23,17 +23,17 @@ namespace SmartKioskBot.Dialogs
             List<Store> stores = StoreController.getClosesStores(coords);
 
             var reply = context.MakeMessage();
-            reply.Text = BotDefaultAnswers.getClosesStore();
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
             List<Attachment> attachments = new List<Attachment>();
 
-            for (var i = 0; i < stores.Count() && i < n_stores; i++)
+            for (var i = 0; i < stores.Count() && i < n_stores && i <7; i++)
             {
                 attachments.Add(StoreCard.GetStoreCard(stores[i]).ToAttachment());
             }
 
             reply.Attachments = attachments;
 
+            await context.PostAsync(BotDefaultAnswers.getClosesStore());
             await context.PostAsync(reply);
         }
 

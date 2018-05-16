@@ -26,11 +26,56 @@ namespace SmartKioskBot.Dialogs
 
             var product = entity[0];
 
-            List<Attachment> cards = new List<Attachment>();
-            cards.Add(ProductCard.getProductDetailsCard(product).ToAttachment());
-
             var reply = context.MakeMessage();
-            reply.Attachments = cards;
+            reply.Text = "![duck](" + product.Photo + ")" + "\n\n" + 
+
+                        "#" + product.Name + "\n" + 
+                        "Preço: " + product.Price + "\n\n" + 
+
+                        "### *Referências*\n" +
+                        "EAN: " + product.EAN + "\n" +
+                        "Marca: " + product.Brand + "\n" +
+                        "Modelo: " + product.Model + "\n" +
+                        "Garantia: " + product.Warranty + " anos\n" +
+
+
+                        "Processador: " + product.CPU + "\n" +
+                        "Família de Processador: " + product.CPUFamily + "\n" +
+                        "Velocidade do Processador: " + product.CPUSpeed + " GHz\n" +
+                        "Número de núcleos: " + product.CoreNr + "\n" +
+                        "RAM: " + product.RAM + " GB\n\n" +
+                        "Tipo de Armazenamento: " + product.StorageType + "\n" +
+                        "Armazenamento: " + product.StorageAmount + " GB\n" +
+                        "Tipo de Placa Gráfica: " + product.GraphicsCardType + "\n" +
+                        "Placa Gráfica: " + product.GraphicsCard + "\n" +
+                        "Memória Gráfica (Máximo): " + product.MaxVideoMem + "\n" +
+                        "Autonomia: " + product.Autonomy + " horas\n" +
+                        "Placa de Som: " + product.SoundCard + "\n" +
+                        "Tem Câmara: " + product.HasCamera + "\n" +
+                        "Teclado Númerico: " + product.NumPad + "\n" +
+                        "Touch Bar: " + product.TouchBar + "\n" +
+                        "Teclado Retroiluminado: " + product.BacklitKeybr + "\n" +
+                        "Teclado Mecânico: " + product.MechKeybr + "\n" +
+                        "Software: " + product.Software + "\n" +
+                        "Sistema Operativo: " + product.OS + "\n" +
+                        "Ecrã: " + product.Screen + "\n" +
+                        "Diagonal do Ecrã: " + product.ScreenDiagonal + "'\n" +
+                        "Resolução do Ecrã: " + product.ScreenResolution + "\n" +
+                        "Ecrã Tatil: " + product.TouchScreen + "\n" +
+                        
+                        "Peso: " + product.Weight + " kg\n" +
+                        "Cor: " + product.Colour + "\n" +
+                        "Altura: " + product.Height + " cm\n" +
+                        "Largura: " + product.Width + " cm\n" +
+                        "Profundidade: " + product.Depth + " cm\n" +
+                        "Garantia da Bateria: " + product.BatteryWarranty + "\n" +
+                        "Conteúdo extra: " + product.ExtraContent + "\n" +
+                        "Tipo: " + product.Type + "\n" +
+                        "Drive: " + product.Drive + "\n" +
+                        "Conetividade: " + product.Connectivity + "\n" +
+                        "Ligações: " + product.Connections + "\n" +
+                        "Mais Informações: " + product.MoreInfo + "\n" +
+                        "Part Number: " + product.PartNr + "\n";
 
             await context.PostAsync(reply);
         }
