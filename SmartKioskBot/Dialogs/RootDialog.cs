@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
+using MongoDB.Bson;
 using SmartKioskBot.Controllers;
 using SmartKioskBot.Dialogs.QnA;
 using SmartKioskBot.Models;
@@ -29,7 +31,7 @@ namespace SmartKioskBot.Dialogs
                 UserController.CreateUser(activity.ChannelId, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString());
                 user = UserController.getUser(activity.ChannelId);
                 ContextController.CreateContext(user);
-                //TODO: CRMController.
+                CRMController.AddCustomer(user);
                 identified = false;
             }
             else
@@ -209,17 +211,17 @@ namespace SmartKioskBot.Dialogs
 
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
+
+            // Add click to CRM
+            CRMController.AddProductClick(this.user.Id, this.user.Country, ObjectId.Parse(id));
+
             await ProductDetails.ShowProductMessage(context, id);
             Next(context);
         }
 
-        /*
-         * Stock
-         */
         [LuisIntent("StockInStore")]
         public async Task StockInStore(IDialogContext context, LuisResult result)
         {
-            
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
 
@@ -230,7 +232,7 @@ namespace SmartKioskBot.Dialogs
         }
 
         /*
-         * InStoreLocation
+         * Store Information
          */
         [LuisIntent("InStoreLocation")]
         public async Task InStoreLocation(IDialogContext context, LuisResult result)
@@ -243,15 +245,41 @@ namespace SmartKioskBot.Dialogs
 
         }
 
-        /*
-        [LuisIntent("Recommendation")]
-        public void Recommendation(IDialogContext context, LuisResult result)
+        [LuisIntent("ClosestStores")]
+        public async Task ClosestStores(IDialogContext context, LuisResult result)
         {
-            FilterIntentScore(context, result);
-            
+            //FilterIntentScore(context, result);
+
+            //simulate user position
+            Random r = new Random();
+            Double[] coords = new Double[]{
+                r.NextDouble() * 180 - 90,
+                r.NextDouble() * 180 - 90
+             };
+
+            await ClosestStoresDialog.ShowClosestStores(context, coords, 3);
             Next(context);
         }
 
+        [LuisIntent("Recommendation")]
+        public async Task Recommendation(IDialogContext context, LuisResult result)
+        {
+            try
+            {
+                FilterIntentScore(context, result);
+
+                var reply = RecommendationDialog.ShowRecommendations(context, this.user);
+                await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
+
+                Next(context);
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e.ToString());
+            }
+        }
+
+        /*
         [LuisIntent("StoreLocation")]
         public void StoreLocation(IDialogContext context, LuisResult result)
         {

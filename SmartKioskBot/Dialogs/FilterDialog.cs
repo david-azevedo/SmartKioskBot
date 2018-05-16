@@ -103,7 +103,10 @@ namespace SmartKioskBot.Dialogs
 
             //Save new Filters
             foreach (Filter f in tmp)
+            {
                 ContextController.AddFilter(user, f.FilterName, f.Operator, f.Value);
+                CRMController.AddFilterUsage(user.Id, user.Country, f);
+            }
 
             var reply = _context.MakeMessage();
             
@@ -118,7 +121,7 @@ namespace SmartKioskBot.Dialogs
             return reply;
         }
 
-        private static List<Product> GetProductsForUser(List<Filter> filters)
+        public static List<Product> GetProductsForUser(List<Filter> filters)
         {
             var total_filter = Builders<Product>.Filter.Empty;
             List<int> treatedIdx = new List<int>();
