@@ -213,32 +213,30 @@ namespace SmartKioskBot.Logic
         {
             Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare); //TODO VERIFICAR RESULTS
 
-            var reply = context.MakeMessage();
-            var text = "";
-
-            reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
 
             //size of products to show on result(top 3 if >3)
-            var resultSize = 0;
+           /* var resultSize = 0;
             if (productsToCompare.Count > 3)
-            {
                 resultSize = 3;
-            }
-            else resultSize = productsToCompare.Count;
+            else */var resultSize = productsToCompare.Count;
+
+            var reply = context.MakeMessage();
+
             //Sends a reply for each specification compared and shows the products(best ones first)
-            String replyText="Top results\n\n";
             foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
             {
                 reply = context.MakeMessage();
-                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                text = BotDefaultAnswers.getComparator(entry.Key.ToString()) + "\n\n";
+                reply.Text = "### " + BotDefaultAnswers.getComparator(entry.Key.ToString()) + "  \n";
 
                 for (int i = 0; i < resultSize && i <7; i++)
                 {
-                    replyText += i+1 + ". "  + productsToCompare[entry.Value[i]].Brand + " "  + productsToCompare[entry.Value[i]].Model + "; ";
+                    reply.Text += i+1 + ". "  + productsToCompare[entry.Value[i]].Brand + " "  + productsToCompare[entry.Value[i]].Model + ";  \n";
                 }
-                replyText += "\n\n";
+                //Send individual classification
+                context.PostAsync(reply);
             }
+            
+            
 
             List<double> overallBest = new List<double>(new double[productsToCompare.Count]);
             var bestInPart = new Product();
@@ -248,7 +246,7 @@ namespace SmartKioskBot.Logic
             {
                 for (int i = 0; i < productsToCompare.Count; i++)
                 {
-                    
+                    //RAM
                     if (entry.Key == Comparator.Parts.RAM)
                     {
                         product = productsToCompare[entry.Value[i]];
@@ -259,6 +257,7 @@ namespace SmartKioskBot.Logic
 
                         overallBest[entry.Value[i]] += (double)(product.RAM * 0.15 / bestInPart.RAM);
                     }
+                    //PRICE
                     else if (entry.Key == Comparator.Parts.Price)
                     {
                         product = productsToCompare[entry.Value[i]];
@@ -268,28 +267,26 @@ namespace SmartKioskBot.Logic
                         }
                             overallBest[entry.Value[i]] += (double)(1-(Math.Abs(bestInPart.Price - product.Price) * 0.3 / bestInPart.Price));
                     }
+                    //GPU
                     else if (entry.Key == Comparator.Parts.GPU)
                     {
                         overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.2);
                     }
+                    //CPU
                     else if (entry.Key == Comparator.Parts.CPU)
                     {
                         overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.25);
                     }
+                    //SCREEN
                     else if (entry.Key == Comparator.Parts.Screen)
                     {
                         overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.1);
                     }
                 }
-                reply.Attachments = cards;
-
-                context.PostAsync(text);
-                context.PostAsync(reply);
-                cards.Clear();
             }
 
-            replyText += "Overall best:\n\n";
-            reply.Text = replyText;
+            context.PostAsync("## Top Resultados Finais:");
+
             List<Attachment> cards = new List<Attachment>();
             Dictionary<int, double> result = new Dictionary<int, double>();
 
@@ -306,7 +303,9 @@ namespace SmartKioskBot.Logic
             {
                 cards.Add(ProductCard.GetProductCard(productsToCompare[kvp.Key], ProductCard.CardType.SEARCH).ToAttachment());
             }
+            reply = context.MakeMessage();
             reply.Attachments = cards;
+            reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
             context.PostAsync(reply);
             cards.Clear();
         }
