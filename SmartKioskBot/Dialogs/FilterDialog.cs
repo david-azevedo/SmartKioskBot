@@ -72,13 +72,12 @@ namespace SmartKioskBot.Dialogs
             context = ContextController.GetContext(user.Id);
             //display current filters
             if (context.Filters.Count() == 0)
-                reply.Text += "\n\n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.FAIL);
+                reply.Text += "  \n  \n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.FAIL);
             else
             {
-                reply.Text += "\n\n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.SUCCESS) + "\n\n";
+                reply.Text += "  \n  \n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.SUCCESS) + "  \n";
                 foreach (Filter f in context.Filters)
                     reply.Text += f.FilterName + f.Operator + f.Value + ", ";
-                reply.Text += "\n\n\n\n";
             }
 
             return reply;
@@ -110,14 +109,20 @@ namespace SmartKioskBot.Dialogs
 
             var reply = _context.MakeMessage();
             
-            ShowProducts(products, reply);
+            bool foundProducts = ShowProducts(products, reply);
+
+            var text = "";
+
+            if (foundProducts)
+                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.SUCCESS) + "  \n";
+            else
+                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.FAIL) + "  \n";
 
             //display current filters
-            reply.Text += "\n\n";
             foreach (Filter f in filters)
-                reply.Text += f.FilterName + f.Operator + f.Value + ", ";
-            reply.Text += "\n\n\n\n";
+               text += f.FilterName + f.Operator + f.Value + ", ";
 
+            _context.PostAsync(text);
             return reply;
         }
 
@@ -156,25 +161,24 @@ namespace SmartKioskBot.Dialogs
             return ProductController.getProductsFilter(total_filter);
         }
 
-        private static IMessageActivity ShowProducts(List<Product> products, IMessageActivity reply)
+        private static bool ShowProducts(List<Product> products, IMessageActivity reply)
         {
             if (products.Count == 0)
             {
                 reply.AttachmentLayout = AttachmentLayoutTypes.List;
-                reply.Text += BotDefaultAnswers.getFilter(BotDefaultAnswers.State.FAIL);
+                return false;
             }
             else
             {
-                reply.Text += BotDefaultAnswers.getFilter(BotDefaultAnswers.State.SUCCESS);
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
-                foreach (Product p in products)
-                    cards.Add(ProductCard.GetProductCard(p,ProductCard.CardType.SEARCH).ToAttachment());
+                for (var i = 0; i < products.Count() && i < 7; i++)
+                    cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.SEARCH).ToAttachment());
 
                 reply.Attachments = cards;
             }
-            return reply;
+            return true;
         }
 
         private static List<Filter> GetEntitiesFilter(LuisResult result)

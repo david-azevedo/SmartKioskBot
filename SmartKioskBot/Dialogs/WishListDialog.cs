@@ -42,20 +42,23 @@ namespace SmartKioskBot.Dialogs
             var products = ProductController.getProducts(context.WishList);
 
             var reply = _context.MakeMessage();
+            var text = "";
 
             if (products.Count == 0)
-                reply.Text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.FAIL);
+                text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.FAIL);
             else
-                reply.Text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS);
+                text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS);
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
             List<Attachment> cards = new List<Attachment>();
 
-            foreach (Product p in products)
+            for(var i=0; i < products.Count() && i < 7;i++)
             {
-                cards.Add(ProductCard.GetProductCard(p, ProductCard.CardType.WISHLIST).ToAttachment());
+                cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.WISHLIST).ToAttachment());
             }
 
             reply.Attachments = cards;
+
+            _context.PostAsync(text);
             return reply;
         }
     }
