@@ -43,7 +43,21 @@ namespace SmartKioskBot.Dialogs
         private async void FilterIntentScore(IDialogContext context, LuisResult result) {
             if (result.TopScoringIntent.Score < INTENT_SCORE_THRESHOLD)
             {
-                await None(context, result);
+                // Chamar QnA Maker
+                QnAMakerResult qnaResult = await QnADialog.MakeRequest(result.Query);
+
+                if (qnaResult != null && result.TopScoringIntent.Score >= INTENT_SCORE_THRESHOLD &&
+                    qnaResult.Score >= INTENT_SCORE_THRESHOLD)
+                {
+                    await context.PostAsync(qnaResult.Answer);
+                }
+                else
+                {
+                    string message = "Desculpa mas não entendi aquilo que disseste. Podes refrasear por favor? :)";
+                    await context.PostAsync(message);
+                }
+
+                Next(context);
             }
         }
 
@@ -67,19 +81,16 @@ namespace SmartKioskBot.Dialogs
         }
 
         [LuisIntent("")]
+        [LuisIntent("None")]
+        //Not yet processed
+        [LuisIntent("Confirmation")]
+        [LuisIntent("Identification")]
+        [LuisIntent("Negation")]
         public async Task None(IDialogContext context, LuisResult result)
         {
-            // Chamar QnA Maker
-            QnAMakerResult qnaResult = await QnADialog.MakeRequest(result.Query);
-            
-            if (qnaResult != null && result.TopScoringIntent.Score >= INTENT_SCORE_THRESHOLD)
-            {
-                await context.PostAsync(qnaResult.Answer);
-            }
-            else {
-                string message = "Desculpa mas não entendi aquilo que disseste. Podes refrasear por favor? :)";
-                await context.PostAsync(message);
-            }
+            FilterIntentScore(context, result);
+            string message = "Desculpa mas não entendi aquilo que disseste. Podes refrasear por favor? :)";
+            await context.PostAsync(message);
 
             Next(context);
         }

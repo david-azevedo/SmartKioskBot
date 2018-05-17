@@ -72,13 +72,12 @@ namespace SmartKioskBot.Dialogs
             context = ContextController.GetContext(user.Id);
             //display current filters
             if (context.Filters.Count() == 0)
-                reply.Text += "\n\n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.FAIL);
+                reply.Text += "  \n  \n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.FAIL);
             else
             {
-                reply.Text += "\n\n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.SUCCESS) + "\n\n";
+                reply.Text += "  \n  \n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.SUCCESS) + "  \n";
                 foreach (Filter f in context.Filters)
                     reply.Text += f.FilterName + f.Operator + f.Value + ", ";
-                reply.Text += "\n\n\n\n";
             }
 
             return reply;
@@ -115,9 +114,9 @@ namespace SmartKioskBot.Dialogs
             var text = "";
 
             if (foundProducts)
-                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.SUCCESS) + "\n";
+                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.SUCCESS) + "  \n";
             else
-                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.FAIL) + "\n";
+                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.FAIL) + "  \n";
 
             //display current filters
             foreach (Filter f in filters)

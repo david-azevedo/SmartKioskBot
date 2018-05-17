@@ -34,7 +34,7 @@ namespace SmartKioskBot.UI
             };
         }
 
-        private static List<CardAction> getButtonsCardType(CardType type, string id)
+        public static List<CardAction> getButtonsCardType(CardType type, string id)
         {
             var buttons = new List<CardAction>();
 
@@ -52,7 +52,6 @@ namespace SmartKioskBot.UI
                     {
                         buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + id));
                         buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Ver Pacotes", value: BotDefaultAnswers.add_to_comparator + id));
                         buttons.Add(new CardAction(ActionTypes.ImBack, "Produtos Relacionados", value: BotDefaultAnswers.add_to_comparator + id));
                         buttons.Add(new CardAction(ActionTypes.ImBack, "Verificar Disponibilidade", value: BotDefaultAnswers.show_store_with_stock + id));
                         break;
