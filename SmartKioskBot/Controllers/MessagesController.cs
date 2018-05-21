@@ -77,7 +77,7 @@ namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
                             //Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
                             //activity.Text = nt.Item1;
                             activity.Locale = "pt-PT";
-                            await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog(activity));
+                            await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog());
                         }
                         break;
 
