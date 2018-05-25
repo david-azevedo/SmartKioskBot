@@ -182,9 +182,11 @@ namespace SmartKioskBot.Controllers
                 }
             );
 
+            
+
             List<Filter> filters = new List<Filter>();
 
-            for (int i = 0; i < maxNumOfFilters; i++)
+            for (int i = 0; i < maxNumOfFilters && i < list.Count; i++)
             {
                 filters.Add(list[i].Filter);
             }
