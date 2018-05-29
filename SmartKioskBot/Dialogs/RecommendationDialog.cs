@@ -57,6 +57,7 @@ namespace SmartKioskBot.Dialogs
             }
 
             reply.Attachments = cards;
+            context.PostAsync("Acredito que irá gostar destes portáteis");
             return reply;
         }
     }

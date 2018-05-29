@@ -473,7 +473,7 @@ namespace SmartKioskBot.Helpers
         public static async Task PostTranslated(IDialogContext context, string reply, string userLanguageCode)
         {
             // Traduzir
-            //string text = await DirectTranslateAsync(reply, "pt", userLanguageCode);
+            string text = await DirectTranslateAsync(reply, "pt", userLanguageCode);
             await context.PostAsync(reply);
 
         }
@@ -481,7 +481,7 @@ namespace SmartKioskBot.Helpers
         {
             // Traduzir
             //reply.Text = await DirectTranslateAsync(reply.Text, "pt", userLanguageCode);
-            /*foreach(Attachment a in reply.Attachments)
+            foreach(Attachment a in reply.Attachments)
             {
                 if(a.ContentType == HeroCard.ContentType)
                 {
@@ -490,7 +490,7 @@ namespace SmartKioskBot.Helpers
                         b.Text = await DirectTranslateAsync(b.Text, "pt", userLanguageCode);
                     }
                 }
-            }*/
+            }
 
 
             await context.PostAsync(reply);

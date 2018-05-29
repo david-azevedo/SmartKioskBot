@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -11,6 +12,7 @@ using Autofac;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Internals;
 using Microsoft.Bot.Connector;
+using SmartKioskBot.Helpers;
 
 namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
 {
@@ -74,8 +76,9 @@ namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
                 {
                     case ActivityTypes.Message:
                         {
-                            //Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
-                            //activity.Text = nt.Item1;
+                            var botTranslator = new BotTranslator();
+                            Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
+                            activity.Text = nt.Item1;
                             activity.Locale = "pt-PT";
                             await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog());
                         }

@@ -54,21 +54,21 @@ namespace SmartKioskBot.Dialogs
         //USAR ISTO EM VEZ DE CONTEXT.WAIT NO FINAL
         private void TryIdentification(IDialogContext context)
         {
-            if (identified == false)
+            var activity = context.Activity;
+            var user = UserController.getUser(activity.Conversation.Id);
+            
+            if (user == null)
             {
-                var activity = context.Activity;
+                var r = new Random();
+                UserController.CreateUser(activity.Conversation.Id, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString());
                 user = UserController.getUser(activity.ChannelId);
-                if (user == null)
-                {
-                    var r = new Random();
-                    UserController.CreateUser(activity.ChannelId, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString());
-                    user = UserController.getUser(activity.ChannelId);
-                    ContextController.CreateContext(user);
-                    CRMController.AddCustomer(user);
-                    context.Call(new IdentificationDialog(), ResumeAfterIdent);
-                }
-                identified = true;
+                ContextController.CreateContext(user);
+                CRMController.AddCustomer(user);
+                context.Call(new IdentificationDialog(), ResumeAfterIdent);
             }
+            identified = true;
+            //return user;
+            
         }
 
         private async Task ResumeAfterIdent(IDialogContext context, IAwaitable<object> result)
@@ -90,6 +90,7 @@ namespace SmartKioskBot.Dialogs
 
             string message = "Desculpa mas não entendi aquilo que disseste. Podes refrasear por favor? :)";
             await context.PostAsync(message);
+// Helpers.BotTranslator.PostTranslated(context,message,)
 
             context.Done<object>(null);
         }
