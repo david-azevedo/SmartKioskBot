@@ -1,10 +1,16 @@
-﻿using MongoDB.Bson;
+﻿using Microsoft.ProjectOxford.Face;
+using Microsoft.ProjectOxford.Face.Contract;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace SmartKioskBot.Controllers
@@ -265,6 +271,23 @@ namespace SmartKioskBot.Controllers
                 "CustomerCard: " + u.CustomerCard + "\n\n";
 
             return o;
+        }
+
+        public async static Task SetFace(string imageUrl, string personId)
+        {
+            FaceServiceClient faceServiceClient = new FaceServiceClient(AppSettings.FACE_API_SUBSCRIPTION_KEY, AppSettings.FACE_API_ENDPOINT);
+            string personGroupId = "myfriends";
+
+            CreatePersonResult newFriend = await faceServiceClient.CreatePersonAsync(personGroupId, personId);
+            //var faces = await faceServiceClient.DetectAsync(imageUrl);
+            //var list = await faceServiceClient.GetPersonGroupAsync(personGroupId);
+            var list = await faceServiceClient.ListPersonsAsync(personGroupId);
+            Debug.WriteLine(list);
+            WebClient client = new WebClient();
+
+            Stream s = client.OpenRead(imageUrl);
+            await faceServiceClient.AddPersonFaceAsync(personGroupId, newFriend.PersonId, s);
+            await faceServiceClient.TrainPersonGroupAsync(personGroupId);
         }
 
     }

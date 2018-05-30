@@ -11,6 +11,8 @@ using Autofac;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Internals;
 using Microsoft.Bot.Connector;
+using SmartKioskBot;
+using SmartKioskBot.Controllers;
 
 namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
 {
@@ -76,8 +78,21 @@ namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
                         {
                             //Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
                             //activity.Text = nt.Item1;
-                            activity.Locale = "pt-PT";
-                            await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog());
+                            if(activity.Attachments != null && activity.Attachments.Count == 1)
+                            {
+                                var image = activity.Attachments[0];
+                                if (image.ContentType.Contains("image"))
+                                {
+                                    await UserController.SetFace(image.ContentUrl, activity.From.Id);
+                                }
+
+                            }
+                            else
+                            {
+                                activity.Locale = "pt-PT";
+                                await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog());
+                            }
+
                         }
                         break;
 
