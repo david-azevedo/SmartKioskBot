@@ -213,7 +213,7 @@ namespace SmartKioskBot.Dialogs
         {
             String[] success =
             {
-                "Top score para " + comparison + ":"
+                "Melhor " + comparison + ":"
             };
             return success[new Random().Next(0, success.Length)];
         }
@@ -296,7 +296,7 @@ namespace SmartKioskBot.Dialogs
         {
             String[] success =
             {
-                "Produto adicionado com sucesso ao comparador!\n\n"
+                "Produto adicionado com sucesso ao comparador!"
             };
             return success[new Random().Next(0, success.Length)];
         }

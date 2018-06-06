@@ -37,7 +37,7 @@ namespace SmartKioskBot.Dialogs
             return;
         }
 
-        public static async void AddComparator(IDialogContext _context, string message)
+        public static async Task AddComparator(IDialogContext _context, string message)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
@@ -63,7 +63,7 @@ namespace SmartKioskBot.Dialogs
 
         }
 
-        public static async void RmvComparator(IDialogContext _context, string message)
+        public static async Task RmvComparator(IDialogContext _context, string message)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");

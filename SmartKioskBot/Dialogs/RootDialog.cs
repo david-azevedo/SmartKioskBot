@@ -158,7 +158,7 @@ namespace SmartKioskBot.Dialogs
             TryIdentification(context);
             FilterIntentScore(context, result);
 
-            CompareDialog.AddComparator(context, result.Query);
+            await CompareDialog.AddComparator(context, result.Query);
 
             context.Done<object>(null);
         }
@@ -169,7 +169,7 @@ namespace SmartKioskBot.Dialogs
             TryIdentification(context);
             FilterIntentScore(context, result);
 
-            CompareDialog.RmvComparator(context, result.Query);
+            await CompareDialog.RmvComparator(context, result.Query);
 
             context.Done<object>(null);
         }

@@ -285,8 +285,6 @@ namespace SmartKioskBot.Logic
                 }
             }
 
-            context.PostAsync("## Top Resultados Finais:");
-
             List<Attachment> cards = new List<Attachment>();
             Dictionary<int, double> result = new Dictionary<int, double>();
 
@@ -303,6 +301,9 @@ namespace SmartKioskBot.Logic
             {
                 cards.Add(ProductCard.GetProductCard(productsToCompare[kvp.Key], ProductCard.CardType.SEARCH).ToAttachment());
             }
+
+            context.PostAsync("## Resultados finais:");
+
             reply = context.MakeMessage();
             reply.Attachments = cards;
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
