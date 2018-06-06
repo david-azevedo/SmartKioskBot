@@ -296,13 +296,44 @@ namespace SmartKioskBot.Logic
             //sort by descending score
             IEnumerable<KeyValuePair< int, double>> sortedResult = result.OrderByDescending(i => i.Key);
 
+            int keyBestProduct = 0;
+            int keySecondBestProduct = 0;
+
             //add products to cards
             foreach (KeyValuePair<int, double> kvp in sortedResult)
             {
+                if(keyBestProduct == 0)
+                {
+                    keyBestProduct = kvp.Key;
+                }
+                else
+                {
+                    if(keySecondBestProduct == 0)
+                    {
+                        keySecondBestProduct = kvp.Key;
+                    }
+                }
+
                 cards.Add(ProductCard.GetProductCard(productsToCompare[kvp.Key], ProductCard.CardType.SEARCH).ToAttachment());
             }
 
-            context.PostAsync("## Resultados finais:");
+            string response = "";
+
+            if(keyBestProduct != 0)
+            {
+                string bestProductModel = productsToCompare[keyBestProduct].Brand + " " + productsToCompare[keyBestProduct].Model;
+
+                response += "O melhor computador pelo preço é o " + bestProductModel + ".";
+
+                if(keySecondBestProduct != 0)
+                {
+                    string secondBestProductModel = productsToCompare[keySecondBestProduct].Brand + " " + productsToCompare[keySecondBestProduct].Model;
+                    response += "A alternativa é o " + secondBestProductModel + ".";
+                }
+
+            }
+
+            context.PostAsync(response);
 
             reply = context.MakeMessage();
             reply.Attachments = cards;
