@@ -22,6 +22,9 @@ namespace SmartKioskBot.Models
         [BsonElement("country")]
         public string Country { get; set; }
 
+        [BsonElement("lastfilter")]
+        public string LastFilter { get; set; }
+
         [BsonElement("filters")]
         public Filter[] Filters { get; set; }
 
