@@ -83,11 +83,12 @@ namespace SmartKioskBot.Dialogs
             return reply;
         }
 
-        public static IMessageActivity Filter(IDialogContext _context, User user, Context context, LuisResult result)
+        public static IMessageActivity Filter(IDialogContext _context, User user, LuisResult result)
         {
-            var filters = context.Filters.ToList();
+            var filters = ContextController.getFilters(user);
             var tmp = GetEntitiesFilter(result);
 
+            // adds the new filters in case they don't exist
             foreach(Filter f1 in tmp)
             {
                 bool exists = false;
@@ -95,17 +96,15 @@ namespace SmartKioskBot.Dialogs
                     if (f1.FilterName == f2.FilterName && f1.Value == f2.Value)
                         exists = true;
                 if (!exists)
+                {
                     filters.Add(f1);
+                    ContextController.AddFilter(user, f1.FilterName, f1.Operator, f1.Value);
+                    CRMController.AddFilterUsage(user.Id, user.Country, f1);
+                }
             }
             
+            // search result
             List<Product> products = GetProductsForUser(filters);
-
-            //Save new Filters
-            foreach (Filter f in tmp)
-            {
-                ContextController.AddFilter(user, f.FilterName, f.Operator, f.Value);
-                CRMController.AddFilterUsage(user.Id, user.Country, f);
-            }
 
             var reply = _context.MakeMessage();
             

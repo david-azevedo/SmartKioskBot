@@ -12,6 +12,9 @@ namespace SmartKioskBot.Controllers
 {
     public abstract class ContextController
     {
+        private static string dateFormat = "yyyy-MM-dd HH:mm:ss";
+        private static int filterExpirationMinutes = 10;
+
         /// <summary>
         /// Get a conversation context related to a user.
         /// </summary>
@@ -55,12 +58,33 @@ namespace SmartKioskBot.Controllers
             Context c = new Context()
             {
                 UserId = user.Id,
+                LastFilter = DateTime.Now.ToString(dateFormat),
                 Country = user.Country,
                 Filters = new Filter[] { },
                 WishList = new ObjectId[] { },
                 Comparator = new ObjectId[] { }
             };
             contextCollection.InsertOne(c);
+        }
+
+        public static List<Filter> getFilters(User user)
+        {
+            var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
+
+            var filter = Builders<Context>.Filter.And(
+                Builders<Context>.Filter.Eq(o => o.UserId, user.Id),           //same user id
+                Builders<Context>.Filter.Eq(o => o.Country, user.Country));    //same country (shard)
+            
+            // filters are cleaned if they had expired
+            if (FiltersHaveExpired(user))
+                CleanFilters(user);
+
+            var tmp = contextCollection.Find(filter).ToList();
+
+            if (tmp.Count != 0)
+                return tmp[0].Filters.ToList<Filter>();
+
+            return new List<Filter>();
         }
 
         /// <summary>
@@ -84,8 +108,17 @@ namespace SmartKioskBot.Controllers
             var filter = Builders<Context>.Filter.And(
                 Builders<Context>.Filter.Eq(o=>o.UserId,user.Id),           //same user id
                 Builders<Context>.Filter.Eq(o=>o.Country,user.Country));    //same country (shard)
-            var update = Builders<Context>.Update.Push(o => o.Filters, f);  //push new filter
 
+            // filters are cleaned if they had expired
+            if (FiltersHaveExpired(user))
+                CleanFilters(user);
+
+            // update filters
+            var update = Builders<Context>.Update.Push(o => o.Filters, f);  //push new filters
+            contextCollection.UpdateOne(filter, update);
+
+            // update date of the last added/removed filter
+            update = Builders<Context>.Update.Set<string>(c => c.LastFilter, DateTime.Now.ToString(dateFormat));
             contextCollection.UpdateOne(filter, update);
         }
 
@@ -101,19 +134,29 @@ namespace SmartKioskBot.Controllers
             var filter = Builders<Context>.Filter.And(
                 Builders<Context>.Filter.Eq(o => o.UserId, user.Id),           //same user id
                 Builders<Context>.Filter.Eq(o => o.Country, user.Country));    //same country (shard)
-
+                                                                               // filters are cleaned if they had expired
             var tmp = contextCollection.Find(filter).ToList();
-
-            //Context found
             if(tmp.Count != 0)
             {
                 Filter[] filters = tmp[0].Filters;
 
-                //remove filter of filters array
-                var newFilters = filters.Where(val => val.FilterName != filterName).ToArray();
+                if (filters.Length > 0)
+                {
+                    if (FiltersHaveExpired(user))
+                        CleanFilters(user);
+                    else
+                    {
+                        //remove filter of filters array
+                        var newFilters = filters.Where(val => val.FilterName != filterName).ToArray();
 
-                var update = Builders<Context>.Update.Set(o => o.Filters, newFilters);
-                contextCollection.UpdateOne(filter, update);
+                        var update = Builders<Context>.Update.Set(o => o.Filters, newFilters);
+                        contextCollection.UpdateOne(filter, update);
+
+                        // update date of the last added/removed filter
+                        update = Builders<Context>.Update.Set<string>(c => c.LastFilter, DateTime.Now.ToString(dateFormat));
+                        contextCollection.UpdateOne(filter, update);
+                    }
+                }
             }
         }
 
@@ -214,6 +257,22 @@ namespace SmartKioskBot.Controllers
 
             var update = Builders<Context>.Update.Pull(o => o.Comparator, ObjectId.Parse(productId));
             contextCollection.UpdateOne(filter, update);
+        }
+
+        private static bool FiltersHaveExpired(User user)
+        {
+            // last time a filter was added/removed
+            var lastAddedDate = DateTime.ParseExact(GetContext(user.Id).LastFilter, dateFormat, 
+                System.Globalization.CultureInfo.InvariantCulture);
+
+            var currentDate = DateTime.Now;
+
+            // see if the filters have expired
+            var minutesPassed = (currentDate - lastAddedDate).Minutes;
+            if (minutesPassed >= filterExpirationMinutes)
+                return true;
+            else
+                return false;
         }
     }
 }

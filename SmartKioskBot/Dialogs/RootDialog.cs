@@ -196,7 +196,7 @@ namespace SmartKioskBot.Dialogs
             TryIdentification(context);
             FilterIntentScore(context, result);
 
-            IMessageActivity r = FilterDialog.Filter(context, this.user, ContextController.GetContext(user.Id), result);
+            IMessageActivity r = FilterDialog.Filter(context, this.user, result);
             await Helpers.BotTranslator.PostTranslated(context, r, context.MakeMessage().Locale);
             context.Done<object>(null);
         }
