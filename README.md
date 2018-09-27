@@ -16,7 +16,7 @@ The Smart Kiosk Bot is a bot platform aimed at retailers. The bots intend to hel
 | 54	    | SEND LIST OF PRODUCTS TO IN-STORE     | LOW				  |			        | -     |
 | 51	    | TUTORIALS							                | HIGH			  |			        | 11    |
 | 50	    | SLACK NOT WORKING					            | LOW				  |			        | 16    |
-| 49	    | DUPLICATED MSGS ON COMPARATOR		      | HIGH			  |			        | 3     |
+| ~~49~~  | ~~DUPLICATED MSGS ON COMPARATOR~~     | ~~HIGH~~	  |			        | ~~3~~ |
 | 46	    | PAGINATION							              | HIGH			  |			        | 4     |
 | 44	    | RECOMMENDATION RESEMBLANCE			      | MEDIUM		  |			        | 15    |
 | 41	    | GUIDED ACCOUNT DIALOG				          | MEDIUM		  |			        | 10    |
