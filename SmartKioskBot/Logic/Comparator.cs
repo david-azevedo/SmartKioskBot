@@ -314,7 +314,7 @@ namespace SmartKioskBot.Logic
                     }
                 }
 
-                cards.Add(ProductCard.GetProductCard(productsToCompare[kvp.Key], ProductCard.CardType.SEARCH).ToAttachment());
+                cards.Add(ProductCard.GetProductCard(productsToCompare[kvp.Key], ProductCard.CardType.COMPARATOR).ToAttachment());
             }
 
             string response = "";
