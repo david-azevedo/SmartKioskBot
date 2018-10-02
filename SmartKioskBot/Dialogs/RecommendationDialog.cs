@@ -7,6 +7,7 @@ using SmartKioskBot.Controllers;
 using SmartKioskBot.Models;
 using SmartKioskBot.UI;
 using static SmartKioskBot.Models.Context;
+using SmartKioskBot.Logic;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -39,8 +40,10 @@ namespace SmartKioskBot.Dialogs
             {
                 userMostPopularFilters = new List<Filter>(userMostPopularFiltersArray);
             }
-                
-            List<Product> productsToRecommend = FilterDialog.GetProductsForUser(userMostPopularFilters);
+
+            //TODO: List<Product> productsToRecommend = ProductController.getProductsFilter(FilterHelper.GetJoinedFilter(userMostPopularFilters));
+
+            List<Product> productsToRecommend = new List<Product>();
 
             return ShowRecommendedProducts(context, productsToRecommend);
         }

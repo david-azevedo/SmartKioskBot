@@ -9,6 +9,9 @@ using MongoDB.Bson;
 using SmartKioskBot.Controllers;
 using SmartKioskBot.Dialogs.QnA;
 using SmartKioskBot.Models;
+using System.Collections.Generic;
+using static SmartKioskBot.Models.Context;
+using SmartKioskBot.Logic;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -71,6 +74,14 @@ namespace SmartKioskBot.Dialogs
             context.Wait(this.MessageReceived);
         }
 
+        private async Task ResumeAfterDialogueCall(IDialogContext context, IAwaitable<object> result)
+        {
+            //var tmp = result;
+            //await Helpers.BotTranslator.PostTranslated(context, tmp.ToString(), context.MakeMessage().Locale);
+            await context.PostAsync("BACK TO ROOT");
+            context.Wait(MessageReceived);
+        }
+
         [LuisIntent("")]
         [LuisIntent("None")]
         //Not yet processed
@@ -114,16 +125,7 @@ namespace SmartKioskBot.Dialogs
             TryIdentification(context);
             FilterIntentScore(context, result);
 
-            context.Call(new WishListDialog(user),ResumeAfterFunction);
-        }
-
-        private async Task ResumeAfterFunction(IDialogContext context, IAwaitable<object> result)
-        {
-            //var tmp = result;
-
-            //await Helpers.BotTranslator.PostTranslated(context, tmp.ToString(), context.MakeMessage().Locale);
-
-            context.Wait(MessageReceived);
+            context.Call(new WishListDialog(user),ResumeAfterDialogueCall);
         }
 
 
@@ -193,14 +195,13 @@ namespace SmartKioskBot.Dialogs
          */
 
         [LuisIntent("Filter")]
-        public async Task Filter(IDialogContext context, LuisResult result)
+        public async Task Filter(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result)
         {
             TryIdentification(context);
             FilterIntentScore(context, result);
-
-            IMessageActivity r = FilterDialog.Filter(context, this.user, result);
-            await Helpers.BotTranslator.PostTranslated(context, r, context.MakeMessage().Locale);
-            context.Wait(this.MessageReceived);
+            
+            List<Filter> luis_filters = FilterLogic.GetEntitiesFilter(result); 
+            context.Call(new FilterDialog(user,luis_filters), ResumeAfterDialogueCall);
         }
 
         [LuisIntent("CleanAllFilters")]

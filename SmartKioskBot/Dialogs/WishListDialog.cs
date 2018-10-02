@@ -47,17 +47,19 @@ namespace SmartKioskBot.Dialogs
             //Prepare answer
 
             var reply = context.MakeMessage();
+            var text = "";
 
             // No products on wishlsit
             if (products.Count == 0)
             {
-                reply.Text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.FAIL);
-                await context.PostAsync(reply);
+                text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.FAIL,0);
+                await context.PostAsync(text);
             }
             // Has Products
             else
             {
-                reply.Text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS);
+                text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS,skip/Constants.N_ITEMS_CARROUSSEL + 1);
+                await context.PostAsync(text);
 
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
@@ -73,7 +75,7 @@ namespace SmartKioskBot.Dialogs
 
                 //Check if pagination is needed
                 if (wishes.Length <= this.skip + Constants.N_ITEMS_CARROUSSEL)
-                    context.Done(reply);
+                    context.Done<object>(null);
                 else
                 {
                     reply = context.MakeMessage();
@@ -88,13 +90,12 @@ namespace SmartKioskBot.Dialogs
         }
 
         //PAGINATION
-        public async Task PaginationHandler(IDialogContext context, IAwaitable<IMessageActivity> argument)
+        private async Task PaginationHandler(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             var activity = await argument as Activity;
 
-            if (activity.Text != null) {
-                await context.PostAsync(activity.Text.ToString());
-
+            if (activity.Text != null)
+            {
                 if (activity.Text.Equals(BotDefaultAnswers.next_pagination))
                     await StartAsync(context);
                 else
@@ -102,7 +103,6 @@ namespace SmartKioskBot.Dialogs
             }
             else
                 context.Done<object>(null);
-                 
         }
 
       

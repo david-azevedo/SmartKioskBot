@@ -172,14 +172,14 @@ namespace SmartKioskBot.Dialogs
         }
 
         //WISHLIST
-        public static String getWishList(State state)
+        public static String getWishList(State state,int page)
         {
             String[] result = new String[] { };
 
             if(state == State.SUCCESS)
             {
                 result = new string[]{
-                    "Aqui está a sua lista de desejos:"
+                    "Página " + page + " - Aqui está a sua lista de desejos:"
                };
 
             }
