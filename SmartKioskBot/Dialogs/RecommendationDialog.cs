@@ -11,6 +11,7 @@ using SmartKioskBot.Logic;
 using MongoDB.Driver;
 using SmartKioskBot.Helpers;
 using MongoDB.Bson;
+using static SmartKioskBot.Helpers.Constants;
 
 namespace SmartKioskBot.Dialogs 
 {
@@ -20,6 +21,7 @@ namespace SmartKioskBot.Dialogs
         private List<Filter> filtersApplied;
         private User user;
         private ObjectId lastFetchId;
+        private int page = 1;
 
         public RecommendationDialog(User user)
         {
@@ -77,7 +79,7 @@ namespace SmartKioskBot.Dialogs
 
             //Check if pagination is needed
             if (products.Count <= Constants.N_ITEMS_CARROUSSEL)
-                context.Done<object>(null);
+                context.Done(new CODE(DIALOG_CODE.DONE));
             else
             {
                 reply = context.MakeMessage();
@@ -95,13 +97,15 @@ namespace SmartKioskBot.Dialogs
 
             if (activity.Text != null)
             {
-                if (activity.Text.Equals(BotDefaultAnswers.next_pagination))
+                if (activity.Text.Equals(BotDefaultAnswers.next_pagination)) {
+                    page++;
                     await ShowRecommendations(context, null);
+                }
                 else
-                    context.Done<object>(null);
+                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
             }
             else
-                context.Done<object>(null);
+                context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
     }

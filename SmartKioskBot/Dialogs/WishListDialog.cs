@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SmartKioskBot.Helpers;
 using AdaptiveCards;
+using static SmartKioskBot.Helpers.Constants;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -75,7 +76,7 @@ namespace SmartKioskBot.Dialogs
 
                 //Check if pagination is needed
                 if (wishes.Length <= this.skip + Constants.N_ITEMS_CARROUSSEL)
-                    context.Done<object>(null);
+                    context.Done(new CODE(DIALOG_CODE.DONE));
                 else
                 {
                     reply = context.MakeMessage();
@@ -99,10 +100,10 @@ namespace SmartKioskBot.Dialogs
                 if (activity.Text.Equals(BotDefaultAnswers.next_pagination))
                     await StartAsync(context);
                 else
-                    context.Done<object>(null);
+                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
             }
             else
-                context.Done<object>(null);
+                context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
       

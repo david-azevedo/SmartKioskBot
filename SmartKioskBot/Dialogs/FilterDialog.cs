@@ -18,6 +18,7 @@ using AdaptiveCards;
 using SmartKioskBot.Logic;
 using MongoDB.Bson;
 using Microsoft.Bot.Builder.Luis;
+using static SmartKioskBot.Helpers.Constants;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -28,6 +29,7 @@ namespace SmartKioskBot.Dialogs
         private List<Filter> filters;
         private List<Filter> filters_received;  //from luis
         private ObjectId last_fetch_id;
+        private int page = 1;
 
         public FilterDialog(User user, List<Filter> filters_luis)
         {
@@ -74,52 +76,63 @@ namespace SmartKioskBot.Dialogs
             var text = "";
 
             if (products.Count > 0)
-                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.SUCCESS) + "  \n";
+                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.SUCCESS,page) + "  \n";
             else
-                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.FAIL) + "  \n";
+                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.FAIL,page) + "  \n";
 
             //display current filters
-            foreach (Filter f in filters)
-                text += f.FilterName + f.Operator + f.Value + ", ";
+            for(int i = 0; i < filters.Count; i++)
+            {
+                text += filters[i].FilterName + filters[i].Operator + filters[i].Value;
+                if (i != filters.Count - 1)
+                    text += ", ";
+            }
 
             await context.PostAsync(text);
 
-            //display products 
-            reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-            List<Attachment> cards = new List<Attachment>();
-
-            for (var i = 0; i < products.Count() && i < Constants.N_ITEMS_CARROUSSEL; i++)
-                cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.SEARCH).ToAttachment());
-
-            reply.Attachments = cards;
-            await context.PostAsync(reply);
-
-            //Check if pagination is needed
-            if(products.Count <= Constants.N_ITEMS_CARROUSSEL)
-                context.Done<object>(null);
-            else
+            if (products.Count > 0)
             {
-                reply = context.MakeMessage();
-                reply.Attachments.Add(Common.PaginationCardAttachment());
+                //display products 
+                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                List<Attachment> cards = new List<Attachment>();
+
+                for (var i = 0; i < products.Count() && i < Constants.N_ITEMS_CARROUSSEL; i++)
+                    cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.SEARCH).ToAttachment());
+
+                reply.Attachments = cards;
                 await context.PostAsync(reply);
 
-                context.Wait(this.PaginationHandler);
+                //Check if pagination is needed
+                if (products.Count <= Constants.N_ITEMS_CARROUSSEL)
+                    context.Done(new CODE(DIALOG_CODE.DONE));
+                else
+                {
+                    reply = context.MakeMessage();
+                    reply.Attachments.Add(Common.PaginationCardAttachment());
+                    await context.PostAsync(reply);
+
+                    context.Wait(this.PaginationHandler);
+                }
             }
+            else
+                context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
-        public async Task PaginationHandler(IDialogContext context, IAwaitable<IMessageActivity> result)
+        public async Task PaginationHandler(IDialogContext context, IAwaitable<object> result)
         {
-            var activity = await result as Activity;
+            var activity = await result as IMessageActivity;
 
             if (activity.Text != null)
             {
-                if (activity.Text.Equals(BotDefaultAnswers.next_pagination))
-                    await FilterAsync(context,null);
+                if (activity.Text.Equals(BotDefaultAnswers.next_pagination)) {
+                    page++;
+                    await FilterAsync(context, null);
+                }
                 else
-                    context.Done<object>(null);
+                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity));
             }
             else
-                context.Done<object>(null);
+                context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         public static IMessageActivity CleanAllFilters(IDialogContext context, User user)

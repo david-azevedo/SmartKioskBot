@@ -18,6 +18,7 @@ namespace SmartKioskBot.Dialogs
         public static List<string> No = new List<string> { "não", "Não" };
         public enum State { SUCCESS, FAIL };
         public const string next_pagination = "Ver Mais";
+        public const string unknown_intention = "Não entendi aquilo que disse, poderia refrasear?";
 
         /*
          * Activity Dialog
@@ -123,7 +124,7 @@ namespace SmartKioskBot.Dialogs
             }
             return result[new Random().Next(0, result.Length)];
         }
-        public static String getFilter(State state)
+        public static String getFilter(State state, int page)
         {
             String[] result = new string[] { };
 
@@ -141,7 +142,7 @@ namespace SmartKioskBot.Dialogs
                 "Não existem produtos com essas especificações"
             };
             }
-            return result[new Random().Next(0, result.Length)];
+            return "Página " + page + " - " + result[new Random().Next(0, result.Length)];
         }
         public static String getRemovedFilter(State state, string filtername)
         {
