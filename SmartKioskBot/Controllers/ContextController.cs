@@ -212,27 +212,6 @@ namespace SmartKioskBot.Controllers
             contextCollection.UpdateOne(filter, update);
         }
 
-        /// <summary>
-        /// Gets all the product wishes from the user.
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="productId"></param>
-        /// <returns></returns>
-        public static ObjectId[] getWishes(User user, string productId)
-        {
-            var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);
-
-            var filter = Builders<Context>.Filter.And(
-                Builders<Context>.Filter.Eq(o => o.UserId, user.Id),           //same user id
-                Builders<Context>.Filter.Eq(o => o.Country, user.Country));    //same country (shard)
-
-            var tmp = contextCollection.Find(filter).ToList();
-
-            if (tmp.Count != 0)
-                return tmp[0].WishList;
-            return new ObjectId[] { };
-        }
-
         public static void AddComparator(User user, string productId)
         {
             var contextCollection = DbSingleton.GetDatabase().GetCollection<Context>(AppSettings.ContextCollection);

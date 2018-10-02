@@ -133,6 +133,7 @@ namespace SmartKioskBot.Controllers
             {
                 for (int i = 0; i < customer.FiltersCount.Length; i++)
                 {
+                    //found same filter => increment search count
                     if (customer.FiltersCount[i].Filter.Equals(productFilter))
                     {
                         var currentFilterSearches = customer.FiltersCount[i];
@@ -155,7 +156,6 @@ namespace SmartKioskBot.Controllers
 
                 update = Builders<Customer>.Update.Push(c => c.FiltersCount, filterCount);
                 collection.UpdateOne(filter, update);
-
             }
             else
             {

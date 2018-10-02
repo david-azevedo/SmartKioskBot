@@ -8,8 +8,7 @@ using Microsoft.Bot.Connector;
 using SmartKioskBot.Controllers;
 using SmartKioskBot.Models;
 using SmartKioskBot.UI;
-
-
+using static SmartKioskBot.Helpers.Constants;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -63,7 +62,7 @@ namespace SmartKioskBot.Dialogs
                 //no
                 else if (optionSelected.ToLower().Contains(BotDefaultAnswers.No[0]))
                 {
-                    context.Done<object>(null);
+                    context.Done(new CODE(DIALOG_CODE.DONE));
                 }
             }
             catch (TooManyAttemptsException ex)
@@ -144,7 +143,7 @@ namespace SmartKioskBot.Dialogs
                 }
                 //no
                 else if (optionSelected.ToLower().Contains(BotDefaultAnswers.No[0]))
-                    context.Done<object>(null);
+                    context.Done(new CODE(DIALOG_CODE.DONE));
             }
             catch (TooManyAttemptsException ex)
             {
