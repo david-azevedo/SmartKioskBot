@@ -39,6 +39,7 @@ namespace SmartKioskBot.Controllers
 
             var productCollection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
             return productCollection.Find(filter)
+                .SortBy(p => p.Id)
                 .Limit(limit).ToList();
         }
     }

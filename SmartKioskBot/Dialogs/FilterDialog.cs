@@ -26,12 +26,14 @@ namespace SmartKioskBot.Dialogs
     {
         private User user;
         private List<Filter> filters;
+        private List<Filter> filters_received;  //from luis
         private ObjectId last_fetch_id;
 
         public FilterDialog(User user, List<Filter> filters_luis)
         {
             this.user = user;
-            this.filters = filters_luis;
+            this.filters_received = filters_luis;
+            this.filters = new List<Filter>();
         }
 
         public async Task StartAsync(IDialogContext context)
@@ -42,14 +44,14 @@ namespace SmartKioskBot.Dialogs
         public async Task FilterAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             
-            var filtersRetrieved = ContextController.getFilters(user);
+            filters = ContextController.getFilters(user);
 
             // join the retrieved filters with the added ones
-            foreach (Filter f1 in filtersRetrieved)
+            foreach (Filter f1 in filters_received)
             {
                 bool exists = false;
                 foreach (Filter f2 in filters)
-                    if (f1.FilterName == f2.FilterName && f1.Value == f2.Value)
+                    if (f1.Equals(f2))
                         exists = true;
                 if (!exists)
                 {
@@ -62,10 +64,11 @@ namespace SmartKioskBot.Dialogs
             // search result
             List<Product> products = ProductController.getProductsFilter(
                 FilterLogic.GetJoinedFilter(filters),
-                Constants.N_ITEMS_CARROUSSEL,
+                Constants.N_ITEMS_CARROUSSEL + 1,
                 last_fetch_id);
 
-            last_fetch_id = products[products.Count - 1].Id;
+            if(products.Count > 1)
+                last_fetch_id = products[products.Count - 2].Id;
 
             var reply = context.MakeMessage();
             var text = "";
@@ -85,14 +88,14 @@ namespace SmartKioskBot.Dialogs
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
             List<Attachment> cards = new List<Attachment>();
 
-            for (var i = 0; i < products.Count() && i < 7; i++)
+            for (var i = 0; i < products.Count() && i < Constants.N_ITEMS_CARROUSSEL; i++)
                 cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.SEARCH).ToAttachment());
 
             reply.Attachments = cards;
             await context.PostAsync(reply);
 
             //Check if pagination is needed
-            if(products.Count < Constants.N_ITEMS_CARROUSSEL)
+            if(products.Count <= Constants.N_ITEMS_CARROUSSEL)
                 context.Done<object>(null);
             else
             {
@@ -117,8 +120,6 @@ namespace SmartKioskBot.Dialogs
             }
             else
                 context.Done<object>(null);
-
-            context.Done<object>(null);
         }
 
         public static IMessageActivity CleanAllFilters(IDialogContext context, User user)

@@ -8,59 +8,101 @@ using SmartKioskBot.Models;
 using SmartKioskBot.UI;
 using static SmartKioskBot.Models.Context;
 using SmartKioskBot.Logic;
+using MongoDB.Driver;
+using SmartKioskBot.Helpers;
+using MongoDB.Bson;
 
-namespace SmartKioskBot.Dialogs
+namespace SmartKioskBot.Dialogs 
 {
     [Serializable]
-    public class RecommendationDialog
+    public class RecommendationDialog : IDialog<object>
     {
-        public static Filter DEFAULT_RECOMMENDATION_FILTER = new Filter()
+        private List<Filter> filtersApplied;
+        private User user;
+        private ObjectId lastFetchId;
+
+        public RecommendationDialog(User user)
         {
-            FilterName = "marca",
-            Operator = "=",
-            Value = "asus"
-        };
+            this.user = user;
 
-        public static IMessageActivity ShowRecommendations(IDialogContext context, User user)
-        {
-            //fetch context
-            Context myContext = ContextController.GetContext(user.Id);
+            //recommendation type
+            this. filtersApplied = new List<Filter>(CRMController.GetMostPopularFilters(user.Id, Constants.MAX_N_FILTERS_RECOMM));
 
-            Filter[] userMostPopularFiltersArray = CRMController.GetMostPopularFilters(user.Id, 10);
-            List<Filter> userMostPopularFilters;
-
-            if(userMostPopularFiltersArray == null || userMostPopularFiltersArray.Length == 0)
-            {
-                userMostPopularFilters = new List<Filter>
-                {
-                    DEFAULT_RECOMMENDATION_FILTER
-                };
-            }
-            else
-            {
-                userMostPopularFilters = new List<Filter>(userMostPopularFiltersArray);
-            }
-
-            //TODO: List<Product> productsToRecommend = ProductController.getProductsFilter(FilterHelper.GetJoinedFilter(userMostPopularFilters));
-
-            List<Product> productsToRecommend = new List<Product>();
-
-            return ShowRecommendedProducts(context, productsToRecommend);
+            //Default
+            if (filtersApplied == null || filtersApplied.Count == 0)
+                this.filtersApplied.Add(FilterLogic.DEFAULT_RECOMMENDATION_FILTER);
         }
 
-        private static IMessageActivity ShowRecommendedProducts(IDialogContext context,List<Product> products)
+        public async Task StartAsync(IDialogContext context)
         {
+            await ShowRecommendations(context, null);
+        }
+
+        private async Task ShowRecommendations(IDialogContext context, IAwaitable<object> result)
+        {
+            List<Product> products = new List<Product>();
+
+            while (true)
+            {
+                FilterDefinition<Product> joinedFilters = FilterLogic.GetJoinedFilter(this.filtersApplied);
+
+                //fetch +1 product to see if pagination is needed
+                products = ProductController.getProductsFilter(
+                joinedFilters,
+                Constants.N_ITEMS_CARROUSSEL + 1,
+                this.lastFetchId);
+
+                //filters didn't retrieved any products at the first try
+                if (products.Count == 0 && lastFetchId == null)
+                    filtersApplied.RemoveAt(filtersApplied.Count - 1);
+                else
+                    break;
+            }
+            
+            if(products.Count > Constants.N_ITEMS_CARROUSSEL) 
+                lastFetchId = products[products.Count - 2].Id;
+            
             var reply = context.MakeMessage();
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
             List<Attachment> cards = new List<Attachment>();
-  
-            for (int i = 0; i < products.Count && i <7; i++)
+
+            for (int i = 0; i < products.Count && i < Constants.N_ITEMS_CARROUSSEL; i++)
             {
-                cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.SEARCH).ToAttachment());
+                cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.RECOMMENDATION).ToAttachment());
             }
 
             reply.Attachments = cards;
-            return reply;
+            
+            await context.PostAsync(reply);
+
+            //Check if pagination is needed
+            if (products.Count <= Constants.N_ITEMS_CARROUSSEL)
+                context.Done<object>(null);
+            else
+            {
+                reply = context.MakeMessage();
+                reply.Attachments.Add(Common.PaginationCardAttachment());
+                await context.PostAsync(reply);
+                
+
+                context.Wait(this.PaginationHandler);
+            }
         }
+
+        public async Task PaginationHandler(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            var activity = await result as Activity;
+
+            if (activity.Text != null)
+            {
+                if (activity.Text.Equals(BotDefaultAnswers.next_pagination))
+                    await ShowRecommendations(context, null);
+                else
+                    context.Done<object>(null);
+            }
+            else
+                context.Done<object>(null);
+        }
+
     }
 }

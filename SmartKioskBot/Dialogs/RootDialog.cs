@@ -302,10 +302,7 @@ namespace SmartKioskBot.Dialogs
                 TryIdentification(context);
                 FilterIntentScore(context, result);
 
-                var reply = RecommendationDialog.ShowRecommendations(context, this.user);
-                await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
-
-                context.Wait(this.MessageReceived);
+                context.Call(new RecommendationDialog(user), ResumeAfterDialogueCall);
             }
             catch(Exception e)
             {

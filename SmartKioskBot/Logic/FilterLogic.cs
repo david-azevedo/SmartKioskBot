@@ -12,6 +12,13 @@ namespace SmartKioskBot.Logic
 {
     public class FilterLogic
     {
+        public static Filter DEFAULT_RECOMMENDATION_FILTER = new Filter()
+        {
+            FilterName = "marca",
+            Operator = "=",
+            Value = "asus"
+        };
+
         //luis => filter
         public static List<Filter> GetEntitiesFilter(LuisResult result)
         {

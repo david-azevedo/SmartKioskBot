@@ -64,7 +64,7 @@ namespace SmartKioskBot.Dialogs
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
-                for (var i = 0; i < products.Count() && i < 7; i++)
+                for (var i = 0; i < products.Count() && i < Constants.N_ITEMS_CARROUSSEL; i++)
                 {
                     cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.WISHLIST).ToAttachment());
                 }
