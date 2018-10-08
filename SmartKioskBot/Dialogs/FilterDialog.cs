@@ -19,6 +19,10 @@ using SmartKioskBot.Logic;
 using MongoDB.Bson;
 using Microsoft.Bot.Builder.Luis;
 using static SmartKioskBot.Helpers.Constants;
+using System.IO;
+using System.Reflection;
+using static SmartKioskBot.Helpers.AdaptiveCardHelper;
+using Newtonsoft.Json.Linq;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -30,17 +34,52 @@ namespace SmartKioskBot.Dialogs
         private List<Filter> filters_received;  //from luis
         private ObjectId last_fetch_id;
         private int page = 1;
+        private State state;
 
-        public FilterDialog(User user, List<Filter> filters_luis)
+        public enum State { INIT, FILTER, CLEAN, CLEAN_ALL };
+
+        public FilterDialog(User user, List<Filter> filters_luis, State state)
         {
             this.user = user;
             this.filters_received = filters_luis;
             this.filters = new List<Filter>();
+            this.state = state;
+
+            if (filters_received.Count == 0)
+                this.state = State.INIT;
         }
 
         public async Task StartAsync(IDialogContext context)
         {
-            await FilterAsync(context, null);
+            //for guided dialog
+            switch (this.state)
+            {
+                case State.INIT:
+                    await GuidedFilterDialog(context, null);
+                    break; ;
+                case State.FILTER:
+                    await FilterAsync(context, null);
+                    break;
+                case State.CLEAN:
+                    break;
+                case State.CLEAN_ALL:
+                    break;
+                default:
+                    await FilterAsync(context, null);
+                    break;
+            }
+        }
+
+        public async Task GuidedFilterDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
+        {
+            
+            var reply = context.MakeMessage();
+            
+            reply.Attachments.Add(await getCardAttachment(CardType.FILTER));
+
+            await context.PostAsync(reply);
+
+            context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         public async Task FilterAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
@@ -108,7 +147,7 @@ namespace SmartKioskBot.Dialogs
                 else
                 {
                     reply = context.MakeMessage();
-                    reply.Attachments.Add(Common.PaginationCardAttachment());
+                    reply.Attachments.Add(await AdaptiveCardHelper.getCardAttachment(CardType.PAGINATION));
                     await context.PostAsync(reply);
 
                     context.Wait(this.PaginationHandler);
@@ -118,18 +157,35 @@ namespace SmartKioskBot.Dialogs
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
-        public async Task PaginationHandler(IDialogContext context, IAwaitable<object> result)
+        public async Task PaginationHandler(IDialogContext context, IAwaitable<object> argument)
         {
-            var activity = await result as IMessageActivity;
+            var activity = await argument as Activity;
 
             if (activity.Text != null)
             {
-                if (activity.Text.Equals(BotDefaultAnswers.next_pagination)) {
-                    page++;
-                    await FilterAsync(context, null);
+                if (activity.Text == BotDefaultAnswers.next_pagination)
+                    context.Done(new CODE(DIALOG_CODE.DONE));
+                else
+                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
+            }
+            else if (activity.Value != null)
+            {
+                JObject json = activity.Value as JObject;
+                JProperty prop = json.First as JProperty;
+
+                if (prop.Name == "reply_type")
+                {
+                    JValue value = prop.Value as JValue;
+                    if (value.Value.ToString() == "pagination")
+                    {
+                        page++;
+                        await StartAsync(context);
+                    }
+                    else
+                        context.Done(new CODE(DIALOG_CODE.DONE));
                 }
                 else
-                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity));
+                    context.Done(new CODE(DIALOG_CODE.DONE));
             }
             else
                 context.Done(new CODE(DIALOG_CODE.DONE));

@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using SmartKioskBot.Helpers;
 using AdaptiveCards;
 using static SmartKioskBot.Helpers.Constants;
+using static SmartKioskBot.Helpers.AdaptiveCardHelper;
+using Newtonsoft.Json.Linq;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -80,7 +82,7 @@ namespace SmartKioskBot.Dialogs
                 else
                 {
                     reply = context.MakeMessage();
-                    reply.Attachments.Add(Common.PaginationCardAttachment());
+                    reply.Attachments.Add(await getCardAttachment(CardType.PAGINATION));
                     await context.PostAsync(reply);
 
                     skip += skip + Constants.N_ITEMS_CARROUSSEL;
@@ -95,17 +97,33 @@ namespace SmartKioskBot.Dialogs
         {
             var activity = await argument as Activity;
 
-            if (activity.Text != null)
+            if(activity.Text != null)
             {
-                if (activity.Text.Equals(BotDefaultAnswers.next_pagination))
-                    await StartAsync(context);
+                if(activity.Text == BotDefaultAnswers.next_pagination)
+                    context.Done(new CODE(DIALOG_CODE.DONE));
                 else
                     context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
+            }
+            else if (activity.Value != null)
+            {
+                JObject json = activity.Value as JObject;
+                JProperty prop = json.First as JProperty;
+
+                if(prop.Name == "reply_type")
+                {
+                    JValue value = prop.Value as JValue;
+                    if(value.Value.ToString() == "pagination")
+                        await StartAsync(context);
+                    else
+                        context.Done(new CODE(DIALOG_CODE.DONE));
+                }
+                else
+                    context.Done(new CODE(DIALOG_CODE.DONE));
             }
             else
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
-
+        
       
         /*
          * Auxiliary Methods
