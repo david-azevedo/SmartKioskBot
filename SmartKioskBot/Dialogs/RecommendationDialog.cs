@@ -108,21 +108,20 @@ namespace SmartKioskBot.Dialogs
             else if (activity.Value != null)
             {
                 JObject json = activity.Value as JObject;
-                JProperty prop = json.First as JProperty;
+                CardType type = getReplyType(json);
 
-                if (prop.Name == "reply_type")
+                switch (type)
                 {
-                    JValue value = prop.Value as JValue;
-                    if (value.Value.ToString() == "pagination")
-                    {
-                        page++;
-                        await ShowRecommendations(context, null);
-                    }
-                    else
+                    case CardType.PAGINATION:
+                        {
+                            page++;
+                            await ShowRecommendations(context,null);
+                            break;
+                        }
+                    default:
                         context.Done(new CODE(DIALOG_CODE.DONE));
+                        break;
                 }
-                else
-                    context.Done(new CODE(DIALOG_CODE.DONE));
             }
             else
                 context.Done(new CODE(DIALOG_CODE.DONE));

@@ -40,5 +40,58 @@ namespace SmartKioskBot.Helpers
 
             return att;
         }
+
+        public static CardType getReplyType(JObject json)
+        {
+            JProperty prop = json.First as JProperty;
+            InputData type = new InputData(prop);
+
+            if (type.attribute == "reply_type")
+            {
+                switch (type.value)
+                {
+                    case "pagination":
+                        return CardType.PAGINATION;
+                    case "filter":
+                        return CardType.FILTER;
+                }
+            }
+            return CardType.NONE;
+        }
+
+        public static List<InputData> getReplyData(JObject json)
+        {
+            List<InputData> data = new List<InputData>();
+            List<JProperty> to_process = json.Children<JProperty>().ToList();
+            
+            //ignore reply type, i=0
+            for(int i = 1; i < to_process.Count(); i++)
+                data.Add(new InputData(to_process[i]));
+
+            return data;
+        }
+
+        public class InputData
+        {
+            public string attribute = "";
+            public string value = "";
+            public string input = "";
+
+            public InputData(JProperty property)
+            {
+                if (property.Name.Contains(":"))
+                {
+                    string[] parts = property.Name.Split(':');
+                    this.attribute = parts[0];
+                    this.value = parts[1];
+                    this.input = (property.Value as JValue).Value.ToString();
+                }
+                else
+                {
+                    this.attribute = property.Name;
+                    this.value = (property.Value as JValue).Value.ToString();
+                }
+            }
+        }
     }
 }

@@ -6,18 +6,69 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Logic
 {
     public class FilterLogic
     {
+        public const string brand_filter = "marca";
+        public const string ram_filter = "ram";
+        public const string storage_type_filter = "tipo_armazenamento";
+        public const string cpu_family_filter = "familia_cpu";
+        public const string gpu_filter = "placa_grafica";
+        public const string type_filter = "tipo";
+        public const string price_filter = "preço";
+        public const string storage_filter = "armazenamento";
+        public const string screen_size_filter = "tamanho_ecra";
+        public const string autonomy_filter = "autonomia";
+
         public static Filter DEFAULT_RECOMMENDATION_FILTER = new Filter()
         {
-            FilterName = "marca",
+            FilterName = brand_filter,
             Operator = "=",
             Value = "asus"
         };
+
+        public static List<Filter> GetFilterFromForm(List<InputData> data)
+        {
+            List<Filter> filters = new List<Filter>();
+
+            for (int i = 0; i < data.Count(); i++)
+            {
+                Filter f = new Filter();
+                bool add_filter = true;
+
+                f.Operator = "=";                   //default
+                f.FilterName = data[i].attribute;
+
+                if (data[i].value == "min")
+                {
+                    f.Operator = ">";
+                    f.Value = data[i].input;
+                }
+                else if (data[i].value == "max")
+                {
+                    f.Operator = "<";
+                    f.Value = data[i].input;
+                }
+                else
+                {
+                    f.Value = data[i].value;
+                    if (data[i].input.Equals("false"))
+                        add_filter = false;
+                }
+
+                if (f.Value == "")
+                    add_filter = false;
+
+                if(add_filter)
+                    filters.Add(f);
+            }
+
+            return filters;
+        }
 
         //luis => filter
         public static List<Filter> GetEntitiesFilter(LuisResult result)
@@ -53,10 +104,10 @@ namespace SmartKioskBot.Logic
                         case "memory-type":
                             {
                                 if (ch.Value == "ram")
-                                    f1.FilterName = "ram";
+                                    f1.FilterName = ram_filter;
                                 else
                                 {
-                                    f1.FilterName = "tipo_armazenamento";
+                                    f1.FilterName = storage_type_filter;
                                     f1.Value = ch.Value;
                                 }
                                 break;
@@ -96,16 +147,16 @@ namespace SmartKioskBot.Logic
                                     break;
 
                                 if ((ch.Type == "builtin.currency" || ch.Type == "builtin.currency") && f1.FilterName == "")
-                                    f1.FilterName = "preço";
+                                    f1.FilterName = price_filter;
 
                                 if (ch.Type == "storage" && f1.FilterName == "")
-                                    f1.FilterName = "armazenamento";
+                                    f1.FilterName = storage_filter;
 
-                                if (f1.FilterName == "tipo_armazenamento")
+                                if (f1.FilterName == storage_type_filter)
                                 {
                                     filters.Add(f1);
                                     f1 = new Filter();
-                                    f1.FilterName = "armazenamento";
+                                    f1.FilterName = storage_filter;
                                     f1.Operator = "=";
                                 }
 
@@ -148,48 +199,48 @@ namespace SmartKioskBot.Logic
                 switch (entities[i].Type.ToLower())
                 {
                     case "cpu":
-                        f.FilterName = "familia_cpu";
+                        f.FilterName = cpu_family_filter;
                         break;
                     case "gpu":
-                        f.FilterName = "placa_grafica";
+                        f.FilterName = gpu_filter;
                         break;
                     case "builtin.currency":
-                        f.FilterName = "preço";
+                        f.FilterName = price_filter;
                         f.Value = Regex.Match(entities[i].Entity, @"[\d]*([\,,\.][\d]*)?").Value.Replace(',', '.');
                         break;
                     case "storage":
-                        f.FilterName = "armazenamento";
+                        f.FilterName = storage_filter;
                         f.Value = Regex.Match(entities[i].Entity, @"[\d]*([\,,\.][\d]*)?").Value.Replace(',', '.');
                         break;
                     case "brand":
-                        f.FilterName = "marca";
+                        f.FilterName = brand_filter;
                         break;
                     case "pc-type::advanced":
-                        f.FilterName = "tipo";
+                        f.FilterName = type_filter;
                         f.Value = "avançado";
                         break;
                     case "pc-type::convertible":
-                        f.FilterName = "tipo";
+                        f.FilterName = type_filter;
                         f.Value = "convertível 2 em 1";
                         break;
                     case "pc-type::essencial":
-                        f.FilterName = "tipo";
+                        f.FilterName = type_filter;
                         f.Value = "essencial";
                         break;
                     case "pc-type::gaming":
-                        f.FilterName = "tipo";
+                        f.FilterName = type_filter;
                         f.Value = "gaming";
                         break;
                     case "pc-type::mobility":
-                        f.FilterName = "tipo";
+                        f.FilterName = type_filter;
                         f.Value = "mobilidade";
                         break;
                     case "pc-type::performance":
-                        f.FilterName = "tipo";
+                        f.FilterName = type_filter;
                         f.Value = "performance";
                         break;
                     case "pc-type::slim":
-                        f.FilterName = "tipo";
+                        f.FilterName = type_filter;
                         f.Value = "ultra fino";
                         break;
                 }
@@ -223,7 +274,7 @@ namespace SmartKioskBot.Logic
         {
             switch (f.FilterName.ToLower())
             {
-                case "preço":
+                case price_filter:
                     if (f.Operator == "=")
                         return Builders<Product>.Filter.Eq(x => x.Price, Convert.ToDouble(f.Value));
                     if (f.Operator == ">")
@@ -231,11 +282,11 @@ namespace SmartKioskBot.Logic
                     else if (f.Operator == "<")
                         return Builders<Product>.Filter.Lte(x => x.Price, Convert.ToDouble(f.Value));
                     break;
-                case "marca":
+                case brand_filter:
                     return Builders<Product>.Filter.Where(x => x.Brand.ToLower() == f.Value.ToLower());
-                case "familia_cpu":
+                case cpu_family_filter:
                     return Builders<Product>.Filter.Where(x => x.CPUFamily.ToLower().Contains(f.Value.ToLower()));
-                case "ram":
+                case ram_filter:
                     if (f.Operator == "=")
                         return Builders<Product>.Filter.Eq(x => x.RAM, Convert.ToDouble(f.Value));
                     else if (f.Operator == ">")
@@ -243,9 +294,9 @@ namespace SmartKioskBot.Logic
                     else if (f.Operator == "<")
                         return Builders<Product>.Filter.Lte(x => x.RAM, Convert.ToDouble(f.Value));
                     break;
-                case "tipo_armazenamento":
+                case storage_type_filter:
                     return Builders<Product>.Filter.Where(x => x.StorageType.ToLower() == f.Value.ToLower());
-                case "armazenamento":
+                case storage_filter:
                     if (f.Operator == "=")
                         return Builders<Product>.Filter.Eq(x => x.StorageAmount, Convert.ToDouble(f.Value));
                     else if (f.Operator == ">")
@@ -253,9 +304,9 @@ namespace SmartKioskBot.Logic
                     else if (f.Operator == "<")
                         return Builders<Product>.Filter.Lte(x => x.StorageAmount, Convert.ToDouble(f.Value));
                     break;
-                case "placa_grafica":
+                case gpu_filter:
                     return Builders<Product>.Filter.Where(x => x.GraphicsCardType.ToLower().Contains(f.Value.ToLower()));
-                case "autonomia":
+                case autonomy_filter:
                     if (f.Operator == "=")
                         return Builders<Product>.Filter.Eq(x => x.Autonomy, Convert.ToDouble(f.Value));
                     else if (f.Operator == ">")
@@ -263,7 +314,7 @@ namespace SmartKioskBot.Logic
                     else if (f.Operator == "<")
                         return Builders<Product>.Filter.Lte(x => x.Autonomy, Convert.ToDouble(f.Value));
                     break;
-                case "tamanho_ecra":
+                case screen_size_filter:
                     if (f.Operator == "=")
                         return Builders<Product>.Filter.Eq(x => x.ScreenDiagonal, Convert.ToDouble(f.Value));
                     else if (f.Operator == ">")
@@ -271,7 +322,7 @@ namespace SmartKioskBot.Logic
                     else if (f.Operator == "<")
                         return Builders<Product>.Filter.Lte(x => x.ScreenDiagonal, Convert.ToDouble(f.Value));
                     break;
-                case "tipo":
+                case type_filter:
                     return Builders<Product>.Filter.Where(x => x.Type.ToLower() == f.Value.ToLower());
             }
 
@@ -286,11 +337,11 @@ namespace SmartKioskBot.Logic
             //combine all filters
             for (var i = 0; i < filters.Count(); i++)
             {
-                if ((filters[i].FilterName == "tipo_armazenamento" ||
-                    filters[i].FilterName == "familia_cpu" ||
-                    filters[i].FilterName == "placa_grafica" ||
-                    filters[i].FilterName == "marca" ||
-                    filters[i].FilterName == "tipo")
+                if ((filters[i].FilterName == storage_type_filter ||
+                    filters[i].FilterName == cpu_family_filter ||
+                    filters[i].FilterName == gpu_filter ||
+                    filters[i].FilterName == brand_filter ||
+                    filters[i].FilterName == type_filter)
                     && !treatedIdx.Contains(i))
                 {
                     var filters_tmp = new List<FilterDefinition<Product>>();

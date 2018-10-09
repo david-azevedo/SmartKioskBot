@@ -210,7 +210,7 @@
     <Compile Include="Controllers\StoreController.cs" />
     <Compile Include="Controllers\CRMController.cs" />
     <Compile Include="Dialogs\AddProductDialog.cs" />
-    <Compile Include="Dialogs\BotDefaultAnswers.cs" />
+    <Compile Include="Helpers\BotDefaultAnswers.cs" />
     <Compile Include="Dialogs\ClosestStoresDialog.cs" />
     <Compile Include="Dialogs\CompareDialog.cs" />
     <Compile Include="Dialogs\FilterDialog.cs" />

@@ -1,418 +1,427 @@
 ﻿{
     "type": "AdaptiveCard",
     "body": [
+    {
+      "type": "TextBlock",
+      "size": "Large",
+      "weight": "Bolder",
+      "color": "Accent",
+      "text": "Formulário de Filtragem"
+    },
+    {
+      "type": "ColumnSet",
+      "separator": true,
+      "columns": [
         {
-            "type": "TextBlock",
-            "size": "Large",
-            "weight": "Bolder",
-            "color": "Accent",
-            "text": "Search Form"
+          "type": "Column",
+          "items": [
+            {
+              "type": "Container",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "weight": "Bolder",
+                  "text": "Processador:"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "familia_cpu:i3",
+                  "spacing": "Small",
+                  "title": "i3",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "familia_cpu:i5",
+                  "spacing": "Small",
+                  "title": "i5",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "familia_cpu:i7",
+                  "spacing": "Small",
+                  "title": "i7",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "familia_cpu:intel",
+                  "spacing": "Small",
+                  "title": "Intel",
+                  "value": "false"
+                }
+              ]
+            }
+          ],
+          "width": "stretch"
         },
         {
-            "type": "ColumnSet",
-            "separator": true,
-            "columns": [
+          "type": "Column",
+          "separator": true,
+          "items": [
+            {
+              "type": "Container",
+              "items": [
                 {
-                    "type": "Column",
-                    "items": [
-                        {
-                            "type": "Container",
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "weight": "Bolder",
-                                    "text": "CPU:"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idCPUi3",
-                                    "spacing": "Small",
-                                    "title": "i3",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idCPUi5",
-                                    "spacing": "Small",
-                                    "title": "i5",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idCPUi7",
-                                    "spacing": "Small",
-                                    "title": "i7",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idCPUIntel",
-                                    "spacing": "Small",
-                                    "title": "Intel",
-                                    "value": "false"
-                                }
-                            ]
-                        }
-                    ],
-                    "width": "stretch"
+                  "type": "TextBlock",
+                  "weight": "Bolder",
+                  "text": "Placa Gráfica:"
                 },
                 {
-                    "type": "Column",
-                    "separator": true,
-                    "items": [
-                        {
-                            "type": "Container",
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "weight": "Bolder",
-                                    "text": "GPU:"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idGPUamd",
-                                    "title": "AMD",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idGPUIntel",
-                                    "spacing": "Small",
-                                    "title": "Intel",
-                                    "value": "false"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "Input.Toggle",
-                            "id": "idGPUnvidia",
-                            "title": "NVIDIA",
-                            "value": "false"
-                        }
-                    ],
-                    "width": "stretch"
+                  "type": "Input.Toggle",
+                  "id": "placa_grafica:amd",
+                  "title": "AMD",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "placa_grafica:intel",
+                  "spacing": "Small",
+                  "title": "Intel",
+                  "value": "false"
                 }
-            ]
-        },
-        {
-            "type": "ColumnSet",
-            "separator": true,
-            "columns": [
-                {
-                    "type": "Column",
-                    "spacing": "Large",
-                    "verticalContentAlignment": "Center",
-                    "items": [
-                        {
-                            "type": "TextBlock",
-                            "horizontalAlignment": "Left",
-                            "spacing": "Small",
-                            "weight": "Bolder",
-                            "text": "Price:"
-                        },
-                        {
-                            "type": "ColumnSet",
-                            "columns": [
-                                {
-                                    "type": "Column",
-                                    "items": [
-                                        {
-                                            "type": "Input.Number",
-                                            "id": "idPriceMin",
-                                            "title": "New Input.Toggle",
-                                            "placeholder": "Minimum",
-                                            "min": "0"
-                                        }
-                                    ],
-                                    "width": "stretch"
-                                },
-                                {
-                                    "type": "Column",
-                                    "items": [
-                                        {
-                                            "type": "Input.Number",
-                                            "id": "idPriceMax",
-                                            "title": "New Input.Toggle",
-                                            "placeholder": "Maximum",
-                                            "min": "0"
-                                        }
-                                    ],
-                                    "width": "stretch"
-                                }
-                            ]
-                        }
-                    ],
-                    "width": "stretch"
-                }
-            ]
-        },
-        {
-            "type": "Container",
-            "separator": true,
-            "items": [
-                {
-                    "type": "TextBlock",
-                    "weight": "Bolder",
-                    "text": "Storage:"
-                },
-                {
-                    "type": "Input.ChoiceSet",
-                    "id": "idStorage",
-                    "value": "HDD",
-                    "placeholder": "HDD",
-                    "choices": [
-                        {
-                            "title": "HDD",
-                            "value": "HDD"
-                        },
-                        {
-                            "title": "SSD",
-                            "value": "SSD"
-                        }
-                    ],
-                    "isCompact": true
-                },
-                {
-                    "type": "ColumnSet",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Input.Number",
-                                    "id": "idStorageMin",
-                                    "title": "New Input.Toggle",
-                                    "placeholder": "Minimum Gb",
-                                    "min": "0"
-                                }
-                            ],
-                            "width": "stretch"
-                        },
-                        {
-                            "type": "Column",
-                            "verticalContentAlignment": "Bottom",
-                            "items": [
-                                {
-                                    "type": "Input.Number",
-                                    "id": "idStorageMax",
-                                    "title": "New Input.Toggle",
-                                    "placeholder": "Maximum Gb",
-                                    "min": "0"
-                                }
-                            ],
-                            "width": "stretch"
-                        }
-                    ]
-                },
-                {
-                    "type": "TextBlock",
-                    "text": "RAM:"
-                },
-                {
-                    "type": "ColumnSet",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Input.Number",
-                                    "id": "idMinRAM",
-                                    "placeholder": "Minimum",
-                                    "min": "0"
-                                }
-                            ],
-                            "width": "stretch"
-                        },
-                        {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Input.Number",
-                                    "id": "idMaxRAM",
-                                    "placeholder": "Maximum",
-                                    "min": "0"
-                                }
-                            ],
-                            "width": "stretch"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "Container",
-            "separator": true,
-            "items": [
-                {
-                    "type": "TextBlock",
-                    "weight": "Bolder",
-                    "text": "Brand:"
-                },
-                {
-                    "type": "ColumnSet",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idAcer",
-                                    "spacing": "Small",
-                                    "title": "Acer",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idApple",
-                                    "spacing": "Small",
-                                    "title": "Apple",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idAsus",
-                                    "spacing": "Small",
-                                    "title": "Asus",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idDell",
-                                    "spacing": "Small",
-                                    "title": "Dell",
-                                    "value": "false"
-                                }
-                            ],
-                            "width": "stretch"
-                        },
-                        {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idHP",
-                                    "spacing": "Small",
-                                    "title": "HP",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idLenovo",
-                                    "spacing": "Small",
-                                    "title": "Lenovo",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idMicrosoft",
-                                    "spacing": "Small",
-                                    "title": "Microsoft",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idMsi",
-                                    "spacing": "Small",
-                                    "title": "MSI",
-                                    "value": "false"
-                                }
-                            ],
-                            "width": "stretch"
-                        },
-                        {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idRazer",
-                                    "spacing": "Small",
-                                    "title": "Razer",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idRoshiba",
-                                    "spacing": "Small",
-                                    "title": "Toshiba",
-                                    "value": "false"
-                                }
-                            ],
-                            "width": "stretch"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "Container",
-            "separator": true,
-            "items": [
-                {
-                    "type": "TextBlock",
-                    "weight": "Bolder",
-                    "text": "Type:"
-                },
-                {
-                    "type": "ColumnSet",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idGaming",
-                                    "title": "Gaming",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idMobility",
-                                    "title": "Mobility",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idPerformance",
-                                    "title": "Performance",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idAdvanced",
-                                    "title": "Advanced",
-                                    "value": "false"
-                                }
-                            ],
-                            "width": "stretch"
-                        },
-                        {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idEssential",
-                                    "title": "Essential",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idConvertible",
-                                    "title": "Convertible 2 in 1",
-                                    "value": "false"
-                                },
-                                {
-                                    "type": "Input.Toggle",
-                                    "id": "idUltraThin",
-                                    "title": "Ultra thin",
-                                    "value": "false"
-                                }
-                            ],
-                            "width": "stretch"
-                        }
-                    ]
-                }
-            ]
+              ]
+            },
+            {
+              "type": "Input.Toggle",
+              "id": "placa_grafica:nvidia",
+              "title": "NVIDIA",
+              "value": "false"
+            }
+          ],
+          "width": "stretch"
         }
-    ],
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "separator": true,
+      "columns": [
+        {
+          "type": "Column",
+          "spacing": "Large",
+          "verticalContentAlignment": "Center",
+          "items": [
+            {
+              "type": "TextBlock",
+              "horizontalAlignment": "Left",
+              "spacing": "Small",
+              "weight": "Bolder",
+              "text": "Preço:"
+            },
+            {
+              "type": "ColumnSet",
+              "columns": [
+                {
+                  "type": "Column",
+                  "items": [
+                    {
+                      "type": "Input.Number",
+                      "id": "preço:min",
+                      "title": "New Input.Toggle",
+                      "placeholder": "Mínimo",
+                      "min": "0"
+                    }
+                  ],
+                  "width": "stretch"
+                },
+                {
+                  "type": "Column",
+                  "items": [
+                    {
+                      "type": "Input.Number",
+                      "id": "preço:max",
+                      "title": "New Input.Toggle",
+                      "placeholder": "Máximo",
+                      "min": "0"
+                    }
+                  ],
+                  "width": "stretch"
+                }
+              ]
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "Armazenamento:"
+        },
+        {
+          "type": "Input.ChoiceSet",
+          "id": "tipo_armazenamento",
+          "value": "HDD",
+          "placeholder": "HDD",
+          "choices": [
+            {
+              "title": "HDD",
+              "value": "HDD"
+            },
+            {
+              "title": "SSD",
+              "value": "SSD"
+            }
+          ],
+          "isCompact": true
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Input.Number",
+                  "id": "armazenamento:min",
+                  "title": "New Input.Toggle",
+                  "placeholder": "Mínimo (Gb)",
+                  "min": "0"
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "verticalContentAlignment": "Bottom",
+              "items": [
+                {
+                  "type": "Input.Number",
+                  "id": "armazenamento:max",
+                  "title": "New Input.Toggle",
+                  "placeholder": "Máximo (Gb)",
+                  "min": "0"
+                }
+              ],
+              "width": "stretch"
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "text": "RAM:"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Input.Number",
+                  "id": "ram:min",
+                  "placeholder": "Mínimo (Gb)",
+                  "min": "0"
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Input.Number",
+                  "id": "ram:max",
+                  "placeholder": "Máximo (Gb)",
+                  "min": "0"
+                }
+              ],
+              "width": "stretch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "Marca:"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Acer",
+                  "spacing": "Small",
+                  "title": "Acer",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Apple",
+                  "spacing": "Small",
+                  "title": "Apple",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Asus",
+                  "spacing": "Small",
+                  "title": "Asus",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Dell",
+                  "spacing": "Small",
+                  "title": "Dell",
+                  "value": "false"
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:HP",
+                  "spacing": "Small",
+                  "title": "HP",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Lenovo",
+                  "spacing": "Small",
+                  "title": "Lenovo",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Microsoft",
+                  "spacing": "Small",
+                  "title": "Microsoft",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Msi",
+                  "spacing": "Small",
+                  "title": "MSI",
+                  "value": "false"
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Razer",
+                  "spacing": "Small",
+                  "title": "Razer",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "marca:Toshiba",
+                  "spacing": "Small",
+                  "title": "Toshiba",
+                  "value": "false"
+                }
+              ],
+              "width": "stretch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "Tipo:"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Input.Toggle",
+                  "id": "tipo:gaming",
+                  "title": "Gaming",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "tipo:mobilidade",
+                  "title": "Mobilidade",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "tipo:performance",
+                  "title": "Performance",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "tipo:avançado",
+                  "title": "Avançado",
+                  "value": "false"
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Input.Toggle",
+                  "id": "tipo:essencial",
+                  "title": "Essential",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "tipo:convertível 2 em 1",
+                  "title": "Convertível 2 in 1",
+                  "value": "false"
+                },
+                {
+                  "type": "Input.Toggle",
+                  "id": "tipo:ultra fino",
+                  "title": "Ultra Fino",
+                  "value": "false"
+                }
+              ],
+              "width": "stretch"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+    "actions": [
+          {
+            "type": "Action.Submit",
+            "title": "Pesquisar",
+            "data": {
+                "reply_type" : "filter"
+                }
+          }
+        ],
     "version": "1.0"
 }
