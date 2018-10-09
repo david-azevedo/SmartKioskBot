@@ -35,6 +35,8 @@ namespace SmartKioskBot.Dialogs.QnA
             {
 
                 string res = response.Content.ReadAsStringAsync().Result;
+                if (res.Contains("No good match found in the KB"))
+                    return null;
                 DataSet dataSet = JsonConvert.DeserializeObject<DataSet>(res);
 
                 DataTable dataTable = dataSet.Tables["answers"];

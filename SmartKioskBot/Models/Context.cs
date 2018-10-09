@@ -22,6 +22,9 @@ namespace SmartKioskBot.Models
         [BsonElement("country")]
         public string Country { get; set; }
 
+        [BsonElement("lastfilter")]
+        public string LastFilter { get; set; }
+
         [BsonElement("filters")]
         public Filter[] Filters { get; set; }
 
@@ -42,6 +45,17 @@ namespace SmartKioskBot.Models
 
             [BsonElement("value")]
             public string Value { get; set; }
+
+            public bool Equals(Filter f)
+            {
+                if (this.FilterName.Equals(f.FilterName) &&
+                    this.Operator.Equals(f.Operator) &&
+                    this.Value.Equals(f.Value))
+                    return true;
+                return false;
+            }
+
+            
         }
 
     }

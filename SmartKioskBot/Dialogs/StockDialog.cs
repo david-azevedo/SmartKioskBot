@@ -45,24 +45,27 @@ namespace SmartKioskBot.Dialogs
                 }
             }
 
+            var text = "";
+
             if (storesWStock.Count() == 0)
             {
                 reply.AttachmentLayout = AttachmentLayoutTypes.List;
-                reply.Text = BotDefaultAnswers.getStockFail();
+                text = BotDefaultAnswers.getStockFail();
             }
             else
             {
-                reply.Text = BotDefaultAnswers.getStockSuccess();
+                text = BotDefaultAnswers.getStockSuccess();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
-                foreach (Store s in storesWStock)
+                for(var i = 0; i < storesWStock.Count() && i <7; i++)
                 {
-                    cards.Add(ProductCard.getStoreDetailsCard(s, productId).ToAttachment());
+                    cards.Add(StoreCard.GetStoreDetailsCard(storesWStock[i], productId).ToAttachment());
                 }
 
                 reply.Attachments = cards;
             }
+            context.PostAsync(text);
             return reply;
         }
     }

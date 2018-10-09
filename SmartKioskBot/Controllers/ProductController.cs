@@ -32,10 +32,15 @@ namespace SmartKioskBot.Controllers
            return productCollection.Find(filter).ToList();
         }
 
-        public static List<Product> getProductsFilter(FilterDefinition<Product> filter)
+        public static List<Product> getProductsFilter(FilterDefinition<Product> filter, int limit, ObjectId last_id_fetch)
         {
+            if(last_id_fetch != null)
+                filter &= Builders<Product>.Filter.Gt(p => p.Id, last_id_fetch);
+
             var productCollection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
-            return productCollection.Find(filter).ToList();
+            return productCollection.Find(filter)
+                .SortBy(p => p.Id)
+                .Limit(limit).ToList();
         }
     }
 }

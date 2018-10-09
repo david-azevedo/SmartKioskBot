@@ -358,5 +358,39 @@ namespace SmartKioskBot.Logic
 
             }
         }
+
+            public class Price : Part
+            {
+                private int value = 0; // in €
+
+                public Price(int value)
+                {
+                    this.value = value;
+                }
+
+                public override int CompareTo(Part c)
+                {
+                    if (!(c is Price))
+                    {
+                        throw new Exception(this.compareExceptionMessage);
+                    }
+
+                    Price price = (Price)c;
+                    int result = 0;
+
+                if (this.value > price.value)
+                {
+                    result++;
+                }
+                else if (this.value < price.value)
+                {
+                    result--;
+                }
+
+
+                return result;
+
+                }
+            }
     }
 }

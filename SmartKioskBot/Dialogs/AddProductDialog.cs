@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static SmartKioskBot.Helpers.Constants;
 
 //Temporary!!! Mais facil criar a collection assim (não sei o que é uma shard key)
 namespace SmartKioskBot.Dialogs
@@ -45,7 +46,7 @@ namespace SmartKioskBot.Dialogs
             }
 
             await context.PostAsync(reply);
-            context.Done<object>(null);
+            context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         private Product CreateProduct(string content)

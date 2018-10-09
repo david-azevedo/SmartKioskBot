@@ -1,78 +1,117 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
+using Autofac;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Internals;
 using Microsoft.Bot.Connector;
-using SmartKioskBot.Controllers;
-using SmartKioskBot.Dialogs;
-using SmartKioskBot.UI;
 
-namespace SmartKioskBot
+namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
 {
-    [BotAuthentication]
-    public class MessagesController : ApiController
+
+    /// <summary>
+    /// A sample ICredentialProvider that is configured by multiple MicrosoftAppIds and MicrosoftAppPasswords
+    /// </summary>
+    public class MultiCredentialProvider : ICredentialProvider
     {
-        private Helpers.BotTranslator botTranslator = new Helpers.BotTranslator();
-        
-        /// <summary>
-        /// POST: api/Messages
-        /// Receive a message from a user and reply to it
-        /// </summary>
-        public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
+        public Dictionary<string, string> credentials = new Dictionary<string, string>
         {
-            if (activity.Type == ActivityTypes.Message)
-            {
-                activity.Conversation.Properties.Add("originalText", activity.Text);
-               // Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
-               // activity.Text = nt.Item1;
-               // activity.Locale = nt.Item2;
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog(activity));
-            }
-            else
-            {
-                HandleSystemMessage(activity);
-            }
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-            return response;
+            { "347f0de7-3c0c-44c7-9788-4ec424eb943b", "gwbzILZ83@;cguIZSH028;[" }
+        };
+
+        public Task<bool> IsValidAppIdAsync(string appId)
+        {
+            return Task.FromResult(this.credentials.ContainsKey(appId));
         }
 
-        private Activity HandleSystemMessage(Activity message)
+        public Task<string> GetAppPasswordAsync(string appId)
         {
-            if (message.Type == ActivityTypes.DeleteUserData)
-            {
-                // Implement user deletion here
-                // If we handle user deletion, return a real message
-            }
-            else if (message.Type == ActivityTypes.ConversationUpdate)
-            {
-                // Handle conversation state changes, like members being added and removed
-                // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
-                // Not available in all channels
+            return Task.FromResult(this.credentials.ContainsKey(appId) ? this.credentials[appId] : null);
+        }
 
-                // text activation
-                if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id)) {
-                    var reply = message.CreateReply(BotDefaultAnswers.getMemberAdded());     
-                    ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
-                    connector.Conversations.ReplyToActivity(reply);
+        public Task<bool> IsAuthenticationDisabledAsync()
+        {
+            return Task.FromResult(!this.credentials.Any());
+        }
+    }
+
+    /// Use the MultiCredentialProvider as credential provider for BotAuthentication
+    [BotAuthentication(CredentialProviderType = typeof(MultiCredentialProvider))]
+    public class MessagesController : ApiController
+    {
+
+
+        static MessagesController()
+        {
+
+            // Update the container to use the right MicorosftAppCredentials based on
+            // Identity set by BotAuthentication
+            var builder = new ContainerBuilder();
+
+            builder.Register(c => ((ClaimsIdentity)HttpContext.Current.User.Identity).GetCredentialsFromClaims())
+                .AsSelf()
+                .InstancePerLifetimeScope();
+            builder.Update(Conversation.Container);
+        }
+
+        /// <summary>
+        /// POST: api/Messages
+        /// receive a message from a user and send replies
+        /// </summary>
+        /// <param name="activity"></param>
+        [ResponseType(typeof(void))]
+        public virtual async Task<HttpResponseMessage> Post([FromBody] Activity activity)
+        {
+            if (activity != null)
+            {
+                switch (activity.GetActivityType())
+                {
+                    case ActivityTypes.Message:
+                        {
+                            //Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
+                            //activity.Text = nt.Item1;
+                            activity.Locale = "pt-PT";
+                            await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog());
+                        }
+                        break;
+
+                    case ActivityTypes.ConversationUpdate:
+                        IConversationUpdateActivity update = activity;
+                        // resolve the connector client from the container to make sure that it is 
+                        // instantiated with the right MicrosoftAppCredentials
+                        using (var scope = DialogModule.BeginLifetimeScope(Conversation.Container, activity))
+                        {
+                            var client = scope.Resolve<IConnectorClient>();
+                            if (update.MembersAdded.Any())
+                            {
+                                var reply = activity.CreateReply();
+                                foreach (var newMember in update.MembersAdded)
+                                {
+                                    if (newMember.Id != activity.Recipient.Id)
+                                    {
+                                        reply.Text = $"Welcome {newMember.Name}!";
+                                        await client.Conversations.ReplyToActivityAsync(reply);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case ActivityTypes.ContactRelationUpdate:
+                    case ActivityTypes.Typing:
+                    case ActivityTypes.DeleteUserData:
+                    case ActivityTypes.Ping:
+                    default:
+                        Trace.TraceError($"Unknown activity type ignored: {activity.GetActivityType()}");
+                        break;
                 }
             }
-            else if (message.Type == ActivityTypes.ContactRelationUpdate)
-            {
-                // Handle add/remove from contact lists
-                // Activity.From + Activity.Action represent what happened
-            }
-            else if (message.Type == ActivityTypes.Typing)
-            {
-                // Handle knowing tha the user is typing
-            }
-            else if (message.Type == ActivityTypes.Ping)
-            {
-            }
-
-            return null;
+            return new HttpResponseMessage(System.Net.HttpStatusCode.Accepted);
         }
     }
 }
