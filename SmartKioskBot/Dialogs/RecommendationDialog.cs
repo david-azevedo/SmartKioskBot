@@ -12,6 +12,8 @@ using MongoDB.Driver;
 using SmartKioskBot.Helpers;
 using MongoDB.Bson;
 using static SmartKioskBot.Helpers.Constants;
+using static SmartKioskBot.Helpers.AdaptiveCardHelper;
+using Newtonsoft.Json.Linq;
 
 namespace SmartKioskBot.Dialogs 
 {
@@ -83,7 +85,8 @@ namespace SmartKioskBot.Dialogs
             else
             {
                 reply = context.MakeMessage();
-                reply.Attachments.Add(Common.PaginationCardAttachment());
+                
+                reply.Attachments.Add(await getCardAttachment(CardType.PAGINATION));
                 await context.PostAsync(reply);
                 
 
@@ -91,18 +94,34 @@ namespace SmartKioskBot.Dialogs
             }
         }
 
-        public async Task PaginationHandler(IDialogContext context, IAwaitable<IMessageActivity> result)
+        public async Task PaginationHandler(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
-            var activity = await result as Activity;
+            var activity = await argument as Activity;
 
             if (activity.Text != null)
             {
-                if (activity.Text.Equals(BotDefaultAnswers.next_pagination)) {
-                    page++;
-                    await ShowRecommendations(context, null);
-                }
+                if (activity.Text == BotDefaultAnswers.next_pagination)
+                    context.Done(new CODE(DIALOG_CODE.DONE));
                 else
                     context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
+            }
+            else if (activity.Value != null)
+            {
+                JObject json = activity.Value as JObject;
+                CardType type = getReplyType(json);
+
+                switch (type)
+                {
+                    case CardType.PAGINATION:
+                        {
+                            page++;
+                            await ShowRecommendations(context,null);
+                            break;
+                        }
+                    default:
+                        context.Done(new CODE(DIALOG_CODE.DONE));
+                        break;
+                }
             }
             else
                 context.Done(new CODE(DIALOG_CODE.DONE));
