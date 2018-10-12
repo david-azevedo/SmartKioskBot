@@ -29,7 +29,7 @@ namespace SmartKioskBot.Dialogs
         private int page = 1;
         private State state;
 
-        public enum State { INIT, FILTER_PREVIOUS, FILTER, CLEAN, CLEAN_ALL };
+        public enum State { INIT, FILTER_PREVIOUS, FILTER, FILTER_AGAIN, CLEAN, CLEAN_ALL };
 
         public FilterDialog(User user, List<Filter> filters_luis, State state)
         {
@@ -48,6 +48,7 @@ namespace SmartKioskBot.Dialogs
             switch (this.state)
             {
                 case State.INIT:
+                case State.FILTER_AGAIN:
                     await GuidedFilterDialog(context, null);
                     break; ;
                 case State.FILTER:
@@ -67,11 +68,20 @@ namespace SmartKioskBot.Dialogs
         public async Task GuidedFilterDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             var reply = context.MakeMessage();
+            Attachment att = await getCardAttachment(CardType.FILTER);
             
-            reply.Attachments.Add(await getCardAttachment(CardType.FILTER));
+            //Fills with the previous choosen filters
+            if (state.Equals(State.FILTER_AGAIN))
+            {
+                JObject json = att.Content as JObject;
+                SetFilterCardValue(json, filters);
+            }
+
+            filters = new List<Filter>();
+            reply.Attachments.Add(att);
             await context.PostAsync(reply);
 
-            context.Wait(PaginationHandler);
+            context.Wait(InputHandler);
         }
 
         public async Task FilterAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
@@ -125,6 +135,8 @@ namespace SmartKioskBot.Dialogs
 
             await context.PostAsync(text);
 
+            bool done = false;
+
             if (products.Count > 0)
             {
                 //display products 
@@ -138,25 +150,27 @@ namespace SmartKioskBot.Dialogs
                 await context.PostAsync(reply);
 
                 //Check if pagination is needed
-                if (products.Count <= Constants.N_ITEMS_CARROUSSEL)
-                    context.Done(new CODE(DIALOG_CODE.DONE));
-                else
-                {
+                if (products.Count > Constants.N_ITEMS_CARROUSSEL) { 
+                    //pagination card
                     reply = context.MakeMessage();
-                    reply.Attachments.Add(await AdaptiveCardHelper.getCardAttachment(CardType.PAGINATION));
+                    reply.Attachments.Add(await getCardAttachment(CardType.PAGINATION));
                     await context.PostAsync(reply);
-
-                    context.Wait(this.PaginationHandler);
                 }
             }
-            else
-                context.Done(new CODE(DIALOG_CODE.DONE));
+
+            //re-filter again
+            reply = context.MakeMessage();
+            reply.Attachments.Add(await getCardAttachment(CardType.FILTER_AGAIN));
+            await context.PostAsync(reply);
+
+            context.Wait(this.InputHandler);
         }
 
-        public async Task PaginationHandler(IDialogContext context, IAwaitable<object> argument)
+        public async Task InputHandler(IDialogContext context, IAwaitable<object> argument)
         {
             var activity = await argument as Activity;
 
+            //Received a Message
             if (activity.Text != null)
             {
                 if (activity.Text == BotDefaultAnswers.next_pagination)
@@ -164,6 +178,7 @@ namespace SmartKioskBot.Dialogs
                 else
                     context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
             }
+            //Received an Event
             else if (activity.Value != null)
             {
                 JObject json = activity.Value as JObject;
@@ -178,6 +193,10 @@ namespace SmartKioskBot.Dialogs
                     case CardType.FILTER:
                         this.filters = FilterLogic.GetFilterFromForm(getReplyData(json));
                         this.state = State.FILTER;
+                        await StartAsync(context);
+                        break;
+                    case CardType.FILTER_AGAIN:
+                        this.state = State.FILTER_AGAIN;
                         await StartAsync(context);
                         break;
                     default:
