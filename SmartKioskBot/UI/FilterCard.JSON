@@ -16,9 +16,6 @@
           "type": "Column",
           "items": [
             {
-              "type": "Container",
-              "items": [
-                {
                   "type": "TextBlock",
                   "weight": "Bolder",
                   "text": "Processador:"
@@ -51,8 +48,6 @@
                   "title": "Intel",
                   "value": "false"
                 }
-              ]
-            }
           ],
           "width": "stretch"
         },
@@ -61,27 +56,22 @@
           "separator": true,
           "items": [
             {
-              "type": "Container",
-              "items": [
-                {
-                  "type": "TextBlock",
-                  "weight": "Bolder",
-                  "text": "Placa Gráfica:"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "placa_grafica:amd",
-                  "title": "AMD",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "placa_grafica:intel",
-                  "spacing": "Small",
-                  "title": "Intel",
-                  "value": "false"
-                }
-              ]
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "Placa Gráfica:"
+            },
+            {
+              "type": "Input.Toggle",
+              "id": "placa_grafica:amd",
+              "title": "AMD",
+              "value": "false"
+            },
+            {
+              "type": "Input.Toggle",
+              "id": "placa_grafica:intel",
+              "spacing": "Small",
+              "title": "Intel",
+              "value": "false"
             },
             {
               "type": "Input.Toggle",
@@ -121,7 +111,9 @@
                       "id": "preço:min",
                       "title": "New Input.Toggle",
                       "placeholder": "Mínimo",
-                      "min": "0"
+                      "min": "0",
+                      "value":  "0"
+                       
                     }
                   ],
                   "width": "stretch"
@@ -134,7 +126,8 @@
                       "id": "preço:max",
                       "title": "New Input.Toggle",
                       "placeholder": "Máximo",
-                      "min": "0"
+                      "min": "0",
+                      "value": "10000"
                     }
                   ],
                   "width": "stretch"
@@ -156,21 +149,18 @@
           "text": "Armazenamento:"
         },
         {
-          "type": "Input.ChoiceSet",
-          "id": "tipo_armazenamento",
-          "value": "HDD",
-          "placeholder": "HDD",
-          "choices": [
-            {
-              "title": "HDD",
-              "value": "HDD"
-            },
-            {
-              "title": "SSD",
-              "value": "SSD"
-            }
-          ],
-          "isCompact": true
+          "type": "Input.Toggle",
+          "id": "tipo_armazenamento:HDD",
+          "spacing": "Small",
+          "title": "HDD",
+          "value": "false"
+        },
+        {
+          "type": "Input.Toggle",
+          "id": "tipo_armazenamento:SSD",
+          "spacing": "Small",
+          "title": "SSD",
+          "value": "false"
         },
         {
           "type": "ColumnSet",
@@ -183,7 +173,8 @@
                   "id": "armazenamento:min",
                   "title": "New Input.Toggle",
                   "placeholder": "Mínimo (Gb)",
-                  "min": "0"
+                  "min": "0",
+                  "value": "0"
                 }
               ],
               "width": "stretch"
@@ -197,7 +188,8 @@
                   "id": "armazenamento:max",
                   "title": "New Input.Toggle",
                   "placeholder": "Máximo (Gb)",
-                  "min": "0"
+                  "min": "0",
+                  "value": "5000"
                 }
               ],
               "width": "stretch"
@@ -218,7 +210,8 @@
                   "type": "Input.Number",
                   "id": "ram:min",
                   "placeholder": "Mínimo (Gb)",
-                  "min": "0"
+                  "min": "0",
+                  "value" :  "0"
                 }
               ],
               "width": "stretch"
@@ -230,7 +223,8 @@
                   "type": "Input.Number",
                   "id": "ram:max",
                   "placeholder": "Máximo (Gb)",
-                  "min": "0"
+                  "min": "0",
+                  "value" :  "100"
                 }
               ],
               "width": "stretch"
