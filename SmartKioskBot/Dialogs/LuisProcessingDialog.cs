@@ -154,9 +154,10 @@ namespace SmartKioskBot.Dialogs
         {
             FilterIntentScore(context, result);
 
-            await CompareDialog.ViewComparator(context);
+            //await CompareDialog.ViewComparator(context);
+            context.Call(new CompareDialog(user), ResumeAfterDialogueCall);
 
-            context.Done(new CODE(DIALOG_CODE.DONE));
+            //context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
 
