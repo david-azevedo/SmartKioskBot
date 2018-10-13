@@ -170,7 +170,7 @@ namespace SmartKioskBot.Dialogs
             FilterIntentScore(context, result);
             
             List<Filter> luis_filters = FilterLogic.GetEntitiesFilter(result); 
-            context.Call(new FilterDialog(user,luis_filters), ResumeAfterDialogueCall);
+            context.Call(new FilterDialog(user,luis_filters,FilterDialog.State.FILTER_PREVIOUS), ResumeAfterDialogueCall);
         }
 
         [LuisIntent("CleanAllFilters")]
