@@ -198,6 +198,7 @@
         },
         {
           "type": "TextBlock",
+          "weight": "Bolder",
           "text": "RAM:"
         },
         {
