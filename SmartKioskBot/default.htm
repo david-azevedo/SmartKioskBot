@@ -1,12 +1,20 @@
 ﻿<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-    <meta charset="utf-8" />
-</head>
-<body style="font-family:'Segoe UI'">
-    <h1>SmartKioskBot</h1>
-    <p>Describe your bot here and your terms of use etc.</p>
-    <p>Visit <a href="https://www.botframework.com/">Bot Framework</a> to register your bot. When you register it, remember to set your bot's endpoint to <pre>https://<i>your_bots_hostname</i>/api/messages</pre></p>
+<html style='min-height:100%; position:relative'>
+<body style='height:100%'>
+    <iframe id="chat" src='' style='width: 100%; height: 95vh'></iframe>
 </body>
+<script>
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "https://webchat.botframework.com/api/tokens", true);
+    xhr.setRequestHeader('Authorization', 'BotConnector ' + 'em14h_YALc8.cwA.kC0.wEjUI-_ULEz8twzSj2FqCXCog2MA68gOOqM7s9cWbuI');
+    xhr.send();
+    xhr.onreadystatechange = processRequest;
+
+    function processRequest(e) {
+      if (xhr.readyState == 4  && xhr.status == 200) {
+        var response = JSON.parse(xhr.responseText);
+        document.getElementById("chat").src = "https://webchat.botframework.com/embed/SKB-LGP?t=" + response
+      }
+    }
+</script>
 </html>

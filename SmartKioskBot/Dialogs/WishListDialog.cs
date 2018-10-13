@@ -57,6 +57,7 @@ namespace SmartKioskBot.Dialogs
             {
                 text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.FAIL,0);
                 await context.PostAsync(text);
+                context.Done(new CODE(DIALOG_CODE.DONE));
             }
             // Has Products
             else
