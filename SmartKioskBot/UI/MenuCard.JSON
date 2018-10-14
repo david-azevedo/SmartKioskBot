@@ -104,7 +104,7 @@
                         "title": "Compare",
                         "data": {
                             "reply_type": "menu_comparator",
-                                    "dialog": "menu"
+                            "dialog": "menu"
                         }
                     },
                     "style": "emphasis",

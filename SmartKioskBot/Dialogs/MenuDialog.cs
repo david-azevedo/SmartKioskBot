@@ -75,7 +75,6 @@ namespace SmartKioskBot.Dialogs
                                     break;
                                 case "menu_comparator":
                                     context.Call(new CompareDialog(user), ResumeAfterDialogCall);
-                                    context.Wait(InputHandler);
                                     break;
                                 case "menu_recommendations":
                                     context.Call(new RecommendationDialog(user), ResumeAfterDialogCall);

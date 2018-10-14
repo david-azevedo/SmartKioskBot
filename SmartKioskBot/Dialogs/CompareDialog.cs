@@ -65,12 +65,11 @@ namespace SmartKioskBot.Dialogs
                 //Check if pagination is needed
                 if (products.Count > Constants.N_ITEMS_CARROUSSEL)
                     buttons.Add(ButtonType.PAGINATION);
-            }
-            else
-            {
-                await context.PostAsync("Não tem produtos para comparar.");
+
                 buttons.Add(ButtonType.COMPARE);
             }
+            else
+                await context.PostAsync("Não tem produtos para comparar.");
 
             buttons.Add(ButtonType.ADD_PRODUCT);
 
@@ -124,6 +123,10 @@ namespace SmartKioskBot.Dialogs
                                     ComparatorLogic.ShowProductComparison(context, products);
                                     context.Wait(InputHandler);
                                     break;
+                                case ClickType.ADD_PRODUCT:
+                                    done_ok = false;
+                                    context.Call(new FilterDialog(user, new List<Context.Filter>(), FilterDialog.State.INIT), ResumeAfterDialogCall);
+                                    break;
                             }
                         }
                     }
@@ -132,6 +135,12 @@ namespace SmartKioskBot.Dialogs
 
             if(done_ok)
                 context.Done(new CODE(DIALOG_CODE.DONE));
+        }
+
+        private async Task ResumeAfterDialogCall(IDialogContext context, IAwaitable<object> result)
+        {
+            CODE code = await result as CODE;
+            context.Done(code);
         }
 
         public static async Task AddComparator(IDialogContext context, string message, User user)
