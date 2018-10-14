@@ -8,28 +8,12 @@ using System.Text.RegularExpressions;
 using System.Web;
 using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using static SmartKioskBot.Models.Context;
+using static SmartKioskBot.Helpers.Constants;
 
 namespace SmartKioskBot.Logic
 {
     public class FilterLogic
     {
-        public const string brand_filter = "marca";
-        public const string ram_filter = "ram";
-        public const string storage_type_filter = "tipo_armazenamento";
-        public const string cpu_family_filter = "familia_cpu";
-        public const string gpu_filter = "placa_grafica";
-        public const string type_filter = "tipo";
-        public const string price_filter = "preço";
-        public const string storage_filter = "armazenamento";
-        public const string screen_size_filter = "tamanho_ecra";
-        public const string autonomy_filter = "autonomia";
-
-        public static Filter DEFAULT_RECOMMENDATION_FILTER = new Filter()
-        {
-            FilterName = brand_filter,
-            Operator = "=",
-            Value = "asus"
-        };
 
         public static List<Filter> GetFilterFromForm(List<InputData> data)
         {

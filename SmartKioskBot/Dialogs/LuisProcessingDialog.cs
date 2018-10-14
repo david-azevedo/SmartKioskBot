@@ -134,7 +134,7 @@ namespace SmartKioskBot.Dialogs
         {
             FilterIntentScore(context, result);
 
-            await CompareDialog.AddComparator(context, result.Query);
+            await CompareDialog.AddComparator(context, result.Query,user);
 
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
@@ -144,7 +144,7 @@ namespace SmartKioskBot.Dialogs
         {
             FilterIntentScore(context, result);
 
-            await CompareDialog.RmvComparator(context, result.Query);
+            await CompareDialog.RmvComparator(context, result.Query,user);
 
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
@@ -153,11 +153,7 @@ namespace SmartKioskBot.Dialogs
         public async Task ViewComparator(IDialogContext context, LuisResult result)
         {
             FilterIntentScore(context, result);
-
-            //await CompareDialog.ViewComparator(context);
             context.Call(new CompareDialog(user), ResumeAfterDialogueCall);
-
-            //context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
 

@@ -20,10 +20,12 @@ namespace SmartKioskBot.Dialogs
     public class CompareDialog : IDialog<Object>
     {
         public User user;
+        public List<Product> products;
 
         public CompareDialog(User user)
         {
             this.user = user;
+            this.products = new List<Product>();
         }
 
         public async Task StartAsync(IDialogContext context)
@@ -33,158 +35,145 @@ namespace SmartKioskBot.Dialogs
 
         public async Task InitAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-
-            await context.PostAsync("Bem vindo ao comparador, estes são os produtos a comparar: ");
             
-            var products = new List<Product>();
-
+            // fetch products
+            products = new List<Product>();
             var itemsToCompare = ContextController.GetContext(this.user.Id).Comparator;
 
-            await context.PostAsync(itemsToCompare.Length.ToString());
-
             foreach (ObjectId o in itemsToCompare)
-            {
                 products.Add(ProductController.getProduct(o.ToString()));
-            }
-        
 
+
+            List<ButtonType> buttons = new List<ButtonType>();
             var reply = context.MakeMessage();
 
             if (products.Count > 0)
             {
+                await context.PostAsync("Bem vindo ao comparador, estes são os produtos que adicionou ao comparador: ");
+                
                 //display products 
+                reply = context.MakeMessage();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
+                //limit 
                 for (var i = 0; i < products.Count && i < Constants.N_ITEMS_CARROUSSEL; i++)
                     cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.COMPARATOR).ToAttachment());
 
                 reply.Attachments = cards;
                 await context.PostAsync(reply);
 
-                context.Wait(InputHandler);
-
                 //Check if pagination is needed
                 if (products.Count > Constants.N_ITEMS_CARROUSSEL)
-                {
-                    //pagination card
-                    reply = context.MakeMessage();
-                    reply.Attachments.Add(await getCardAttachment(CardType.PAGINATION));
-                    await context.PostAsync(reply);
-                }
-
-                //Show compare button
-                    //pagination card
-                    reply = context.MakeMessage();
-                    reply.Attachments.Add(await getCardAttachment(CardType.COMPARATOR));
-                    await context.PostAsync(reply);
-
+                    buttons.Add(ButtonType.PAGINATION);
             } else
-            {
-                //TODO 
-            }
+                await context.PostAsync("Não tem produtos para comparar.");
+
+            buttons.Add(ButtonType.ADD_PRODUCT);
+            buttons.Add(ButtonType.COMPARE);
+
+            //show options
+            reply = context.MakeMessage();
+            reply.Attachments.Add(getCardButtonsAttachment(buttons, DialogType.COMPARE));
+            await context.PostAsync(reply);
+
+            context.Wait(InputHandler);
         }
 
         public async Task InputHandler(IDialogContext context, IAwaitable<object> argument)
         {
            var activity = await argument as Activity;
 
+            //close dialog at the end without more processing
+            bool done_ok = true;
             
             //Received a Message
             if (activity.Text != null)
             {
-                /*if (activity.Text == BotDefaultAnswers.next_pagination)
-                    context.Done(new CODE(DIALOG_CODE.DONE));
-                else*/
-                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
+                done_ok = false;
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
             }
             //Received an Event
             else if (activity.Value != null)
             {
                 JObject json = activity.Value as JObject;
-                CardType type = getReplyType(json);
+                List<InputData> data = getReplyData(json);
 
-                switch (type)
+                //have mandatory info
+                if (data.Count >= 2)
                 {
-                    case CardType.COMPARATOR:
-                        await ViewComparator(context);
-                        context.Done(new CODE(DIALOG_CODE.DONE));
-                        break;
-                    default:
-                        context.Done(new CODE(DIALOG_CODE.DONE));
-                        break;
+                    //json structure is correct
+                    if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
+                    {
+                        ClickType click = getClickType(data[0].value);
+
+                        if (data[1].value.Equals(getDialogName(DialogType.COMPARE)) &&
+                            click != ClickType.NONE)
+                        {
+                            switch (click)
+                            {
+                                case ClickType.COMPARE:
+                                    done_ok = false;
+
+                                    var reply = context.MakeMessage();
+                                    reply.Text = BotDefaultAnswers.getOngoingComp();
+                                    await context.PostAsync(reply);
+
+                                    ComparatorLogic.ShowProductComparison(context, products);
+                                    context.Wait(InputHandler);
+                                    break;
+                            }
+                        }
+                    }
                 }
             }
-            else
+
+            if(done_ok)
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
-        public static async Task ViewComparator(IDialogContext _context)
-        {
-            //fetch user and context
-            var currentUser = UserController.getUser(_context.Activity.ChannelId);
-            var context = ContextController.GetContext(currentUser.Id);
-
-            var reply = _context.MakeMessage();
-            reply.Text = BotDefaultAnswers.getOngoingComp();
-            await _context.PostAsync(reply);
-
-            // OBTER PRODUTOS
-            var productsToCompare = new List<Product>();
-            foreach (ObjectId o in context.Comparator)
-            {
-                productsToCompare.Add(ProductController.getProduct(o.ToString()));
-            }
-            Comparator.ShowProductComparison(_context, productsToCompare);
-            return;
-        }
-
-        public static async Task AddComparator(IDialogContext _context, string message)
+        public static async Task AddComparator(IDialogContext context, string message, User user)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
             {
-                //fetch user and context
-                var currentUser = UserController.getUser(_context.Activity.ChannelId);
-                var context = ContextController.GetContext(currentUser.Id);
+                var user_context = ContextController.GetContext(user.Id);
 
-                Product productToAdd = ProductController.getProduct(product);
-                //MOSTRA PRODUTO ADICIONADO
-                var reply = _context.MakeMessage();
-                reply.Text = String.Format(BotDefaultAnswers.getAddComparator());
+                if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= user_context.Comparator.Length)
+                    await context.PostAsync("Lamento mas o número máximo de produtos permitidos no comparador é de " + 
+                        ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR.ToString() + "produtos.");
+                else
+                {
+                    Product productToAdd = ProductController.getProduct(product);
+                    
+                    var reply = context.MakeMessage();
+                    reply.Text = String.Format(BotDefaultAnswers.getAddComparator());
+                    await context.PostAsync(reply);
 
-                await _context.PostAsync(reply);
-
-                //UPDATE AO COMPARADOR DO USER
-                ContextController.AddComparator(currentUser, product);
+                    //UPDATE AO COMPARADOR DO USER
+                    ContextController.AddComparator(user, product);
+                }
             }
-
-            return;
-
         }
 
-        public static async Task RmvComparator(IDialogContext _context, string message)
+        public static async Task RmvComparator(IDialogContext _context, string message, User user)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
             {
-                //fetch user and context
-                var currentUser = UserController.getUser(_context.Activity.ChannelId);
-                var context = ContextController.GetContext(currentUser.Id);
+                var context = ContextController.GetContext(user.Id);
 
                 var reply = _context.MakeMessage();
                 reply.Text = BotDefaultAnswers.getRemComparator();
                 await _context.PostAsync(reply);
 
                 //REMOVER PRODUTO
-                ContextController.RemComparator(currentUser, product);
+                ContextController.RemComparator(user, product);
             }
-
-            return;
         }
 
         

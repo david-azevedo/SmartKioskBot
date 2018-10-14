@@ -13,6 +13,7 @@ using AdaptiveCards;
 using static SmartKioskBot.Helpers.Constants;
 using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using Newtonsoft.Json.Linq;
+using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -21,9 +22,11 @@ namespace SmartKioskBot.Dialogs
     {
         private ObjectId[] wishes;
         private int skip = 0;
+        private User user = null;
 
         public WishListDialog(User user)
         {
+            this.user = user;
             this.wishes = ContextController.GetContext(user.Id).WishList;
         }
 
@@ -35,16 +38,17 @@ namespace SmartKioskBot.Dialogs
         //SHOW WISHES
         public async Task ShowWishesAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-            //Retriece wishes information
+
+            //Retrive wishes information
             var to_retrieve = wishes;
 
+            //fetch only a limited number of wishes
             if (wishes.Length > Constants.N_ITEMS_CARROUSSEL)
             {
-                to_retrieve = wishes.Skip(this.skip)                    //skip id's already fetched
-                                    .Take(Constants.N_ITEMS_CARROUSSEL) //fetch only 7 elements
+                to_retrieve = wishes.Skip(this.skip)               
+                                    .Take(Constants.N_ITEMS_CARROUSSEL) 
                                     .ToArray();
             }
-
             var products = ProductController.getProducts(to_retrieve);
 
             //Prepare answer
@@ -64,68 +68,98 @@ namespace SmartKioskBot.Dialogs
                 text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS,skip/Constants.N_ITEMS_CARROUSSEL + 1);
                 await context.PostAsync(text);
 
+                List<ButtonType> buttons = new List<ButtonType>();
+
+                //display products 
+                reply = context.MakeMessage();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
-                for (var i = 0; i < products.Count() && i < Constants.N_ITEMS_CARROUSSEL; i++)
-                {
+                //limit 
+                for (var i = 0; i < products.Count && i < Constants.N_ITEMS_CARROUSSEL; i++)
                     cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.WISHLIST).ToAttachment());
-                }
 
                 reply.Attachments = cards;
-
                 await context.PostAsync(reply);
 
-                //Check if pagination is needed
-                if (wishes.Length <= this.skip + Constants.N_ITEMS_CARROUSSEL)
-                    context.Done(new CODE(DIALOG_CODE.DONE));
-                else
+                //Check if pagination is needed and display wishes
+                if (wishes.Length > this.skip + Constants.N_ITEMS_CARROUSSEL)
                 {
-                    reply = context.MakeMessage();
-                    reply.Attachments.Add(await getCardAttachment(CardType.PAGINATION));
-                    await context.PostAsync(reply);
-
+                    buttons.Add(ButtonType.PAGINATION);
                     skip += skip + Constants.N_ITEMS_CARROUSSEL;
-
-                    context.Wait(this.PaginationHandler);
                 }
+
+                //add option add more products
+                buttons.Add(ButtonType.ADD_PRODUCT);
+
+                //show options
+                reply = context.MakeMessage();
+                reply.Attachments.Add(getCardButtonsAttachment(buttons, DialogType.WISHLIST));
+                await context.PostAsync(reply);
+
+                context.Wait(this.InputHandler);
             }
         }
-
-        //PAGINATION
-        private async Task PaginationHandler(IDialogContext context, IAwaitable<IMessageActivity> argument)
+        
+        private async Task InputHandler(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             var activity = await argument as Activity;
 
+            //close dialog at the end without more processing
+            bool done_ok = true;
+
+            //received message
             if(activity.Text != null)
             {
-                if(activity.Text == BotDefaultAnswers.next_pagination)
-                    context.Done(new CODE(DIALOG_CODE.DONE));
-                else
-                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
+                done_ok = false;
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
             }
+            //received event
             else if (activity.Value != null)
             {
+                
                 JObject json = activity.Value as JObject;
-                CardType type = getReplyType(json);
+                List<InputData> data = getReplyData(json);
 
-                switch (type)
+                //have mandatory info
+                if(data.Count >= 2)
                 {
-                    case CardType.PAGINATION:
+                    //json structure is correct
+                    if(data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
+                    {
+                        ClickType click = getClickType(data[0].value);
+
+                        if (data[1].value.Equals(getDialogName(DialogType.WISHLIST)) &&
+                            click != ClickType.NONE)
                         {
-                            await StartAsync(context);
-                            break;
+                            switch (click)
+                            {
+                                case ClickType.PAGINATION:
+                                    await StartAsync(context);
+                                    done_ok = false;
+                                    break;
+                                case ClickType.ADD_PRODUCT:
+                                    var dialog = new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT);
+                                    context.Call(dialog, ResumeAfterDialogCall);
+                                    done_ok = false;
+                                    break;
+                            }
                         }
-                    default:
-                        context.Done(new CODE(DIALOG_CODE.DONE));
-                        break;
+                    }
                 }
             }
-            else
+
+            if(done_ok)
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
-        
-      
+
+        private async Task ResumeAfterDialogCall(IDialogContext context, IAwaitable<object> result)
+        {
+            CODE code = await result as CODE;
+            context.Done(code);
+        }
+
+
         /*
          * Auxiliary Methods
          */

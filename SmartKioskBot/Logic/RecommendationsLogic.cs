@@ -7,11 +7,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Logic
 {
-    public class Recommendations
+    public abstract class RecommendationsLogic
     {
+
+        public static Filter DEFAULT_RECOMMENDATION = new Filter()
+        {
+            FilterName = Constants.brand_filter,
+            Operator = "=",
+            Value = "asus"
+        };
+
         public static List<Product> GetSimilarProducts(ObjectId productId)
         {
             const double PRICE_RANGE = 50;

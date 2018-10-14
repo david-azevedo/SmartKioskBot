@@ -413,7 +413,8 @@
             "type": "Action.Submit",
             "title": "Pesquisar",
             "data": {
-                "reply_type" : "filter"
+              "reply_type": "filter",
+              "dialog": "filter"
                 }
           }
         ],

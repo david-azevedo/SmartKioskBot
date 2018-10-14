@@ -16,23 +16,14 @@ namespace SmartKioskBot.Helpers
     {
         public static string CARDS_PATH = HostingEnvironment.MapPath(@"~/UI");
 
-        public enum CardType {PAGINATION, FILTER, FILTER_AGAIN, COMPARATOR, NONE};
+        public enum CardType {FILTER, NONE};
+        public enum ButtonType { PAGINATION, FILTER_AGAIN, ADD_PRODUCT, COMPARE};
+        public enum ClickType {FILTER, PAGINATION, FILTER_AGAIN, ADD_PRODUCT, COMPARE, NONE};
 
-        private static string getCardFileName(CardType type)
-        {
-            switch(type){
-                case CardType.PAGINATION:
-                    return "PaginationCard";
-                case CardType.FILTER:
-                    return "FilterCard";
-                case CardType.FILTER_AGAIN:
-                    return "FilterAgainCard";
-                case CardType.COMPARATOR:
-                    return "ComparatorCard";
-            }
-            return "";
-        }
+        public static string REPLY_ATR = "reply_type";
+        public static string DIALOG_ATR = "dialog";
 
+       
         public static async Task<Attachment> getCardAttachment(CardType type)
         {
             string path = getCardFileName(type);
@@ -47,27 +38,87 @@ namespace SmartKioskBot.Helpers
             return att;
         }
 
-        public static CardType getReplyType(JObject json)
+        public static Attachment getCardButtonsAttachment(List<ButtonType> button_types, Constants.DialogType dialog)
         {
-            JProperty prop = json.First as JProperty;
-            InputData type = new InputData(prop);
-
-            if (type.attribute == "reply_type")
+            AdaptiveCard card = new AdaptiveCard()
             {
-                switch (type.value)
-                {
-                    case "pagination":
-                        return CardType.PAGINATION;
-                    case "filter":
-                        return CardType.FILTER;
-                    case "filter_again":
-                        return CardType.FILTER_AGAIN;
-                    case "compare":
-                        return CardType.COMPARATOR;
-                }
-            }
-            return CardType.NONE;
+                Version = "1.0",
+                Body = { },
+                Actions = { }
+            };
+
+            foreach (var t in button_types)
+                card.Actions.Add(getButtonAction(t,dialog));
+
+            Attachment att = new Attachment()
+            {
+                ContentType = AdaptiveCard.ContentType,
+                Content = card
+            };
+
+            return att;
         }
+        
+        private static AdaptiveSubmitAction getButtonAction(ButtonType type, Constants.DialogType dialog)
+        {
+            var action = new AdaptiveSubmitAction();
+            var data = "{'reply_type' : '";
+
+            switch (type)
+            {
+                case ButtonType.PAGINATION:
+                    action.Title = "Ver Mais";
+                    data += "pagination";
+                    break;
+                case ButtonType.FILTER_AGAIN:
+                    action.Title = "Alterar Filtragem";
+                    data += "filter_again";
+                    break;
+                case ButtonType.ADD_PRODUCT:
+                    action.Title = "Adicionar Produto";
+                    data += "add_product";
+                    break;
+                case ButtonType.COMPARE:
+                    action.Title = "Comparar";
+                    data += "compare";
+                    break;
+            }
+
+            data += "', 'dialog' : '" + Constants.getDialogName(dialog) + "'}";
+            action.DataJson = data;
+            return action;
+        }
+
+        private static string getCardFileName(CardType type)
+        {
+            switch(type){
+                case CardType.FILTER:
+                    return "FilterCard";
+            }
+            return "";
+        }
+       
+        public static ClickType getClickType(string type)
+        {
+            switch (type)
+            {
+                case "pagination":
+                    return ClickType.PAGINATION;
+                case "filter_again":
+                    return ClickType.FILTER_AGAIN;
+                case "add_product":
+                    return ClickType.ADD_PRODUCT;
+                case "compare":
+                    return ClickType.COMPARE;
+                case "filter":
+                    return ClickType.FILTER;
+            }
+
+            return ClickType.NONE;
+        }
+        /*
+         * Events data
+         */
 
         public static List<InputData> getReplyData(JObject json)
         {
@@ -75,7 +126,7 @@ namespace SmartKioskBot.Helpers
             List<JProperty> to_process = json.Children<JProperty>().ToList();
             
             //ignore reply type, i=0
-            for(int i = 1; i < to_process.Count(); i++)
+            for(int i = 0; i < to_process.Count(); i++)
                 data.Add(new InputData(to_process[i]));
 
             return data;
@@ -83,9 +134,9 @@ namespace SmartKioskBot.Helpers
 
         public class InputData
         {
-            public string attribute = "";
-            public string value = "";
-            public string input = "";
+            public string attribute = "";   //ex: cpu,  ex: reply_type              
+            public string value = "";       //ex: i3 ,  ex: pagination
+            public string input = "";       //ex: true
 
             public InputData(JProperty property)
             {
@@ -103,7 +154,11 @@ namespace SmartKioskBot.Helpers
                 }
             }
         }
-        
+
+        /*
+         * CARD SPECIFIC
+         */
+
         public static void SetFilterCardValue(JToken card, List<Filter> applied_filters)
         {
             List<JToken> card_fields = new List<JToken>();
@@ -149,36 +204,36 @@ namespace SmartKioskBot.Helpers
 
             switch (section)
             {
-                case FilterLogic.cpu_family_filter:
+                case Constants.cpu_family_filter:
                     fields = card.SelectTokens("body[1].columns[0].items").Children().ToList();
                     fields.RemoveAt(0);
                     break;
-                case FilterLogic.gpu_filter:
+                case Constants.gpu_filter:
                     fields = card.SelectTokens("body[1].columns[1].items").Children().ToList();
                     fields.RemoveAt(0);
                     break;
-                case FilterLogic.price_filter:
+                case Constants.price_filter:
                     fields.Add(card.SelectToken("body[2].columns[0].items[1].columns[0].items[0]"));
                     fields.Add(card.SelectToken("body[2].columns[0].items[1].columns[1].items[0]"));
                     break;
-                case FilterLogic.storage_type_filter:
+                case Constants.storage_type_filter:
                     fields.Add(card.SelectToken("body[3].items[1]"));
                     fields.Add(card.SelectToken("body[3].items[2]"));
                     break;
-                case FilterLogic.storage_filter:
+                case Constants.storage_filter:
                     fields.Add(card.SelectToken("body[3].items[3].columns[0].items[0]"));
                     fields.Add(card.SelectToken("body[3].items[3].columns[1].items[0]"));
                     break;
-                case FilterLogic.ram_filter:
+                case Constants.ram_filter:
                     fields.Add(card.SelectToken("body[3].items[5].columns[0].items[0]"));
                     fields.Add(card.SelectToken("body[3].items[5].columns[1].items[0]"));
                     break;
-                case FilterLogic.brand_filter:
+                case Constants.brand_filter:
                     fields = card.SelectTokens("body[4].items[1].columns[0].items").Children().ToList();
                     fields = fields.Concat(card.SelectTokens("body[4].items[1].columns[1].items").Children().ToList()).ToList();
                     fields = fields.Concat(card.SelectTokens("body[4].items[1].columns[2].items").Children().ToList()).ToList();
                     break;
-                case FilterLogic.type_filter:
+                case Constants.type_filter:
                     fields = card.SelectTokens("body[5].items[1].columns[0].items").Children().ToList();
                     fields = fields.Concat(card.SelectTokens("body[5].items[1].columns[1].items").Children().ToList()).ToList();
                     break;
