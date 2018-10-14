@@ -14,18 +14,27 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class MenuDialog : IDialog<object>
     {
-        private User user = null;
+        public User user = null;
+        public State state;
 
-        public MenuDialog(User user)
+        public enum State { INIT, INPUT_HANDLE}
+
+        public MenuDialog(User user, State state)
         {
             this.user = user;
+            this.state = state;
         }
 
         public async Task StartAsync(IDialogContext context)
         {
-            var reply = context.MakeMessage();
-            reply.Attachments.Add(await getCardAttachment(CardType.MENU));
-            await context.PostAsync(reply);
+            switch (state)
+            {
+                case State.INIT:
+                    var reply = context.MakeMessage();
+                    reply.Attachments.Add(await getCardAttachment(CardType.MENU));
+                    await context.PostAsync(reply);
+                    break;
+            }
 
             context.Wait(InputHandler);
         }
@@ -34,81 +43,88 @@ namespace SmartKioskBot.Dialogs
         {
             var activity = await argument as Activity;
 
-            //close dialog at the end without more processing
-            bool done_ok = true;
-
             //Received a Message
             if (activity.Text != null)
-            {
-                done_ok = false;
-                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
-            }
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity));
             //Received an Event
             else if (activity.Value != null)
+                await EventHandler(context, activity);
+            else
+                context.Done(new CODE(DIALOG_CODE.DONE));
+        }
+
+        private async Task EventHandler(IDialogContext context, Activity activity)
+        {
+            JObject json = activity.Value as JObject;
+            List<InputData> data = getReplyData(json);
+
+            //have mandatory info
+            if (data.Count >= 2)
             {
-                JObject json = activity.Value as JObject;
-                List<InputData> data = getReplyData(json);
-
-                //have mandatory info
-                if (data.Count >= 2)
+                //json structure is correct
+                if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
                 {
-                    //json structure is correct
-                    if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
+                    ClickType click = getClickType(data[0].value);
+
+                    if (data[1].value.Equals(getDialogName(DialogType.MENU)) &&
+                        click != ClickType.NONE &&
+                        click.Equals(ClickType.MENU))
                     {
-                        ClickType click = getClickType(data[0].value);
-
-                        if (data[1].value.Equals(getDialogName(DialogType.MENU)) &&
-                            click != ClickType.NONE &&
-                            click.Equals(ClickType.MENU))
+                        switch (data[0].value)
                         {
-                            done_ok = false;
-
-                            switch (data[0].value)
-                            {
-                                case "menu_session":
-                                    //Add call to account
-                                    context.Wait(InputHandler);
-                                    break;
-                                case "menu_filter":
-                                    var next_dialog = new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT);
-                                    context.Call(next_dialog, ResumeAfterDialogCall);
-                                    break;
-                                case "menu_comparator":
-                                    context.Call(new CompareDialog(user), ResumeAfterDialogCall);
-                                    break;
-                                case "menu_recommendations":
-                                    context.Call(new RecommendationDialog(user), ResumeAfterDialogCall);
-                                    break;
-                                case "menu_wishlist":
-                                    context.Call(new WishListDialog(user), ResumeAfterDialogCall);
-                                    break;
-                                case "menu_stores":
-                                    //Add call to stores
-                                    context.Wait(InputHandler);
-                                    break;
-                                case "menu_help":
-                                    //Add call to help
-                                    context.Wait(InputHandler);
-                                    break;
-                                case "menu_info":
-                                    var reply = context.MakeMessage();
-                                    reply.Attachments.Add(await getCardAttachment(CardType.INFO_MENU));
-                                    await context.PostAsync(reply);
-                                    context.Wait(InputHandler);
-                                    break;
-                            }
+                            case "menu_session":
+                                //Add call to account
+                                context.Wait(InputHandler);
+                                break;
+                            case "menu_filter":
+                                var next_dialog = new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT);
+                                context.Call(next_dialog, ResumeAfterDialogCall);
+                                break;
+                            case "menu_comparator":
+                                context.Call(new CompareDialog(user, CompareDialog.State.INIT),
+                                    ResumeAfterDialogCall);
+                                break;
+                            case "menu_recommendations":
+                                context.Call(
+                                    new RecommendationDialog(user,RecommendationDialog.State.INIT),
+                                    ResumeAfterDialogCall);
+                                break;
+                            case "menu_wishlist":
+                                context.Call(
+                                    new WishListDialog(user,WishListDialog.State.INIT), 
+                                    ResumeAfterDialogCall);
+                                break;
+                            case "menu_stores":
+                                //Add call to stores
+                                context.Wait(InputHandler);
+                                break;
+                            case "menu_help":
+                                //Add call to help
+                                context.Wait(InputHandler);
+                                break;
+                            case "menu_info":
+                                var reply = context.MakeMessage();
+                                reply.Attachments.Add(await getCardAttachment(CardType.INFO_MENU));
+                                await context.PostAsync(reply);
+                                context.Wait(InputHandler);
+                                break;
                         }
                     }
+                    else
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity));
                 }
+                else
+                    context.Done(new CODE(DIALOG_CODE.DONE));
             }
-
-            if(done_ok)
+            else
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         private async Task ResumeAfterDialogCall(IDialogContext context, IAwaitable<object> result)
         {
             CODE code = await result as CODE;
+            if (code.dialog == DialogType.MENU)
+                await EventHandler(context, code.activity);
             context.Done(code);
         }
     }
