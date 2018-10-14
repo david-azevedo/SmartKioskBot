@@ -1,0 +1,20 @@
+﻿{
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "wrap" : "True",
+            "text": "Caso queira adicionar mais produtos ao comparador faça uma nova filtragem"
+        }
+    ],
+    "actions": [
+      {
+        "type": "Action.Submit",
+        "title": "Comparar",
+        "data": {
+          "reply_type": "compare"
+        }
+      }
+    ],
+    "version": "1.0"
+}

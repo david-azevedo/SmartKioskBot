@@ -16,6 +16,7 @@ using MongoDB.Bson;
 using static SmartKioskBot.Helpers.Constants;
 using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -49,7 +50,7 @@ namespace SmartKioskBot.Dialogs
             {
                 case State.INIT:
                 case State.FILTER_AGAIN:
-                    await GuidedFilterDialog(context, null);
+                    await InitDialog(context, null);
                     break; ;
                 case State.FILTER:
                 case State.FILTER_PREVIOUS:
@@ -65,19 +66,21 @@ namespace SmartKioskBot.Dialogs
             }
         }
 
-        public async Task GuidedFilterDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
+        public async Task InitDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             var reply = context.MakeMessage();
             Attachment att = await getCardAttachment(CardType.FILTER);
             
-            //Fills with the previous choosen filters
+            //Fills the form with the previous choosen filters
             if (state.Equals(State.FILTER_AGAIN))
             {
                 JObject json = att.Content as JObject;
                 SetFilterCardValue(json, filters);
             }
-
+            //reset filters (they will be added again in the filtering process)
             filters = new List<Filter>();
+
+            //send form
             reply.Attachments.Add(att);
             await context.PostAsync(reply);
 
@@ -86,12 +89,12 @@ namespace SmartKioskBot.Dialogs
 
         public async Task FilterAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-
+            // join the retrieved filters with the added ones
+            // in case the user entered the filters manually
             if (this.state.Equals(State.FILTER_PREVIOUS))
             {
                 filters = ContextController.getFilters(user);
 
-                // join the retrieved filters with the added ones
                 foreach (Filter f1 in filters_received)
                 {
                     bool exists = false;
@@ -107,13 +110,13 @@ namespace SmartKioskBot.Dialogs
                 }
             }
             
-
-            // search result
+            // search products based on the last fetch id (inclusive)
+            // search will fetch +1 product to know if pagination is needed
             List<Product> products = ProductController.getProductsFilter(
                 FilterLogic.GetJoinedFilter(filters),
                 Constants.N_ITEMS_CARROUSSEL + 1,
                 last_fetch_id);
-
+            
             if(products.Count > 1)
                 last_fetch_id = products[products.Count - 2].Id;
 
@@ -136,31 +139,33 @@ namespace SmartKioskBot.Dialogs
             await context.PostAsync(text);
 
             bool done = false;
+            List<ButtonType> buttons = new List<ButtonType>();
 
+            //show products
             if (products.Count > 0)
             {
                 //display products 
+                reply = context.MakeMessage();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
-                for (var i = 0; i < products.Count() && i < Constants.N_ITEMS_CARROUSSEL; i++)
+                //limit 
+                for (var i = 0; i < products.Count && i < Constants.N_ITEMS_CARROUSSEL; i++)
                     cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.SEARCH).ToAttachment());
 
                 reply.Attachments = cards;
                 await context.PostAsync(reply);
 
                 //Check if pagination is needed
-                if (products.Count > Constants.N_ITEMS_CARROUSSEL) { 
-                    //pagination card
-                    reply = context.MakeMessage();
-                    reply.Attachments.Add(await getCardAttachment(CardType.PAGINATION));
-                    await context.PostAsync(reply);
-                }
+                if (products.Count > Constants.N_ITEMS_CARROUSSEL)
+                    buttons.Add(ButtonType.PAGINATION);
             }
 
-            //re-filter again
+            buttons.Add(ButtonType.FILTER_AGAIN);
+
+            //show options
             reply = context.MakeMessage();
-            reply.Attachments.Add(await getCardAttachment(CardType.FILTER_AGAIN));
+            reply.Attachments.Add(getCardButtonsAttachment(buttons, DialogType.FILTER));
             await context.PostAsync(reply);
 
             context.Wait(this.InputHandler);
@@ -170,41 +175,59 @@ namespace SmartKioskBot.Dialogs
         {
             var activity = await argument as Activity;
 
+            //close dialog at the end without more processing
+            bool done_ok = true;
+
             //Received a Message
             if (activity.Text != null)
             {
-                if (activity.Text == BotDefaultAnswers.next_pagination)
-                    context.Done(new CODE(DIALOG_CODE.DONE));
-                else
-                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
+                done_ok = false;
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
             }
             //Received an Event
             else if (activity.Value != null)
             {
                 JObject json = activity.Value as JObject;
-                CardType type = getReplyType(json);
+                List<InputData> data = getReplyData(json);
 
-                switch (type)
+                //has the mandatory info
+                if (data.Count >= 2)
                 {
-                    case CardType.PAGINATION:
-                        page++;
-                        await StartAsync(context);
-                        break;
-                    case CardType.FILTER:
-                        this.filters = FilterLogic.GetFilterFromForm(getReplyData(json));
-                        this.state = State.FILTER;
-                        await StartAsync(context);
-                        break;
-                    case CardType.FILTER_AGAIN:
-                        this.state = State.FILTER_AGAIN;
-                        await StartAsync(context);
-                        break;
-                    default:
-                        context.Done(new CODE(DIALOG_CODE.DONE));
-                        break;
+                    //json structure is correct
+                    if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
+                    {
+                        ClickType click = getClickType(data[0].value);
+
+                        if (data[1].value.Equals(getDialogName(DialogType.FILTER)) &&
+                            click != ClickType.NONE)
+                        {
+                            switch (click)
+                            {
+                                case ClickType.PAGINATION:
+                                    page++;
+                                    done_ok = false;
+                                    await StartAsync(context);
+                                    break;
+                                case ClickType.FILTER:
+                                    done_ok = false;
+                                    data.RemoveAt(0);   //remove reply_type
+                                    data.RemoveAt(0);   //remove dialog
+                                    this.filters = FilterLogic.GetFilterFromForm(data);
+                                    this.state = State.FILTER;
+                                    await StartAsync(context);
+                                    break;
+                                case ClickType.FILTER_AGAIN:
+                                    done_ok = false;
+                                    this.state = State.FILTER_AGAIN;
+                                    await StartAsync(context);
+                                    break;
+                            }
+                        }
+                    }
                 }
             }
-            else
+
+            if(done_ok)
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
@@ -228,15 +251,15 @@ namespace SmartKioskBot.Dialogs
                     filtername = e.Type.Remove(0, e.Type.LastIndexOf(":") + 1);
                 else if (e.Type == "memory-type")
                 {
-                    if (e.Entity == "ram") filtername = FilterLogic.ram_filter;
-                    else filtername = FilterLogic.storage_type_filter;
+                    if (e.Entity == "ram") filtername = Constants.ram_filter;
+                    else filtername = Constants.storage_type_filter;
                 }
                 else if (e.Type == "brand")
-                    filtername = FilterLogic.brand_filter;
+                    filtername = Constants.brand_filter;
                 else if (e.Type == "cpu")
-                    filtername = FilterLogic.cpu_family_filter;
+                    filtername = Constants.cpu_family_filter;
                 else if (e.Type == "gpu")
-                    filtername = FilterLogic.gpu_filter;
+                    filtername = Constants.gpu_filter;
 
                 if (filtername != "")
                 {

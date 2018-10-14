@@ -15,11 +15,12 @@ using SmartKioskBot.Dialogs;
 
 namespace SmartKioskBot.Logic
 {
-    public static class Comparator
+    public static class ComparatorLogic
     {
         public enum Parts { CPU, GPU, RAM, Screen, Price };
+        public static int MAX_PRODUCTS_ON_COMPARATOR = 6;
 
-        public static Dictionary<Parts, List<int>> GetBestProduct(List<Product> products)
+        private static Dictionary<Parts, List<int>> GetBestProduct(List<Product> products)
         {
             // The key is the index of the product in the list argument. The value is the number of times a component of the product is 
             // better than the others.
@@ -43,7 +44,7 @@ namespace SmartKioskBot.Logic
             return partToSortedBestProducts;
         }
 
-        public static List<int> GetSortedBestCPUs(List<Product> products)
+        private static List<int> GetSortedBestCPUs(List<Product> products)
         {
             List<Part.CPU> cpus = new List<Part.CPU>();
 
@@ -87,7 +88,7 @@ namespace SmartKioskBot.Logic
             return GetSortedParts(cpus);
         }
 
-        public static List<int> GetSortedBestGPUs(List<Product> products)
+        private static List<int> GetSortedBestGPUs(List<Product> products)
         {
             List<Part.GPU> gpus = new List<Part.GPU>();
 
@@ -111,7 +112,7 @@ namespace SmartKioskBot.Logic
             return GetSortedParts(gpus);
         }
 
-        public static List<int> GetSortedBestRAMs(List<Product> products)
+        private static List<int> GetSortedBestRAMs(List<Product> products)
         {
             List<Part.RAM> rams = new List<Part.RAM>();
 
@@ -128,7 +129,7 @@ namespace SmartKioskBot.Logic
             return GetSortedParts(rams);
         }
 
-        public static List<int> GetSortedBestScreens(List<Product> products)
+        private static List<int> GetSortedBestScreens(List<Product> products)
         {
             List<Part.Screen> screens = new List<Part.Screen>();
 
@@ -185,7 +186,8 @@ namespace SmartKioskBot.Logic
 
             return GetSortedParts(prices);
         }
-        public static List<int> GetSortedParts<T>(List<T> comparables) where T : Part
+
+        private static List<int> GetSortedParts<T>(List<T> comparables) where T : Part
         {
             Dictionary<T, int> partToIndexOfProduct = new Dictionary<T, int>();
 
@@ -211,7 +213,7 @@ namespace SmartKioskBot.Logic
 
         public static void ShowProductComparison(IDialogContext context, List<Product> productsToCompare)
         {
-            Dictionary<Comparator.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare); //TODO VERIFICAR RESULTS
+            Dictionary<ComparatorLogic.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare); //TODO VERIFICAR RESULTS
 
 
             //size of products to show on result(top 3 if >3)
@@ -223,7 +225,7 @@ namespace SmartKioskBot.Logic
             var reply = context.MakeMessage();
 
             //Sends a reply for each specification compared and shows the products(best ones first)
-            foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
+            foreach (KeyValuePair<ComparatorLogic.Parts, List<int>> entry in comparisonResults)
             {
                 reply = context.MakeMessage();
                 reply.Text = "### " + BotDefaultAnswers.getComparator(entry.Key.ToString()) + "  \n";
@@ -242,12 +244,12 @@ namespace SmartKioskBot.Logic
             var bestInPart = new Product();
             var product = new Product();
             //calculate score for each product
-            foreach (KeyValuePair<Comparator.Parts, List<int>> entry in comparisonResults)
+            foreach (KeyValuePair<ComparatorLogic.Parts, List<int>> entry in comparisonResults)
             {
                 for (int i = 0; i < productsToCompare.Count; i++)
                 {
                     //RAM
-                    if (entry.Key == Comparator.Parts.RAM)
+                    if (entry.Key == ComparatorLogic.Parts.RAM)
                     {
                         product = productsToCompare[entry.Value[i]];
                         if (i == 0)
@@ -258,7 +260,7 @@ namespace SmartKioskBot.Logic
                         overallBest[entry.Value[i]] += (double)(product.RAM * 0.15 / bestInPart.RAM);
                     }
                     //PRICE
-                    else if (entry.Key == Comparator.Parts.Price)
+                    else if (entry.Key == ComparatorLogic.Parts.Price)
                     {
                         product = productsToCompare[entry.Value[i]];
                         if (i == 0)
@@ -268,17 +270,17 @@ namespace SmartKioskBot.Logic
                             overallBest[entry.Value[i]] += (double)(1-(Math.Abs(bestInPart.Price - product.Price) * 0.3 / bestInPart.Price));
                     }
                     //GPU
-                    else if (entry.Key == Comparator.Parts.GPU)
+                    else if (entry.Key == ComparatorLogic.Parts.GPU)
                     {
                         overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.2);
                     }
                     //CPU
-                    else if (entry.Key == Comparator.Parts.CPU)
+                    else if (entry.Key == ComparatorLogic.Parts.CPU)
                     {
                         overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.25);
                     }
                     //SCREEN
-                    else if (entry.Key == Comparator.Parts.Screen)
+                    else if (entry.Key == ComparatorLogic.Parts.Screen)
                     {
                         overallBest[entry.Value[i]] += (double)((productsToCompare.Count - i) * 0.1);
                     }
