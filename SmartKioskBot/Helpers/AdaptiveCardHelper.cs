@@ -16,7 +16,14 @@ namespace SmartKioskBot.Helpers
     {
         public static string CARDS_PATH = HostingEnvironment.MapPath(@"~/UI");
 
-        public enum CardType {PAGINATION, FILTER, FILTER_AGAIN, NONE};
+        public enum CardType {
+            PAGINATION,
+            FILTER,
+            FILTER_AGAIN,
+            NONE,
+            MENU,
+            INFO_MENU
+        };
 
         private static string getCardFileName(CardType type)
         {
@@ -27,6 +34,10 @@ namespace SmartKioskBot.Helpers
                     return "FilterCard";
                 case CardType.FILTER_AGAIN:
                     return "FilterAgainCard";
+                case CardType.MENU:
+                    return "MenuCard";
+                case CardType.INFO_MENU:
+                    return "InfoMenuCard";
             }
             return "";
         }
@@ -45,7 +56,7 @@ namespace SmartKioskBot.Helpers
             return att;
         }
 
-        public static CardType getReplyType(JObject json)
+        public static CardType getCardTypeReply(JObject json)
         {
             JProperty prop = json.First as JProperty;
             InputData type = new InputData(prop);
@@ -60,6 +71,15 @@ namespace SmartKioskBot.Helpers
                         return CardType.FILTER;
                     case "filter_again":
                         return CardType.FILTER_AGAIN;
+                    case "menu_session":
+                    case "menu_filter":
+                    case "menu_comparator":
+                    case "menu_recommendations":
+                    case "menu_wishlist":
+                    case "menu_stores":
+                    case "menu_help":
+                    case "menu_info":
+                        return CardType.MENU;
                 }
             }
             return CardType.NONE;
@@ -139,6 +159,10 @@ namespace SmartKioskBot.Helpers
             }
         }
 
+        /*
+         *  CARD SPECIFIC
+         */
+         
         private static List<JToken> GetFilterCardSection(JToken card, string section)
         {
             List<JToken> fields = new List<JToken>();

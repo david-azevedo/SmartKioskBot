@@ -90,11 +90,11 @@ namespace SmartKioskBot.Dialogs
                 await context.PostAsync(reply);
                 
 
-                context.Wait(this.PaginationHandler);
+                context.Wait(this.InputHandler);
             }
         }
 
-        public async Task PaginationHandler(IDialogContext context, IAwaitable<IMessageActivity> argument)
+        public async Task InputHandler(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             var activity = await argument as Activity;
 
@@ -108,7 +108,7 @@ namespace SmartKioskBot.Dialogs
             else if (activity.Value != null)
             {
                 JObject json = activity.Value as JObject;
-                CardType type = getReplyType(json);
+                CardType type = getCardTypeReply(json);
 
                 switch (type)
                 {

@@ -182,7 +182,7 @@ namespace SmartKioskBot.Dialogs
             else if (activity.Value != null)
             {
                 JObject json = activity.Value as JObject;
-                CardType type = getReplyType(json);
+                CardType type = getCardTypeReply(json);
 
                 switch (type)
                 {

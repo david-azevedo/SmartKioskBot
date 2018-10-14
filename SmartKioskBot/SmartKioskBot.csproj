@@ -210,6 +210,7 @@
     <Compile Include="Controllers\StoreController.cs" />
     <Compile Include="Controllers\CRMController.cs" />
     <Compile Include="Dialogs\AddProductDialog.cs" />
+    <Compile Include="Dialogs\MenuDialog.cs" />
     <Compile Include="Helpers\BotDefaultAnswers.cs" />
     <Compile Include="Dialogs\ClosestStoresDialog.cs" />
     <Compile Include="Dialogs\CompareDialog.cs" />
@@ -261,6 +262,12 @@
     </Content>
     <Content Include="UI\PaginationCard.JSON" />
     <Content Include="UI\FilterAgainCard.JSON">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\MenuCard.JSON">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\InfoMenuCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Web.Debug.config">

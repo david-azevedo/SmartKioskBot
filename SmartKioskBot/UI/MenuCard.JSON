@@ -1,0 +1,303 @@
+﻿{
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "horizontalAlignment": "Center",
+            "spacing": "Large",
+            "separator": true,
+            "size": "Medium",
+            "weight": "Bolder",
+            "color": "Accent",
+            "text": "Menu Principal"
+        },
+        {
+            "type": "Container",
+            "spacing": "Medium",
+            "items": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": 1
+                        },
+                        {
+                            "type": "Column",
+                            "horizontalAlignment": "Center",
+                            "selectAction": {
+                                "type": "Action.Submit",
+                                "title": "Session",
+                                "data": {
+                                    "reply_type": "menu_session"
+                                }
+                            },
+                            "style": "emphasis",
+                            "verticalContentAlignment": "Center",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "horizontalAlignment": "Center",
+                                    "height": "stretch",
+                                    "text": "Sessão"
+                                }
+                            ],
+                            "width": "200px"
+                        },
+                        {
+                            "type": "Column",
+                            "width": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": 1
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "height": "stretch",
+                    "selectAction": {
+                        "type": "Action.Submit",
+                        "title": "Filter",
+                        "data": {
+                            "reply_type": "menu_filter"
+                        }
+                    },
+                    "style": "emphasis",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "text": "Procurar"
+                        }
+                    ],
+                    "width": "200px"
+                },
+                {
+                    "type": "Column",
+                    "width": 1
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": 1
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "selectAction": {
+                        "type": "Action.Submit",
+                        "title": "Compare",
+                        "data": {
+                            "reply_type": "menu_comparator"
+                        }
+                    },
+                    "style": "emphasis",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "text": "Comparador"
+                        }
+                    ],
+                    "width": "200px"
+                },
+                {
+                    "type": "Column",
+                    "width": 1
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": 1
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "selectAction": {
+                        "type": "Action.Submit",
+                        "title": "Wishlist",
+                        "data": {
+                            "reply_type": "menu_wishlist"
+                        }
+                    },
+                    "style": "emphasis",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "text": "Favoritos"
+                        }
+                    ],
+                    "width": "200px"
+                },
+                {
+                    "type": "Column",
+                    "width": 1
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": 1
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "selectAction": {
+                        "type": "Action.Submit",
+                        "title": "Recommendation",
+                        "data": {
+                            "reply_type": "menu_recommendations"
+                        }
+                    },
+                    "style": "emphasis",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "text": "Recomendações"
+                        }
+                    ],
+                    "width": "200px"
+                },
+                {
+                    "type": "Column",
+                    "width": 1
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": 1
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "selectAction": {
+                        "type": "Action.Submit",
+                        "title": "Lojas",
+                        "data": {
+                            "reply_type": "menu_stores"
+                        }
+                    },
+                    "style": "emphasis",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "text": "Loja"
+                        }
+                    ],
+                    "width": "200px"
+                },
+                {
+                    "type": "Column",
+                    "width": 1
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": 1
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "selectAction": {
+                        "type": "Action.Submit",
+                        "title": "Help",
+                        "data": {
+                            "reply_type": "menu_help"
+                        }
+                    },
+                    "style": "emphasis",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "text": "Ajuda"
+                        }
+                    ],
+                    "width": "200px"
+                },
+                {
+                    "type": "Column",
+                    "width": 1
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "spacing": "Medium",
+            "items": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "stretch"
+                        },
+                        {
+                            "type": "Column",
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "horizontalAlignment": "Center",
+                                    "url": "http://www.free-icons-download.net/images/info-logo-icon-95232.png",
+                                    "size": "Small",
+                                    "width": "25px",
+                                    "height": "25px"
+                                }
+                            ],
+                          "width": "stretch",
+                          "selectAction": {
+                                "type": "Action.Submit",
+                                "title": "Info",
+                                "data": {
+                                    "reply_type": "menu_info"
+                                }
+                            }
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
+}
