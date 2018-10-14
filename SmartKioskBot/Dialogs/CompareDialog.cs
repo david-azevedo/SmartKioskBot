@@ -35,7 +35,8 @@ namespace SmartKioskBot.Dialogs
 
         public async Task InitAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-            
+            List<ButtonType> buttons = new List<ButtonType>();
+
             // fetch products
             products = new List<Product>();
             var itemsToCompare = ContextController.GetContext(this.user.Id).Comparator;
@@ -43,8 +44,6 @@ namespace SmartKioskBot.Dialogs
             foreach (ObjectId o in itemsToCompare)
                 products.Add(ProductController.getProduct(o.ToString()));
 
-
-            List<ButtonType> buttons = new List<ButtonType>();
             var reply = context.MakeMessage();
 
             if (products.Count > 0)
@@ -66,11 +65,14 @@ namespace SmartKioskBot.Dialogs
                 //Check if pagination is needed
                 if (products.Count > Constants.N_ITEMS_CARROUSSEL)
                     buttons.Add(ButtonType.PAGINATION);
-            } else
+            }
+            else
+            {
                 await context.PostAsync("Não tem produtos para comparar.");
+                buttons.Add(ButtonType.COMPARE);
+            }
 
             buttons.Add(ButtonType.ADD_PRODUCT);
-            buttons.Add(ButtonType.COMPARE);
 
             //show options
             reply = context.MakeMessage();

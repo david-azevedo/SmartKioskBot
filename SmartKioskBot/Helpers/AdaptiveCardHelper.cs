@@ -16,9 +16,16 @@ namespace SmartKioskBot.Helpers
     {
         public static string CARDS_PATH = HostingEnvironment.MapPath(@"~/UI");
 
-        public enum CardType {FILTER, NONE};
+        public enum CardType {FILTER, MENU, INFO_MENU, NONE};
         public enum ButtonType { PAGINATION, FILTER_AGAIN, ADD_PRODUCT, COMPARE};
-        public enum ClickType {FILTER, PAGINATION, FILTER_AGAIN, ADD_PRODUCT, COMPARE, NONE};
+        public enum ClickType {
+            MENU,
+            FILTER,
+            PAGINATION,
+            FILTER_AGAIN,
+            ADD_PRODUCT,
+            COMPARE,
+            NONE };
 
         public static string REPLY_ATR = "reply_type";
         public static string DIALOG_ATR = "dialog";
@@ -94,6 +101,10 @@ namespace SmartKioskBot.Helpers
             switch(type){
                 case CardType.FILTER:
                     return "FilterCard";
+                case CardType.MENU:
+                    return "MenuCard";
+                case CardType.INFO_MENU:
+                    return "InfoMenuCard";
             }
             return "";
         }
@@ -112,6 +123,15 @@ namespace SmartKioskBot.Helpers
                     return ClickType.COMPARE;
                 case "filter":
                     return ClickType.FILTER;
+                case "menu_session":
+                case "menu_filter":
+                case "menu_comparator":
+                case "menu_recommendations":
+                case "menu_wishlist":
+                case "menu_stores":
+                case "menu_help":
+                case "menu_info":
+                    return ClickType.MENU;
             }
 
             return ClickType.NONE;

@@ -38,9 +38,11 @@ namespace SmartKioskBot.Dialogs
         //SHOW WISHES
         public async Task ShowWishesAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-
             //Retrive wishes information
             var to_retrieve = wishes;
+
+            //options
+            List<ButtonType> buttons = new List<ButtonType>();
 
             //fetch only a limited number of wishes
             if (wishes.Length > Constants.N_ITEMS_CARROUSSEL)
@@ -68,9 +70,7 @@ namespace SmartKioskBot.Dialogs
             {
                 text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS,skip/Constants.N_ITEMS_CARROUSSEL + 1);
                 await context.PostAsync(text);
-
-                List<ButtonType> buttons = new List<ButtonType>();
-
+                
                 //display products 
                 reply = context.MakeMessage();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
@@ -89,17 +89,17 @@ namespace SmartKioskBot.Dialogs
                     buttons.Add(ButtonType.PAGINATION);
                     skip += skip + Constants.N_ITEMS_CARROUSSEL;
                 }
-
-                //add option add more products
-                buttons.Add(ButtonType.ADD_PRODUCT);
-
-                //show options
-                reply = context.MakeMessage();
-                reply.Attachments.Add(getCardButtonsAttachment(buttons, DialogType.WISHLIST));
-                await context.PostAsync(reply);
-
-                context.Wait(this.InputHandler);
             }
+
+            //add option add more products
+            buttons.Add(ButtonType.ADD_PRODUCT);
+
+            //show options
+            reply = context.MakeMessage();
+            reply.Attachments.Add(getCardButtonsAttachment(buttons, DialogType.WISHLIST));
+            await context.PostAsync(reply);
+
+            context.Wait(this.InputHandler);
         }
         
         private async Task InputHandler(IDialogContext context, IAwaitable<IMessageActivity> argument)

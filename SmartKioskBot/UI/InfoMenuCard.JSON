@@ -1,0 +1,293 @@
+﻿{
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "id": "title",
+                    "horizontalAlignment": "Center",
+                    "separator": true,
+                    "size": "Medium",
+                    "weight": "Bolder",
+                    "color": "Accent",
+                    "text": "Informação"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "info",
+                    "horizontalAlignment": "Center",
+                    "spacing": "Medium",
+                    "separator": true,
+                    "text": "O menu principal permite o acesso de forma fácil e intuitiva às diversas funcionalidades que tenho para oferecer.",
+                    "wrap": true
+                },
+                {
+                    "type": "ColumnSet",
+                    "spacing": "Medium",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "horizontalAlignment": "Center",
+                            "separator": true,
+                            "style": "emphasis",
+                            "verticalContentAlignment": "Center",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "horizontalAlignment": "Center",
+                                    "weight": "Bolder",
+                                    "text": "Opção"
+                                }
+                            ],
+                            "width": 10
+                        },
+                        {
+                            "type": "Column",
+                            "horizontalAlignment": "Center",
+                            "separator": true,
+                            "style": "emphasis",
+                            "verticalContentAlignment": "Center",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "horizontalAlignment": "Center",
+                                    "spacing": "None",
+                                    "weight": "Bolder",
+                                    "text": "Funcionalidade"
+                                }
+                            ],
+                          "width": 20
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "separator": true,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "weight": "Bolder",
+                            "text": "Sessão"
+                        }
+                    ],
+                    "width": 10
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "separator": true,
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Aceder a informação sobre o utilizador.",
+                            "wrap": true
+                        }
+                    ],
+                    "width": 20
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "separator": true,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "weight": "Bolder",
+                            "text": "Procurar"
+                        }
+                    ],
+                    "width": 10
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Procurar produtos conforme as especificações do utilizador.",
+                            "wrap": true
+                        }
+                    ],
+                    "width": 20
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "separator": true,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "weight": "Bolder",
+                            "text": "Comparador"
+                        }
+                    ],
+                    "width": 10
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Comparar produtos conforme as informações em benchmarkings.",
+                            "wrap": true
+                        }
+                    ],
+                    "width": 20
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "separator": true,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "weight": "Bolder",
+                            "text": "Favoritos"
+                        }
+                    ],
+                    "width": 10
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Aceder aos produtos marcados como favoritos.",
+                            "wrap": true
+                        }
+                    ],
+                    "width": 20
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "separator": true,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "weight": "Bolder",
+                            "text": "Recomendações"
+                        }
+                    ],
+                    "width": 10
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Receber recomendações sobre produtos.",
+                            "wrap": true
+                        }
+                    ],
+                    "width": 20
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "separator": true,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "weight": "Bolder",
+                            "text": "Lojas"
+                        }
+                    ],
+                    "width": 10
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Encontrar as lojas mais próximas e aceder a informação sobre as mesmas.",
+                            "wrap": true
+                        }
+                    ],
+                    "width": 20
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "separator": true,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "horizontalAlignment": "Center",
+                            "weight": "Bolder",
+                            "text": "Ajuda"
+                        }
+                    ],
+                    "width": 10
+                },
+                {
+                    "type": "Column",
+                    "horizontalAlignment": "Center",
+                    "verticalContentAlignment": "Center",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Tutoriais em como usufruir melhor das funcionalidades disponibilizadas.",
+                            "wrap": true
+                        }
+                    ],
+                    "width": 20
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "spacing": "Medium"
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
+}

@@ -51,13 +51,8 @@ namespace SmartKioskBot.Dialogs
             //var tmp = result;
             //await Helpers.BotTranslator.PostTranslated(context, tmp.ToString(), context.MakeMessage().Locale);
 
-            if (result != null)
-            {
-                CODE code = await result as CODE;
-                context.Done(code);
-            }
-            else
-                context.Done(new CODE(DIALOG_CODE.DONE));
+            CODE code = await result as CODE;
+            context.Done(code);
         }
 
         [LuisIntent("")]
@@ -83,12 +78,14 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("Greeting")]
         public async Task Greeting(IDialogContext context, LuisResult result)
         {
+            //just for test
             FilterIntentScore(context, result);
+            context.Call(new MenuDialog(user), ResumeAfterDialogueCall);
             
-            var reply = context.MakeMessage();
+           /* var reply = context.MakeMessage();
             reply.Text = BotDefaultAnswers.getGreeting(context.Activity.From.Name);
             await Helpers.BotTranslator.PostTranslated(context, reply, reply.Locale);
-            context.Done(new CODE(DIALOG_CODE.DONE));
+            context.Done(new CODE(DIALOG_CODE.DONE));*/
         }
 
         /*
@@ -99,7 +96,6 @@ namespace SmartKioskBot.Dialogs
         public async Task ViewWishList(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result)
         {
             FilterIntentScore(context, result);
-
             context.Call(new WishListDialog(user),ResumeAfterDialogueCall);
         }
 
@@ -256,15 +252,8 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("Recommendation")]
         public async Task Recommendation(IDialogContext context, LuisResult result)
         {
-            try
-            {
-                FilterIntentScore(context, result);
-                context.Call(new RecommendationDialog(user), ResumeAfterDialogueCall);
-            }
-            catch(Exception e)
-            {
-                Debug.WriteLine(e.ToString());
-            }
+            FilterIntentScore(context, result);
+            context.Call(new RecommendationDialog(user), ResumeAfterDialogueCall);
         }
     }
 }
