@@ -96,7 +96,6 @@ namespace SmartKioskBot.Dialogs
         public async Task ViewWishList(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result)
         {
             FilterIntentScore(context, result);
-
             context.Call(new WishListDialog(user),ResumeAfterDialogueCall);
         }
 
@@ -131,7 +130,7 @@ namespace SmartKioskBot.Dialogs
         {
             FilterIntentScore(context, result);
 
-            await CompareDialog.AddComparator(context, result.Query);
+            await CompareDialog.AddComparator(context, result.Query,user);
 
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
@@ -141,7 +140,7 @@ namespace SmartKioskBot.Dialogs
         {
             FilterIntentScore(context, result);
 
-            await CompareDialog.RmvComparator(context, result.Query);
+            await CompareDialog.RmvComparator(context, result.Query,user);
 
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
@@ -150,10 +149,7 @@ namespace SmartKioskBot.Dialogs
         public async Task ViewComparator(IDialogContext context, LuisResult result)
         {
             FilterIntentScore(context, result);
-
-            await CompareDialog.ViewComparator(context);
-
-            context.Done(new CODE(DIALOG_CODE.DONE));
+            context.Call(new CompareDialog(user), ResumeAfterDialogueCall);
         }
 
 
@@ -256,15 +252,8 @@ namespace SmartKioskBot.Dialogs
         [LuisIntent("Recommendation")]
         public async Task Recommendation(IDialogContext context, LuisResult result)
         {
-            try
-            {
-                FilterIntentScore(context, result);
-                context.Call(new RecommendationDialog(user), ResumeAfterDialogueCall);
-            }
-            catch(Exception e)
-            {
-                Debug.WriteLine(e.ToString());
-            }
+            FilterIntentScore(context, result);
+            context.Call(new RecommendationDialog(user), ResumeAfterDialogueCall);
         }
     }
 }

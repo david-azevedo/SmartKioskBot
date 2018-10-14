@@ -34,7 +34,7 @@ namespace SmartKioskBot.Dialogs
 
             //Default
             if (filtersApplied == null || filtersApplied.Count == 0)
-                this.filtersApplied.Add(FilterLogic.DEFAULT_RECOMMENDATION_FILTER);
+                this.filtersApplied.Add(RecommendationsLogic.DEFAULT_RECOMMENDATION);
         }
 
         public async Task StartAsync(IDialogContext context)
@@ -71,9 +71,7 @@ namespace SmartKioskBot.Dialogs
             List<Attachment> cards = new List<Attachment>();
 
             for (int i = 0; i < products.Count && i < Constants.N_ITEMS_CARROUSSEL; i++)
-            {
                 cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.RECOMMENDATION).ToAttachment());
-            }
 
             reply.Attachments = cards;
             
@@ -86,7 +84,8 @@ namespace SmartKioskBot.Dialogs
             {
                 reply = context.MakeMessage();
                 
-                reply.Attachments.Add(await getCardAttachment(CardType.PAGINATION));
+                reply.Attachments.Add(
+                    getCardButtonsAttachment(new List<ButtonType> { ButtonType.PAGINATION },DialogType.RECOMMENDATION));
                 await context.PostAsync(reply);
                 
 
@@ -98,32 +97,46 @@ namespace SmartKioskBot.Dialogs
         {
             var activity = await argument as Activity;
 
+            //close dialog at the end without more processing
+            bool done_ok = true;
+
             if (activity.Text != null)
             {
-                if (activity.Text == BotDefaultAnswers.next_pagination)
-                    context.Done(new CODE(DIALOG_CODE.DONE));
-                else
-                    context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
+                done_ok = false;
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
             }
             else if (activity.Value != null)
             {
                 JObject json = activity.Value as JObject;
-                CardType type = getCardTypeReply(json);
+                List<InputData> data = getReplyData(json);
 
-                switch (type)
+                //have mandatory info
+                if (data.Count >= 2)
                 {
-                    case CardType.PAGINATION:
+                    //json structure is correct
+                    if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
+                    {
+                        ClickType click = getClickType(data[0].value);
+
+                        if (data[1].value.Equals(getDialogName(DialogType.RECOMMENDATION)) &&
+                            click != ClickType.NONE)
                         {
-                            page++;
-                            await ShowRecommendations(context,null);
-                            break;
+                            switch (click)
+                            {
+                                case ClickType.PAGINATION:
+                                    {
+                                        done_ok = false;
+                                        page++;
+                                        await ShowRecommendations(context, null);
+                                        break;
+                                    }
+                            }
                         }
-                    default:
-                        context.Done(new CODE(DIALOG_CODE.DONE));
-                        break;
+                    }
                 }
             }
-            else
+
+            if(done_ok)
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 

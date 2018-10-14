@@ -29,7 +29,8 @@
                                 "type": "Action.Submit",
                                 "title": "Session",
                                 "data": {
-                                    "reply_type": "menu_session"
+                                  "reply_type": "menu_session",
+                                    "dialog": "menu"
                                 }
                             },
                             "style": "emphasis",
@@ -67,7 +68,8 @@
                         "type": "Action.Submit",
                         "title": "Filter",
                         "data": {
-                            "reply_type": "menu_filter"
+                            "reply_type": "menu_filter",
+                                    "dialog": "menu"
                         }
                     },
                     "style": "emphasis",
@@ -101,7 +103,8 @@
                         "type": "Action.Submit",
                         "title": "Compare",
                         "data": {
-                            "reply_type": "menu_comparator"
+                            "reply_type": "menu_comparator",
+                                    "dialog": "menu"
                         }
                     },
                     "style": "emphasis",
@@ -135,7 +138,8 @@
                         "type": "Action.Submit",
                         "title": "Wishlist",
                         "data": {
-                            "reply_type": "menu_wishlist"
+                            "reply_type": "menu_wishlist",
+                                    "dialog": "menu"
                         }
                     },
                     "style": "emphasis",
@@ -169,7 +173,8 @@
                         "type": "Action.Submit",
                         "title": "Recommendation",
                         "data": {
-                            "reply_type": "menu_recommendations"
+                            "reply_type": "menu_recommendations",
+                                    "dialog": "menu"
                         }
                     },
                     "style": "emphasis",
@@ -203,7 +208,8 @@
                         "type": "Action.Submit",
                         "title": "Lojas",
                         "data": {
-                            "reply_type": "menu_stores"
+                            "reply_type": "menu_stores",
+                                    "dialog": "menu"
                         }
                     },
                     "style": "emphasis",
@@ -237,7 +243,8 @@
                         "type": "Action.Submit",
                         "title": "Help",
                         "data": {
-                            "reply_type": "menu_help"
+                            "reply_type": "menu_help",
+                                    "dialog": "menu"
                         }
                     },
                     "style": "emphasis",
@@ -285,7 +292,8 @@
                                 "type": "Action.Submit",
                                 "title": "Info",
                                 "data": {
-                                    "reply_type": "menu_info"
+                                  "reply_type": "menu_info",
+                                  "dialog" :  "menu"
                                 }
                             }
                         },

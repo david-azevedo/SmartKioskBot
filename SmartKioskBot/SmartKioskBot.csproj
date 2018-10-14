@@ -232,10 +232,10 @@
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\DbSingleton.cs" />
     <Compile Include="Helpers\FileAsync.cs" />
-    <Compile Include="Logic\Comparator.cs" />
+    <Compile Include="Logic\ComparatorLogic.cs" />
     <Compile Include="Logic\FilterLogic.cs" />
     <Compile Include="Logic\Part.cs" />
-    <Compile Include="Logic\Recommendations.cs" />
+    <Compile Include="Logic\RecommendationsLogic.cs" />
     <Compile Include="Models\Context.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\Product.cs" />
@@ -260,14 +260,10 @@
     <Content Include="UI\FilterCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="UI\PaginationCard.JSON" />
-    <Content Include="UI\FilterAgainCard.JSON">
+    <Content Include="UI\InfoMenuCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="UI\MenuCard.JSON">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="UI\InfoMenuCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Web.Debug.config">
