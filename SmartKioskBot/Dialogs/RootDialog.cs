@@ -8,6 +8,8 @@ using Microsoft.Bot.Connector;
 using static SmartKioskBot.Helpers.Constants;
 using SmartKioskBot.Models;
 using SmartKioskBot.Controllers;
+using static SmartKioskBot.Helpers.AdaptiveCardHelper;
+using Newtonsoft.Json.Linq;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -20,42 +22,95 @@ namespace SmartKioskBot.Dialogs
         public async Task StartAsync(IDialogContext context)
         {
             TryIdentification(context);
-            context.Wait(ProcessMessage);
+            context.Wait(InputHandler);
         }
 
-        private async Task ProcessMessage(IDialogContext context, IAwaitable<IMessageActivity> result)
+        private async Task InputHandler(IDialogContext context, IAwaitable<object> result)
         {
-            var activity = await result;
-            await context.Forward(new LuisProcessingDialog(user), ResumeAfterDialog, activity);
+            var activity = await result as Activity;
+
+            //message
+            if (activity.Text != null)
+                await MessageHandler(context, activity);
+            //event
+            else if (activity.Value != null)
+            {
+                JObject json = activity.Value as JObject;
+                List<InputData> data = getReplyData(json);
+
+                if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
+                    await EventHandler(context, getDialogType(data[1].value), activity);
+                else
+                    context.Wait(InputHandler);
+            }
         }
 
-        private async Task ResumeAfterDialog(IDialogContext context, IAwaitable<object> result)
+        private async Task MessageHandler(IDialogContext context, Activity activity)
+        {
+            await context.Forward(new LuisProcessingDialog(user), ResumeAfterDialogCall, activity);
+        }
+
+        private async Task EventHandler(IDialogContext context, DialogType dialog, Activity message)
+        {
+            switch (dialog)
+            {
+                case DialogType.ACCOUNT:
+                    //TODO: call dialog
+                    break;
+                case DialogType.COMPARE:
+                    await context.Forward(
+                        new CompareDialog(user, CompareDialog.State.INPUT_HANDLER),
+                        ResumeAfterDialogCall, message);
+                    break;
+                case DialogType.FILTER:
+                    await context.Forward(
+                        new FilterDialog(user, new List<Context.Filter>(), FilterDialog.State.INPUT_HANDLER),
+                        ResumeAfterDialogCall, message);
+                    break;
+                case DialogType.MENU:
+                    await context.Forward(
+                        new MenuDialog(user,MenuDialog.State.INPUT_HANDLE), 
+                        ResumeAfterDialogCall, message);
+                    break;
+                case DialogType.RECOMMENDATION:
+                    await context.Forward(
+                        new RecommendationDialog(
+                            user,RecommendationDialog.State.INPUT_HANDLE), 
+                        ResumeAfterDialogCall, message);
+                    break;
+                case DialogType.STORE:
+                    //TODO: call store dialog
+                    break;
+                case DialogType.TUTORIAL:
+                    //TODO: calldialog
+                    break;
+                case DialogType.WISHLIST:
+                    await context.Forward(
+                        new WishListDialog(user,WishListDialog.State.INPUT_HANDLER), 
+                        ResumeAfterDialogCall, message);
+                    break;
+            }
+        }
+
+        private async Task ResumeAfterDialogCall(IDialogContext context, IAwaitable<object> result)
         {
             if (result != null)
             {
+                //code from child parent
                 var c = await result as CODE;
 
-                //handle child dialog response
-                switch (c.value)
-                {
-                    case DIALOG_CODE.PROCESS_LUIS:
-                        await context.Forward(new LuisProcessingDialog(user), ResumeAfterDialogInterrupt, c.message);
-                        break;
-                    case DIALOG_CODE.DONE:
-                        context.Wait(ProcessMessage);
-                        break;
-                }
+                //dialog ended
+                if (c.code == DIALOG_CODE.DONE)
+                    context.Wait(InputHandler);
+                //message to handle
+                else if (c.dialog == DialogType.NONE)
+                    await MessageHandler(context, c.activity);
+                //event handle
+                else
+                    await EventHandler(context, c.dialog, c.activity);
             }
             else
-            {
-                context.Wait(ProcessMessage);
-            }
-        }
-
-        private async Task ResumeAfterDialogInterrupt(IDialogContext context, IAwaitable<object> result)
-        {
-            var activity = await result;
-            context.Wait(ProcessMessage);
+                context.Wait(InputHandler);
         }
 
         private void TryIdentification(IDialogContext context)
@@ -80,7 +135,7 @@ namespace SmartKioskBot.Dialogs
         private async Task ResumeAfterIdent(IDialogContext context, IAwaitable<object> result)
         {
             this.user = UserController.getUser(context.Activity.ChannelId);
-            context.Wait(ProcessMessage);
+            context.Wait(InputHandler);
         }
 
     }

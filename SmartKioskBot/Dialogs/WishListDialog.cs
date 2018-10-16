@@ -23,21 +23,33 @@ namespace SmartKioskBot.Dialogs
         private ObjectId[] wishes;
         private int skip = 0;
         private User user = null;
+        private State state;
 
-        public WishListDialog(User user)
+        public enum State { INIT, INPUT_HANDLER };
+
+        public WishListDialog(User user, State state)
         {
             this.user = user;
-            this.wishes = ContextController.GetContext(user.Id).WishList;
+            this.state = state;
         }
 
         public async Task StartAsync(IDialogContext context)
         {
-            await ShowWishesAsync(context, null);
+            switch (state)
+            {
+                case State.INIT:
+                    await ShowWishesAsync(context, null);
+                    break;
+                case State.INPUT_HANDLER:
+                    context.Wait(InputHandler);
+                    break;
+            }
         }
 
-        //SHOW WISHES
         public async Task ShowWishesAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
+            this.wishes = ContextController.GetContext(user.Id).WishList;
+
             //Retrive wishes information
             var to_retrieve = wishes;
 
@@ -105,57 +117,61 @@ namespace SmartKioskBot.Dialogs
         {
             var activity = await argument as Activity;
 
-            //close dialog at the end without more processing
-            bool done_ok = true;
-
             //received message
-            if(activity.Text != null)
-            {
-                done_ok = false;
-                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
-            }
+            if (activity.Text != null)
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity));
             //received event
             else if (activity.Value != null)
+                await EventHandler(context, activity);
+            else
+                context.Done(new CODE(DIALOG_CODE.DONE));
+        }
+
+        private async Task EventHandler(IDialogContext context, Activity activity)
+        {
+
+            JObject json = activity.Value as JObject;
+            List<InputData> data = getReplyData(json);
+
+            //have mandatory info
+            if (data.Count >= 2)
             {
-                
-                JObject json = activity.Value as JObject;
-                List<InputData> data = getReplyData(json);
-
-                //have mandatory info
-                if(data.Count >= 2)
+                //json structure is correct
+                if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
                 {
-                    //json structure is correct
-                    if(data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
-                    {
-                        ClickType click = getClickType(data[0].value);
+                    ClickType click = getClickType(data[0].value);
 
-                        if (data[1].value.Equals(getDialogName(DialogType.WISHLIST)) &&
-                            click != ClickType.NONE)
+                    //process in this dialog
+                    if (data[1].value.Equals(getDialogName(DialogType.WISHLIST)) &&
+                        click != ClickType.NONE)
+                    {
+                        switch (click)
                         {
-                            switch (click)
-                            {
-                                case ClickType.PAGINATION:
-                                    await StartAsync(context);
-                                    done_ok = false;
-                                    break;
-                                case ClickType.ADD_PRODUCT:
-                                    var dialog = new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT);
-                                    context.Call(dialog, ResumeAfterDialogCall);
-                                    done_ok = false;
-                                    break;
-                            }
+                            case ClickType.PAGINATION:
+                                await StartAsync(context);
+                                break;
+                            case ClickType.ADD_PRODUCT:
+                                var dialog = new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT);
+                                context.Call(dialog, ResumeAfterDialogCall);
+                                break;
                         }
                     }
+                    //process in parent dialog
+                    else
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity));
                 }
+                else
+                    context.Done(new CODE(DIALOG_CODE.DONE));
             }
-
-            if(done_ok)
+            else
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         private async Task ResumeAfterDialogCall(IDialogContext context, IAwaitable<object> result)
         {
             CODE code = await result as CODE;
+            if (code.dialog == DialogType.WISHLIST)
+                await EventHandler(context, code.activity);
             context.Done(code);
         }
 

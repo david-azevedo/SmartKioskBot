@@ -30,7 +30,14 @@ namespace SmartKioskBot.Dialogs
         private int page = 1;
         private State state;
 
-        public enum State { INIT, FILTER_PREVIOUS, FILTER, FILTER_AGAIN, CLEAN, CLEAN_ALL };
+        public enum State {
+            INIT,
+            FILTER_PREVIOUS,
+            FILTER,
+            FILTER_AGAIN,
+            CLEAN,
+            CLEAN_ALL,
+            INPUT_HANDLER };
 
         public FilterDialog(User user, List<Filter> filters_luis, State state)
         {
@@ -39,7 +46,7 @@ namespace SmartKioskBot.Dialogs
             this.filters = new List<Filter>();
             this.state = state;
 
-            if (filters_received.Count == 0)
+            if (filters_received.Count == 0 && state != State.INPUT_HANDLER)
                 this.state = State.INIT;
         }
 
@@ -60,8 +67,11 @@ namespace SmartKioskBot.Dialogs
                     break;
                 case State.CLEAN_ALL:
                     break;
+                case State.INPUT_HANDLER:
+                    context.Wait(InputHandler);
+                    break;
                 default:
-                    await FilterAsync(context, null);
+                    context.Wait(FilterAsync);
                     break;
             }
         }
@@ -175,59 +185,64 @@ namespace SmartKioskBot.Dialogs
         {
             var activity = await argument as Activity;
 
-            //close dialog at the end without more processing
-            bool done_ok = true;
-
             //Received a Message
             if (activity.Text != null)
-            {
-                done_ok = false;
-                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
-            }
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity));
             //Received an Event
             else if (activity.Value != null)
+                await EventHandler(context, activity);
+            //Other
+            else
+                context.Done(new CODE(DIALOG_CODE.DONE));
+        }
+
+        public async Task EventHandler(IDialogContext context, Activity activity)
+        {
+            JObject json = activity.Value as JObject;
+            List<InputData> data = getReplyData(json);
+
+            //has the mandatory info
+            if (data.Count >= 2)
             {
-                JObject json = activity.Value as JObject;
-                List<InputData> data = getReplyData(json);
-
-                //has the mandatory info
-                if (data.Count >= 2)
+                //json structure is correct
+                if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
                 {
-                    //json structure is correct
-                    if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
-                    {
-                        ClickType click = getClickType(data[0].value);
+                    ClickType event_click = getClickType(data[0].value);
+                    DialogType event_dialog = getDialogType(data[1].value);
 
-                        if (data[1].value.Equals(getDialogName(DialogType.FILTER)) &&
-                            click != ClickType.NONE)
+                    //event of this dialog
+                    if (event_dialog == DialogType.FILTER &&
+                        event_click != ClickType.NONE)
+                    {
+                        switch (event_click)
                         {
-                            switch (click)
-                            {
-                                case ClickType.PAGINATION:
-                                    page++;
-                                    done_ok = false;
-                                    await StartAsync(context);
-                                    break;
-                                case ClickType.FILTER:
-                                    done_ok = false;
-                                    data.RemoveAt(0);   //remove reply_type
-                                    data.RemoveAt(0);   //remove dialog
-                                    this.filters = FilterLogic.GetFilterFromForm(data);
-                                    this.state = State.FILTER;
-                                    await StartAsync(context);
-                                    break;
-                                case ClickType.FILTER_AGAIN:
-                                    done_ok = false;
-                                    this.state = State.FILTER_AGAIN;
-                                    await StartAsync(context);
-                                    break;
-                            }
+                            case ClickType.PAGINATION:
+                                page++;
+                                await StartAsync(context);
+                                break;
+                            case ClickType.FILTER:
+                                data.RemoveAt(0);   //remove reply_type
+                                data.RemoveAt(0);   //remove dialog
+                                this.filters = FilterLogic.GetFilterFromForm(data);
+                                this.state = State.FILTER;
+                                await StartAsync(context);
+                                break;
+                            case ClickType.FILTER_AGAIN:
+                                this.state = State.FILTER_AGAIN;
+                                await StartAsync(context);
+                                break;
                         }
                     }
+                    // event of other dialog
+                    else
+                    {
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity, event_dialog));
+                    }
                 }
+                else
+                    context.Done(new CODE(DIALOG_CODE.DONE));
             }
-
-            if(done_ok)
+            else
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 

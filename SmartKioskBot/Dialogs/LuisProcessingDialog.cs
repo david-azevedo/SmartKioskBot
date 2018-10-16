@@ -42,6 +42,7 @@ namespace SmartKioskBot.Dialogs
                 {
                     string message = "Desculpa mas não entendi aquilo que disseste. Podes refrasear por favor? :)";
                     await context.PostAsync(message);
+                    context.Done(new CODE(DIALOG_CODE.DONE));
                 }
             }
         }
@@ -80,7 +81,7 @@ namespace SmartKioskBot.Dialogs
         {
             //just for test
             FilterIntentScore(context, result);
-            context.Call(new MenuDialog(user), ResumeAfterDialogueCall);
+            context.Call(new MenuDialog(user,MenuDialog.State.INIT), ResumeAfterDialogueCall);
             
            /* var reply = context.MakeMessage();
             reply.Text = BotDefaultAnswers.getGreeting(context.Activity.From.Name);
@@ -96,7 +97,7 @@ namespace SmartKioskBot.Dialogs
         public async Task ViewWishList(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result)
         {
             FilterIntentScore(context, result);
-            context.Call(new WishListDialog(user),ResumeAfterDialogueCall);
+            context.Call(new WishListDialog(user,WishListDialog.State.INIT),ResumeAfterDialogueCall);
         }
 
 
@@ -149,7 +150,8 @@ namespace SmartKioskBot.Dialogs
         public async Task ViewComparator(IDialogContext context, LuisResult result)
         {
             FilterIntentScore(context, result);
-            context.Call(new CompareDialog(user), ResumeAfterDialogueCall);
+            context.Call(new CompareDialog(user,CompareDialog.State.INIT), 
+                ResumeAfterDialogueCall);
         }
 
 
@@ -253,7 +255,7 @@ namespace SmartKioskBot.Dialogs
         public async Task Recommendation(IDialogContext context, LuisResult result)
         {
             FilterIntentScore(context, result);
-            context.Call(new RecommendationDialog(user), ResumeAfterDialogueCall);
+            context.Call(new RecommendationDialog(user,RecommendationDialog.State.INIT), ResumeAfterDialogueCall);
         }
     }
 }
