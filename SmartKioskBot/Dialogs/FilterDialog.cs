@@ -82,7 +82,7 @@ namespace SmartKioskBot.Dialogs
             if (state.Equals(State.FILTER_AGAIN))
             {
                 JObject json = att.Content as JObject;
-                SetFilterCardValue(json, filters);
+                FilterLogic.SetFilterCardValue(json, filters);
             }
             //reset filters (they will be added again in the filtering process)
             filters = new List<Filter>();
@@ -269,15 +269,15 @@ namespace SmartKioskBot.Dialogs
                     filtername = e.Type.Remove(0, e.Type.LastIndexOf(":") + 1);
                 else if (e.Type == "memory-type")
                 {
-                    if (e.Entity == "ram") filtername = Constants.ram_filter;
-                    else filtername = Constants.storage_type_filter;
+                    if (e.Entity == "ram") filtername = FilterLogic.ram_filter;
+                    else filtername = FilterLogic.storage_type_filter;
                 }
                 else if (e.Type == "brand")
-                    filtername = Constants.brand_filter;
+                    filtername = FilterLogic.brand_filter;
                 else if (e.Type == "cpu")
-                    filtername = Constants.cpu_family_filter;
+                    filtername = FilterLogic.cpu_family_filter;
                 else if (e.Type == "gpu")
-                    filtername = Constants.gpu_filter;
+                    filtername = FilterLogic.gpu_filter;
 
                 if (filtername != "")
                 {

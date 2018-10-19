@@ -13,14 +13,14 @@ namespace SmartKioskBot.Controllers
     public abstract class UserController
     {
         /// <summary>
-        /// Gets a user that is related to a comunication channel conversation.
+        /// Get user by email.
         /// </summary>
-        /// <param name="channelId"></param>
+        /// <param name="email"></param>
         /// <returns></returns>
-        public static User getUser(string channelId)
+        public static User getUser(ObjectId id)
         {
             var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
-            var filter = Builders<User>.Filter.AnyEq(u => u.ChannelsIds, channelId);
+            var filter = Builders<User>.Filter.Eq(u => u.Id, id);
 
             List<User> user = userCollection.Find(filter).ToList();
 
@@ -104,40 +104,21 @@ namespace SmartKioskBot.Controllers
         /// <param name="email"></param>
         /// <param name="name"></param>
         /// <param name="country"></param>
-        public static void CreateUser(string channelId, string email, string name, string country)
+        public static void CreateUser(string email, string name, string country, string gender)
         {
             User u = new User()
             {
                 Name = name,
                 Email = email,
                 Country = country,
-                ChannelsIds = new string[] { channelId },
-                CustomerCard = ""
+                CustomerCard = "",
+                Gender = gender
             };
 
             var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
             userCollection.InsertOne(u);
         }
-
-        /// <summary>
-        /// Adds a new communication channel conversation to the user.
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="channelId"></param>
-        public static void AddChannel(User user, string channelId)
-        {
-            if (!user.ChannelsIds.Contains(channelId))
-            {
-                var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
-                var update = Builders<User>.Update.Push(o => o.ChannelsIds, channelId);
-                var filter = Builders<User>.Filter.And(
-                    Builders<User>.Filter.Eq(o => o.Id, user.Id),
-                    Builders<User>.Filter.Eq(o => o.Country, user.Country));
-
-                userCollection.UpdateOne(filter, update);
-            }
-        }
-
+        
         /// <summary>
         /// Sets the user information.
         /// </summary>
@@ -145,10 +126,10 @@ namespace SmartKioskBot.Controllers
         /// <param name="name"></param>
         /// <param name="email"></param>
         /// <param name="customerId"></param>
-        public static void SetUserInfo(User user, string name, string email, string customerId)
+        public static void SetUserInfo(User user, string name, string email, string customerId, string gender)
         {
             var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
-            var update = Builders<User>.Update.Set(o => o.Name, name).Set(o => o.Email, email).Set(o => customerId, customerId);
+            var update = Builders<User>.Update.Set(o => o.Name, name).Set(o => o.Email, email).Set(o => o.CustomerCard, customerId).Set(o => o.Gender, gender);
             var filter = Builders<User>.Filter.And(
                 Builders<User>.Filter.Eq(o => o.Id, user.Id),
                 Builders<User>.Filter.Eq(o => o.Country, user.Country));
@@ -181,6 +162,17 @@ namespace SmartKioskBot.Controllers
         {
             var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
             var update = Builders<User>.Update.Set(o => o.Email, email);
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(o => o.Id, user.Id),
+                Builders<User>.Filter.Eq(o => o.Country, user.Country));
+
+            userCollection.UpdateOne(filter, update);
+        }
+
+        public static void SetGender(User user, string gender)
+        {
+            var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
+            var update = Builders<User>.Update.Set(o => o.Gender, gender);
             var filter = Builders<User>.Filter.And(
                 Builders<User>.Filter.Eq(o => o.Id, user.Id),
                 Builders<User>.Filter.Eq(o => o.Country, user.Country));
@@ -249,20 +241,13 @@ namespace SmartKioskBot.Controllers
         /// <returns></returns>
         public static string PrintUser(User u)
         {
-            var channels = "";
-
-            for (var i = 0; i < u.ChannelsIds.Length; i++)
-            {
-                channels += u.ChannelsIds[i] + " ";
-            }
-
             string o = "User Information: \n\n" +
                 "ID: " + u.Id.ToString() + "\n\n" +
                 "Name: " + u.Name + "\n\n" +
                 "Country: " + u.Country + "\n\n" +
-                "Channels: " + channels + "\n\n" +
                 "Email: " + u.Email + "\n\n" +
-                "CustomerCard: " + u.CustomerCard + "\n\n";
+                "CustomerCard: " + u.CustomerCard + "\n\n" + 
+                "Gender: " + u.Gender + "\n\n";
 
             return o;
         }

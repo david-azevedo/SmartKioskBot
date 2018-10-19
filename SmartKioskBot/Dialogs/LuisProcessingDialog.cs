@@ -257,5 +257,16 @@ namespace SmartKioskBot.Dialogs
             FilterIntentScore(context, result);
             context.Call(new RecommendationDialog(user,RecommendationDialog.State.INIT), ResumeAfterDialogueCall);
         }
+
+        /*
+        * View Account
+        */
+
+        [LuisIntent("ViewAccount")]
+        public async Task ViewAccount(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+            context.Call(new AccountDialog(user, AccountDialog.State.INIT), ResumeAfterDialogueCall);
+        }
     }
 }

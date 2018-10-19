@@ -61,7 +61,10 @@ namespace SmartKioskBot.Dialogs
             switch (dialog)
             {
                 case DialogType.ACCOUNT:
-                    //TODO: call dialog
+                    //TODO
+                    await context.Forward(
+                        new AccountDialog(user, AccountDialog.State.INPUT_HANDLER),
+                        ResumeAfterDialogCall, message);
                     break;
                 case DialogType.COMPARE:
                     await context.Forward(
@@ -123,16 +126,19 @@ namespace SmartKioskBot.Dialogs
         {
             if (identified == false && !context.Activity.From.Id.Equals("default-user"))
             {
+                //TODO
+                string email = "123@mail.com";
+                //email -> activity.ChannelId
+
                 var activity = context.Activity;
-                user = UserController.getUser(activity.ChannelId);
+                this.user = UserController.getUserByEmail(email);
                 if (user == null)
                 {
                     var r = new Random();
-                    UserController.CreateUser(activity.ChannelId, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString());
-                    user = UserController.getUser(activity.ChannelId);
+                    UserController.CreateUser(email, activity.From.Name, (r.Next(25) + 1).ToString(),"Desconhecido");
+                    this.user = UserController.getUserByEmail(email);
                     ContextController.CreateContext(user);
                     CRMController.AddCustomer(user);
-                    context.Call(new IdentificationDialog(), ResumeAfterIdent);
                 }
                 identified = true;
             }
@@ -140,7 +146,6 @@ namespace SmartKioskBot.Dialogs
 
         private async Task ResumeAfterIdent(IDialogContext context, IAwaitable<object> result)
         {
-            this.user = UserController.getUser(context.Activity.ChannelId);
             context.Wait(InputHandler);
         }
 

@@ -218,11 +218,11 @@
     <Compile Include="Controllers\CRMController.cs" />
     <Compile Include="Dialogs\AddProductDialog.cs" />
     <Compile Include="Dialogs\MenuDialog.cs" />
+    <Compile Include="Dialogs\AccountDialog.cs" />
     <Compile Include="Helpers\BotDefaultAnswers.cs" />
     <Compile Include="Dialogs\ClosestStoresDialog.cs" />
     <Compile Include="Dialogs\CompareDialog.cs" />
     <Compile Include="Dialogs\FilterDialog.cs" />
-    <Compile Include="Dialogs\IdentificationDialog.cs" />
     <Compile Include="Dialogs\ProductDetails.cs" />
     <Compile Include="Dialogs\QnA\QnADialog.cs" />
     <Compile Include="Dialogs\QnA\QnAMakerResult.cs" />
@@ -241,6 +241,7 @@
     <Compile Include="Helpers\FileAsync.cs" />
     <Compile Include="Helpers\StateHelper.cs" />
     <Compile Include="Logic\ComparatorLogic.cs" />
+    <Compile Include="Logic\AccountLogic.cs" />
     <Compile Include="Logic\FilterLogic.cs" />
     <Compile Include="Logic\Part.cs" />
     <Compile Include="Logic\RecommendationsLogic.cs" />
@@ -271,6 +272,10 @@
     <Content Include="UI\InfoMenuCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="UI\AccountCard.JSON">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\EditAccountCard.JSON" />
     <Content Include="UI\MenuCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
