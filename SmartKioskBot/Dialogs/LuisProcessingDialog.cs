@@ -269,5 +269,17 @@ namespace SmartKioskBot.Dialogs
                 Debug.WriteLine(e.ToString());
             }
         }
+
+        /*
+        * View Account
+        */
+
+        [LuisIntent("ViewAccount")]
+        public async Task ViewAccount(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+
+            context.Call(new AccountDialog(user), ResumeAfterDialogueCall);
+        }
     }
 }

@@ -1,0 +1,164 @@
+﻿{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Medium",
+      "color": "Accent",
+      "text": "Informação do cliente"
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "spacing": "Small",
+          "weight": "Bolder",
+          "text": "Nome:"
+        },
+        {
+          "type": "TextBlock",
+          "id": "id_name",
+          "spacing": "Small",
+          "text": "Utilizador "
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "Nº Cliente:"
+            },
+            {
+              "type": "TextBlock",
+              "spacing": "Small",
+              "text": "123456789"
+            }
+          ],
+          "width": "stretch"
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "Nº  Telemóvel:"
+            },
+            {
+              "type": "TextBlock",
+              "spacing": "Small",
+              "text": "963 987 844"
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "Container",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "weight": "Bolder",
+                  "text": "Género:"
+                },
+                {
+                  "type": "Input.ChoiceSet",
+                  "id": "genero",
+                  "placeholder": "Placeholder text",
+                  "choices": [
+                    {
+                      "title": "Choice 1",
+                      "value": "Choice 1"
+                    },
+                    {
+                      "title": "Choice 2",
+                      "value": "Choice 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "width": "stretch"
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "E-mail:"
+            },
+            {
+              "type": "TextBlock",
+              "spacing": "Small",
+              "text": "user@xdsc.com"
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "Morada:"
+            },
+            {
+              "type": "TextBlock",
+              "spacing": "Small",
+              "text": "morada"
+            }
+          ],
+          "width": "stretch"
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "País:"
+            },
+            {
+              "type": "TextBlock",
+              "spacing": "Small",
+              "text": "Portugal"
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Editar",
+      "data": {
+        "reply_type": "edit_account"
+      }
+    }
+  ],
+  "version": "1.0"
+}

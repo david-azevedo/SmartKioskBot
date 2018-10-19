@@ -1,0 +1,136 @@
+﻿{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "Nome:"
+        },
+        {
+          "type": "Input.Text",
+          "id": "name",
+          "title": "New Input.Toggle",
+          "placeholder": "Placeholder text"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "Container",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "Género:"
+            },
+            {
+              "type": "Input.ChoiceSet",
+              "placeholder": "Placeholder text",
+              "choices": [
+                {
+                  "title": "Homem",
+                  "value": "homem"
+                },
+                {
+                  "title": "Mulher",
+                  "value": "mulher"
+                }
+              ],
+              "style": "expanded"
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "Nº Cliente:"
+        }
+      ]
+    },
+    {
+      "type": "Input.Text",
+      "id": "clientNumb",
+      "title": "New Input.Toggle",
+      "placeholder": "Placeholder text"
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "Nº Telemóvel:"
+        }
+      ]
+    },
+    {
+      "type": "Input.Text",
+      "id": "phoneNumb",
+      "title": "New Input.Toggle",
+      "placeholder": "Placeholder text"
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "E-mail:"
+        },
+        {
+          "type": "Input.Text",
+          "id": "email",
+          "title": "New Input.Toggle",
+          "placeholder": "Placeholder text"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "Morada:"
+        },
+        {
+          "type": "Input.Text",
+          "id":  "country",
+          "title": "New Input.Toggle",
+          "placeholder": "Placeholder text"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "text": "País:"
+        },
+        {
+          "type": "Input.Text",
+          "id": "country",
+          "title": "New Input.Toggle",
+          "placeholder": "Placeholder text"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Guardar",
+      "data": {
+        "reply_type": "submit_edit_account"
+      }
+    }
+  ],
+  "version": "1.0"
+}

@@ -16,7 +16,7 @@ namespace SmartKioskBot.Helpers
     {
         public static string CARDS_PATH = HostingEnvironment.MapPath(@"~/UI");
 
-        public enum CardType {PAGINATION, FILTER, FILTER_AGAIN, NONE};
+        public enum CardType {PAGINATION, FILTER, FILTER_AGAIN, NONE, VIEW_ACCOUNT, EDIT_ACCOUNT};
 
         private static string getCardFileName(CardType type)
         {
@@ -27,6 +27,10 @@ namespace SmartKioskBot.Helpers
                     return "FilterCard";
                 case CardType.FILTER_AGAIN:
                     return "FilterAgainCard";
+                case CardType.VIEW_ACCOUNT:
+                    return "AccountCard";
+                case CardType.EDIT_ACCOUNT:
+                    return "EditAccountCard";
             }
             return "";
         }
@@ -60,6 +64,8 @@ namespace SmartKioskBot.Helpers
                         return CardType.FILTER;
                     case "filter_again":
                         return CardType.FILTER_AGAIN;
+                    case "edit_account":
+                        return CardType.VIEW_ACCOUNT;
                 }
             }
             return CardType.NONE;
