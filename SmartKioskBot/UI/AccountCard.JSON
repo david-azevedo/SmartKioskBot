@@ -1,0 +1,103 @@
+﻿{
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "separator": true,
+            "size": "Large",
+            "weight": "Bolder",
+            "color": "Accent",
+            "text": "Informação do cliente"
+        },
+        {
+            "type": "Container",
+            "spacing": "Medium",
+            "separator": true,
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "spacing": "Small",
+                    "weight": "Bolder",
+                    "text": "Nome:"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "name",
+                    "spacing": "Small",
+                    "text": "Utilizador "
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "E-mail:"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "email",
+                    "spacing": "Small",
+                    "text": "New TextBlock"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Número de Cliente:"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "client_id",
+                    "spacing": "Small",
+                    "text": "New TextBlock"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Género:"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "gender",
+                    "spacing": "Small",
+                    "text": "New TextBlock"
+                }
+            ]
+        },
+        {
+            "type": "Container"
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.Submit",
+            "title": "Editar Dados",
+            "data": {
+                "reply_type": "account_edit",
+                "dialog": "account"
+            }
+        },
+        {
+            "type": "Action.Submit",
+            "title": "Terminar Sessão",
+            "data": {
+                "reply_type": "account_logout",
+                "dialog": "account"
+            }
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
+}

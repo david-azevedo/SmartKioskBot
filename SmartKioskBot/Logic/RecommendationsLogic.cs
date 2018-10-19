@@ -16,7 +16,7 @@ namespace SmartKioskBot.Logic
 
         public static Filter DEFAULT_RECOMMENDATION = new Filter()
         {
-            FilterName = Constants.brand_filter,
+            FilterName = FilterLogic.brand_filter,
             Operator = "=",
             Value = "asus"
         };

@@ -73,12 +73,12 @@ namespace SmartKioskBot.Dialogs
                         switch (data[0].value)
                         {
                             case "menu_session":
-                                //Add call to account
-                                context.Wait(InputHandler);
+                                context.Call(new AccountDialog(user, AccountDialog.State.INIT), 
+                                    ResumeAfterDialogCall);
                                 break;
                             case "menu_filter":
-                                var next_dialog = new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT);
-                                context.Call(next_dialog, ResumeAfterDialogCall);
+                                context.Call(new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT), 
+                                    ResumeAfterDialogCall);
                                 break;
                             case "menu_comparator":
                                 context.Call(new CompareDialog(user, CompareDialog.State.INIT),
