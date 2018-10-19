@@ -23,9 +23,6 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class FilterDialog : IDialog<object>
     {
-        private User user;
-        private List<Filter> filters;
-        private List<Filter> filters_received;  //from luis
         private ObjectId last_fetch_id;
         private int page = 1;
         private State state;
@@ -103,8 +100,13 @@ namespace SmartKioskBot.Dialogs
             // in case the user entered the filters manually
             if (this.state.Equals(State.FILTER_PREVIOUS))
             {
-                filters = ContextController.getFilters(user);
+                List<Filter> filters = context.UserData.GetValue<List<Filter>>(StateHelper.FILTERS_ATR);
 
+                foreach(Filter f in filters){
+                    CRMController.AddFilterUsage(user.Id, user.Country, f1);
+                }
+
+                /*
                 foreach (Filter f1 in filters_received)
                 {
                     bool exists = false;
@@ -118,6 +120,7 @@ namespace SmartKioskBot.Dialogs
                         CRMController.AddFilterUsage(user.Id, user.Country, f1);
                     }
                 }
+                */
             }
             
             // search products based on the last fetch id (inclusive)

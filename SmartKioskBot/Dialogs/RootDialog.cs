@@ -13,6 +13,10 @@ using Newtonsoft.Json.Linq;
 
 namespace SmartKioskBot.Dialogs
 {
+    /*TODO:
+     * User is not passed, all information is kept in store memory
+     * When logging in, the userid is stored and 
+     */
     [Serializable]
     public class RootDialog : IDialog<Object>
     {
@@ -28,6 +32,8 @@ namespace SmartKioskBot.Dialogs
         private async Task InputHandler(IDialogContext context, IAwaitable<object> result)
         {
             var activity = await result as Activity;
+
+            var i = 1;
 
             //message
             if (activity.Text != null)
@@ -115,7 +121,7 @@ namespace SmartKioskBot.Dialogs
 
         private void TryIdentification(IDialogContext context)
         {
-            if (identified == false)
+            if (identified == false && !context.Activity.From.Id.Equals("default-user"))
             {
                 var activity = context.Activity;
                 user = UserController.getUser(activity.ChannelId);
