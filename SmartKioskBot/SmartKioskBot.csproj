@@ -232,6 +232,7 @@
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\DbSingleton.cs" />
     <Compile Include="Helpers\FileAsync.cs" />
+    <Compile Include="Logic\AccountLogic.cs" />
     <Compile Include="Logic\Comparator.cs" />
     <Compile Include="Logic\FilterLogic.cs" />
     <Compile Include="Logic\Part.cs" />
@@ -267,9 +268,7 @@
     <Content Include="UI\AccountCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="UI\EditAccountCard.JSON">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="UI\EditAccountCard.JSON" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

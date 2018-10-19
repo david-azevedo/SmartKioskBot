@@ -1,21 +1,13 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
-using MongoDB.Driver;
-using SmartKioskBot.Controllers;
-using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
-using SmartKioskBot.UI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using static SmartKioskBot.Models.Context;
-using SmartKioskBot.Logic;
-using MongoDB.Bson;
 using static SmartKioskBot.Helpers.Constants;
 using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using Newtonsoft.Json.Linq;
+using SmartKioskBot.Logic;
+using System.Collections.Generic;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -39,15 +31,14 @@ namespace SmartKioskBot.Dialogs
             var reply = context.MakeMessage();
             Attachment att = await getCardAttachment(CardType.VIEW_ACCOUNT);
 
+            JObject json = att.Content as JObject;
+            AccountLogic.SetAccountCardFields(json, user,false);
+
             reply.Attachments.Add(att);
             await context.PostAsync(reply);
 
             context.Wait(InputHandler);
         }
-
-
-
-
         public async Task InputHandler(IDialogContext context, IAwaitable<object> argument)
         {
             var activity = await argument as Activity;
@@ -64,13 +55,24 @@ namespace SmartKioskBot.Dialogs
                 JObject json = activity.Value as JObject;
                 CardType type = getReplyType(json);
 
-                var reply = context.MakeMessage();
-                Attachment att = await getCardAttachment(CardType.EDIT_ACCOUNT);
+                if (type.Equals(CardType.VIEW_ACCOUNT)) {
 
-                reply.Attachments.Add(att);
-                await context.PostAsync(reply);
+                    //edit card
+                    var reply = context.MakeMessage();
 
-                context.Wait(InputHandler);
+                    Attachment att = await getCardAttachment(CardType.EDIT_ACCOUNT);
+                    JObject content = att.Content as JObject;
+                    AccountLogic.SetAccountCardFields(content, user, true);
+                    reply.Attachments.Add(att);
+                    await context.PostAsync(reply);
+
+                    context.Wait(InputHandler);
+                    
+                }
+                else if(type.Equals(CardType.EDIT_ACCOUNT)){ 
+                    var data = getReplyData(json);
+                    var i = 1;
+                }
 
             }
             else

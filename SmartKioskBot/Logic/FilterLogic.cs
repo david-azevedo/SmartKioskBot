@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder.Luis.Models;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,90 @@ namespace SmartKioskBot.Logic
             Operator = "=",
             Value = "asus"
         };
+
+        public static void SetFilterCardValue(JToken card, List<Filter> applied_filters)
+        {
+            List<JToken> card_fields = new List<JToken>();
+            string last_retrieved = "";
+
+            for (int i = 0; i < applied_filters.Count(); i++)
+            {
+                var f = applied_filters[i];
+
+                if (last_retrieved != f.FilterName)
+                    card_fields = GetFilterCardSection(card, f.FilterName);
+
+                string lookup = f.FilterName + ":";
+                bool checkbox = false;
+
+                if (f.Operator.Equals("<"))
+                    lookup += "max";
+                else if (f.Operator.Equals(">"))
+                    lookup += "min";
+                else
+                {
+                    lookup += f.Value;
+                    checkbox = true;
+                }
+
+                for (int j = 0; j < card_fields.Count; j++)
+                {
+                    if (card_fields[j]["id"].ToString().Equals(lookup))
+                    {
+                        if (!checkbox)
+                            card_fields[j]["value"] = f.Value;
+                        else
+                            card_fields[j]["value"] = "true";
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static List<JToken> GetFilterCardSection(JToken card, string section)
+        {
+            List<JToken> fields = new List<JToken>();
+
+            switch (section)
+            {
+                case FilterLogic.cpu_family_filter:
+                    fields = card.SelectTokens("body[1].columns[0].items").Children().ToList();
+                    fields.RemoveAt(0);
+                    break;
+                case FilterLogic.gpu_filter:
+                    fields = card.SelectTokens("body[1].columns[1].items").Children().ToList();
+                    fields.RemoveAt(0);
+                    break;
+                case FilterLogic.price_filter:
+                    fields.Add(card.SelectToken("body[2].columns[0].items[1].columns[0].items[0]"));
+                    fields.Add(card.SelectToken("body[2].columns[0].items[1].columns[1].items[0]"));
+                    break;
+                case FilterLogic.storage_type_filter:
+                    fields.Add(card.SelectToken("body[3].items[1]"));
+                    fields.Add(card.SelectToken("body[3].items[2]"));
+                    break;
+                case FilterLogic.storage_filter:
+                    fields.Add(card.SelectToken("body[3].items[3].columns[0].items[0]"));
+                    fields.Add(card.SelectToken("body[3].items[3].columns[1].items[0]"));
+                    break;
+                case FilterLogic.ram_filter:
+                    fields.Add(card.SelectToken("body[3].items[5].columns[0].items[0]"));
+                    fields.Add(card.SelectToken("body[3].items[5].columns[1].items[0]"));
+                    break;
+                case FilterLogic.brand_filter:
+                    fields = card.SelectTokens("body[4].items[1].columns[0].items").Children().ToList();
+                    fields = fields.Concat(card.SelectTokens("body[4].items[1].columns[1].items").Children().ToList()).ToList();
+                    fields = fields.Concat(card.SelectTokens("body[4].items[1].columns[2].items").Children().ToList()).ToList();
+                    break;
+                case FilterLogic.type_filter:
+                    fields = card.SelectTokens("body[5].items[1].columns[0].items").Children().ToList();
+                    fields = fields.Concat(card.SelectTokens("body[5].items[1].columns[1].items").Children().ToList()).ToList();
+                    break;
+            }
+
+            return fields;
+        }
+
 
         public static List<Filter> GetFilterFromForm(List<InputData> data)
         {

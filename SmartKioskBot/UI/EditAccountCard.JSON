@@ -1,136 +1,118 @@
 ﻿{
-  "type": "AdaptiveCard",
-  "body": [
-    {
-      "type": "Container",
-      "items": [
+    "type": "AdaptiveCard",
+    "body": [
         {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "Nome:"
+            "type": "TextBlock",
+            "separator": true,
+            "size": "Large",
+            "weight": "Bolder",
+            "color": "Accent",
+            "text": "Informação do cliente"
         },
         {
-          "type": "Input.Text",
-          "id": "name",
-          "title": "New Input.Toggle",
-          "placeholder": "Placeholder text"
-        }
-      ]
-    },
-    {
-      "type": "Container",
-      "items": [
-        {
-          "type": "Container",
-          "items": [
-            {
-              "type": "TextBlock",
-              "weight": "Bolder",
-              "text": "Género:"
-            },
-            {
-              "type": "Input.ChoiceSet",
-              "placeholder": "Placeholder text",
-              "choices": [
+            "type": "Container",
+            "spacing": "Medium",
+            "separator": true,
+            "items": [
                 {
-                  "title": "Homem",
-                  "value": "homem"
+                    "type": "TextBlock",
+                    "spacing": "Small",
+                    "weight": "Bolder",
+                    "text": "Nome:"
                 },
                 {
-                  "title": "Mulher",
-                  "value": "mulher"
+                    "type": "Input.Text",
+                    "id": "name",
+                    "spacing": "Small",
+                    "title": "New Input.Toggle",
+                    "placeholder": "Insira o seu nome aqui"
                 }
-              ],
-              "style": "expanded"
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "E-mail:"
+                },
+                {
+                    "type": "Input.Text",
+                    "id": "email",
+                    "spacing": "Small",
+                    "title": "New Input.Toggle",
+                    "placeholder": "Insira o seu email aqui"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Número de Cliente:"
+                },
+                {
+                    "type": "Input.Number",
+                    "id": "client_id",
+                    "spacing": "Small",
+                    "title": "New Input.Toggle",
+                    "value": "0",
+                    "placeholder": "Insira o seu número de cliente aqui"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Género:"
+                },
+                {
+                    "type": "Input.ChoiceSet",
+                    "id": "gender",
+                    "spacing": "Small",
+                    "value": "Desconhecido",
+                    "placeholder": "Placeholder text",
+                    "choices": [
+                        {
+                            "title": "Feminino",
+                            "value": "Feminino"
+                        },
+                        {
+                            "title": "Masculino",
+                            "value": "Masculino"
+                        },
+                        {
+                            "title": "Outro",
+                            "value": "Outro"
+                        },
+                        {
+                            "title": "Desconhecido",
+                            "value": "Desconhecido"
+                        }
+                    ],
+                    "style": "expanded"
+                }
+            ]
+        },
+        {
+            "type": "Container"
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.Submit",
+            "title": "Guardar",
+            "data": {
+                "reply_type": "account_save"
             }
-          ]
-        },
-        {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "Nº Cliente:"
         }
-      ]
-    },
-    {
-      "type": "Input.Text",
-      "id": "clientNumb",
-      "title": "New Input.Toggle",
-      "placeholder": "Placeholder text"
-    },
-    {
-      "type": "Container",
-      "items": [
-        {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "Nº Telemóvel:"
-        }
-      ]
-    },
-    {
-      "type": "Input.Text",
-      "id": "phoneNumb",
-      "title": "New Input.Toggle",
-      "placeholder": "Placeholder text"
-    },
-    {
-      "type": "Container",
-      "items": [
-        {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "E-mail:"
-        },
-        {
-          "type": "Input.Text",
-          "id": "email",
-          "title": "New Input.Toggle",
-          "placeholder": "Placeholder text"
-        }
-      ]
-    },
-    {
-      "type": "Container",
-      "items": [
-        {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "Morada:"
-        },
-        {
-          "type": "Input.Text",
-          "id":  "country",
-          "title": "New Input.Toggle",
-          "placeholder": "Placeholder text"
-        }
-      ]
-    },
-    {
-      "type": "Container",
-      "items": [
-        {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "País:"
-        },
-        {
-          "type": "Input.Text",
-          "id": "country",
-          "title": "New Input.Toggle",
-          "placeholder": "Placeholder text"
-        }
-      ]
-    }
-  ],
-  "actions": [
-    {
-      "type": "Action.Submit",
-      "title": "Guardar",
-      "data": {
-        "reply_type": "submit_edit_account"
-      }
-    }
-  ],
-  "version": "1.0"
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
 }

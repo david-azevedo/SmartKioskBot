@@ -278,7 +278,6 @@ namespace SmartKioskBot.Dialogs
         public async Task ViewAccount(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result)
         {
             FilterIntentScore(context, result);
-
             context.Call(new AccountDialog(user), ResumeAfterDialogueCall);
         }
     }

@@ -67,7 +67,7 @@ namespace SmartKioskBot.Dialogs
                 if (user == null)
                 {
                     var r = new Random();
-                    UserController.CreateUser(activity.ChannelId, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString());
+                    UserController.CreateUser(activity.ChannelId, activity.From.Id, activity.From.Name, (r.Next(25) + 1).ToString(),"Desconhecido");
                     user = UserController.getUser(activity.ChannelId);
                     ContextController.CreateContext(user);
                     CRMController.AddCustomer(user);

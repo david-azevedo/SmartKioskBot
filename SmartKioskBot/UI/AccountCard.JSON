@@ -1,164 +1,101 @@
 ﻿{
-  "type": "AdaptiveCard",
-  "body": [
-    {
-      "type": "TextBlock",
-      "size": "Medium",
-      "color": "Accent",
-      "text": "Informação do cliente"
-    },
-    {
-      "type": "Container",
-      "items": [
+    "type": "AdaptiveCard",
+    "body": [
         {
-          "type": "TextBlock",
-          "spacing": "Small",
-          "weight": "Bolder",
-          "text": "Nome:"
+            "type": "TextBlock",
+            "separator": true,
+            "size": "Large",
+            "weight": "Bolder",
+            "color": "Accent",
+            "text": "Informação do cliente"
         },
         {
-          "type": "TextBlock",
-          "id": "id_name",
-          "spacing": "Small",
-          "text": "Utilizador "
-        }
-      ]
-    },
-    {
-      "type": "ColumnSet",
-      "columns": [
-        {
-          "type": "Column",
-          "items": [
-            {
-              "type": "TextBlock",
-              "weight": "Bolder",
-              "text": "Nº Cliente:"
-            },
-            {
-              "type": "TextBlock",
-              "spacing": "Small",
-              "text": "123456789"
-            }
-          ],
-          "width": "stretch"
-        },
-        {
-          "type": "Column",
-          "items": [
-            {
-              "type": "TextBlock",
-              "weight": "Bolder",
-              "text": "Nº  Telemóvel:"
-            },
-            {
-              "type": "TextBlock",
-              "spacing": "Small",
-              "text": "963 987 844"
-            }
-          ],
-          "width": "stretch"
-        }
-      ]
-    },
-    {
-      "type": "ColumnSet",
-      "columns": [
-        {
-          "type": "Column",
-          "items": [
-            {
-              "type": "Container",
-              "items": [
+            "type": "Container",
+            "spacing": "Medium",
+            "separator": true,
+            "items": [
                 {
-                  "type": "TextBlock",
-                  "weight": "Bolder",
-                  "text": "Género:"
+                    "type": "TextBlock",
+                    "spacing": "Small",
+                    "weight": "Bolder",
+                    "text": "Nome:"
                 },
                 {
-                  "type": "Input.ChoiceSet",
-                  "id": "genero",
-                  "placeholder": "Placeholder text",
-                  "choices": [
-                    {
-                      "title": "Choice 1",
-                      "value": "Choice 1"
-                    },
-                    {
-                      "title": "Choice 2",
-                      "value": "Choice 2"
-                    }
-                  ]
+                    "type": "TextBlock",
+                    "id": "name",
+                    "spacing": "Small",
+                    "text": "Utilizador "
                 }
-              ]
-            }
-          ],
-          "width": "stretch"
+            ]
         },
         {
-          "type": "Column",
-          "items": [
-            {
-              "type": "TextBlock",
-              "weight": "Bolder",
-              "text": "E-mail:"
-            },
-            {
-              "type": "TextBlock",
-              "spacing": "Small",
-              "text": "user@xdsc.com"
-            }
-          ],
-          "width": "stretch"
-        }
-      ]
-    },
-    {
-      "type": "ColumnSet",
-      "columns": [
-        {
-          "type": "Column",
-          "items": [
-            {
-              "type": "TextBlock",
-              "weight": "Bolder",
-              "text": "Morada:"
-            },
-            {
-              "type": "TextBlock",
-              "spacing": "Small",
-              "text": "morada"
-            }
-          ],
-          "width": "stretch"
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "E-mail:"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "email",
+                    "spacing": "Small",
+                    "text": "New TextBlock"
+                }
+            ]
         },
         {
-          "type": "Column",
-          "items": [
-            {
-              "type": "TextBlock",
-              "weight": "Bolder",
-              "text": "País:"
-            },
-            {
-              "type": "TextBlock",
-              "spacing": "Small",
-              "text": "Portugal"
-            }
-          ],
-          "width": "stretch"
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Número de Cliente:"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "client_id",
+                    "spacing": "Small",
+                    "text": "New TextBlock"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Género:"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "gender",
+                    "spacing": "Small",
+                    "text": "New TextBlock"
+                }
+            ]
+        },
+        {
+            "type": "Container"
         }
-      ]
-    }
-  ],
-  "actions": [
-    {
-      "type": "Action.Submit",
-      "title": "Editar",
-      "data": {
-        "reply_type": "edit_account"
-      }
-    }
-  ],
-  "version": "1.0"
+    ],
+    "actions": [
+        {
+            "type": "Action.Submit",
+            "title": "Editar Dados",
+            "data": {
+                "reply_type": "account_edit"
+            }
+        },
+        {
+            "type": "Action.Submit",
+            "title": "Terminar Sessão",
+            "data": {
+                "reply_type": "account_logout"
+            }
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
 }

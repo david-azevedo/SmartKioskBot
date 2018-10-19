@@ -1,421 +1,168 @@
 ﻿{
     "type": "AdaptiveCard",
     "body": [
-    {
-      "type": "TextBlock",
-      "size": "Large",
-      "weight": "Bolder",
-      "color": "Accent",
-      "text": "Formulário de Filtragem"
-    },
-    {
-      "type": "ColumnSet",
-      "separator": true,
-      "columns": [
         {
-          "type": "Column",
-          "items": [
-            {
-                  "type": "TextBlock",
-                  "weight": "Bolder",
-                  "text": "Processador:"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "familia_cpu:i3",
-                  "spacing": "Small",
-                  "title": "i3",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "familia_cpu:i5",
-                  "spacing": "Small",
-                  "title": "i5",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "familia_cpu:i7",
-                  "spacing": "Small",
-                  "title": "i7",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "familia_cpu:intel",
-                  "spacing": "Small",
-                  "title": "Intel",
-                  "value": "false"
-                }
-          ],
-          "width": "stretch"
+            "type": "TextBlock",
+            "separator": true,
+            "size": "Large",
+            "weight": "Bolder",
+            "color": "Accent",
+            "text": "Informação do cliente"
         },
         {
-          "type": "Column",
-          "separator": true,
-          "items": [
-            {
-              "type": "TextBlock",
-              "weight": "Bolder",
-              "text": "Placa Gráfica:"
-            },
-            {
-              "type": "Input.Toggle",
-              "id": "placa_grafica:amd",
-              "title": "AMD",
-              "value": "false"
-            },
-            {
-              "type": "Input.Toggle",
-              "id": "placa_grafica:intel",
-              "spacing": "Small",
-              "title": "Intel",
-              "value": "false"
-            },
-            {
-              "type": "Input.Toggle",
-              "id": "placa_grafica:nvidia",
-              "title": "NVIDIA",
-              "value": "false"
-            }
-          ],
-          "width": "stretch"
+            "type": "Container",
+            "spacing": "Medium",
+            "separator": true,
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "spacing": "Small",
+                    "weight": "Bolder",
+                    "text": "Nome"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "name",
+                    "spacing": "Small",
+                    "text": "Utilizador "
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "weight": "Bolder",
+                            "text": "Nº Cliente"
+                        },
+                        {
+                            "type": "TextBlock",
+                            "id": "client_number",
+                            "spacing": "Small",
+                            "text": "123456789"
+                        }
+                    ],
+                    "width": "stretch"
+                },
+                {
+                    "type": "Column",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "weight": "Bolder",
+                            "text": "Nº  Telemóvel"
+                        },
+                        {
+                            "type": "TextBlock",
+                            "id": "phone_number",
+                            "spacing": "Small",
+                            "text": "963 987 844"
+                        }
+                    ],
+                    "width": "stretch"
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "items": [
+                        {
+                            "type": "Container",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "weight": "Bolder",
+                                    "text": "Género:"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "TextBlock",
+                            "id": "gender",
+                            "spacing": "Small",
+                            "text": "New TextBlock"
+                        }
+                    ],
+                    "width": "stretch"
+                },
+                {
+                    "type": "Column",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "weight": "Bolder",
+                            "text": "E-mail:"
+                        },
+                        {
+                            "type": "TextBlock",
+                            "id": "email",
+                            "spacing": "Small",
+                            "text": "user@xdsc.com"
+                        }
+                    ],
+                    "width": "stretch"
+                }
+            ]
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "weight": "Bolder",
+                            "text": "Morada"
+                        },
+                        {
+                            "type": "TextBlock",
+                            "id": "address",
+                            "spacing": "Small",
+                            "text": "morada"
+                        }
+                    ],
+                    "width": "stretch"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "País"
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "country",
+                    "spacing": "Small",
+                    "text": "Portugal"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "spacing": "Medium"
         }
-      ]
-    },
-    {
-      "type": "ColumnSet",
-      "separator": true,
-      "columns": [
-        {
-          "type": "Column",
-          "spacing": "Large",
-          "verticalContentAlignment": "Center",
-          "items": [
-            {
-              "type": "TextBlock",
-              "horizontalAlignment": "Left",
-              "spacing": "Small",
-              "weight": "Bolder",
-              "text": "Preço:"
-            },
-            {
-              "type": "ColumnSet",
-              "columns": [
-                {
-                  "type": "Column",
-                  "items": [
-                    {
-                      "type": "Input.Number",
-                      "id": "preço:min",
-                      "title": "New Input.Toggle",
-                      "placeholder": "Mínimo",
-                      "min": "0",
-                      "value":  "0"
-                       
-                    }
-                  ],
-                  "width": "stretch"
-                },
-                {
-                  "type": "Column",
-                  "items": [
-                    {
-                      "type": "Input.Number",
-                      "id": "preço:max",
-                      "title": "New Input.Toggle",
-                      "placeholder": "Máximo",
-                      "min": "0",
-                      "value": "10000"
-                    }
-                  ],
-                  "width": "stretch"
-                }
-              ]
-            }
-          ],
-          "width": "stretch"
-        }
-      ]
-    },
-    {
-      "type": "Container",
-      "separator": true,
-      "items": [
-        {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "Armazenamento:"
-        },
-        {
-          "type": "Input.Toggle",
-          "id": "tipo_armazenamento:HDD",
-          "spacing": "Small",
-          "title": "HDD",
-          "value": "false"
-        },
-        {
-          "type": "Input.Toggle",
-          "id": "tipo_armazenamento:SSD",
-          "spacing": "Small",
-          "title": "SSD",
-          "value": "false"
-        },
-        {
-          "type": "ColumnSet",
-          "columns": [
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Input.Number",
-                  "id": "armazenamento:min",
-                  "title": "New Input.Toggle",
-                  "placeholder": "Mínimo (Gb)",
-                  "min": "0",
-                  "value": "0"
-                }
-              ],
-              "width": "stretch"
-            },
-            {
-              "type": "Column",
-              "verticalContentAlignment": "Bottom",
-              "items": [
-                {
-                  "type": "Input.Number",
-                  "id": "armazenamento:max",
-                  "title": "New Input.Toggle",
-                  "placeholder": "Máximo (Gb)",
-                  "min": "0",
-                  "value": "5000"
-                }
-              ],
-              "width": "stretch"
-            }
-          ]
-        },
-        {
-          "type": "TextBlock",
-          "text": "RAM:"
-        },
-        {
-          "type": "ColumnSet",
-          "columns": [
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Input.Number",
-                  "id": "ram:min",
-                  "placeholder": "Mínimo (Gb)",
-                  "min": "0",
-                  "value" :  "0"
-                }
-              ],
-              "width": "stretch"
-            },
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Input.Number",
-                  "id": "ram:max",
-                  "placeholder": "Máximo (Gb)",
-                  "min": "0",
-                  "value" :  "100"
-                }
-              ],
-              "width": "stretch"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "Container",
-      "separator": true,
-      "items": [
-        {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "Marca:"
-        },
-        {
-          "type": "ColumnSet",
-          "columns": [
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Acer",
-                  "spacing": "Small",
-                  "title": "Acer",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Apple",
-                  "spacing": "Small",
-                  "title": "Apple",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Asus",
-                  "spacing": "Small",
-                  "title": "Asus",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Dell",
-                  "spacing": "Small",
-                  "title": "Dell",
-                  "value": "false"
-                }
-              ],
-              "width": "stretch"
-            },
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:HP",
-                  "spacing": "Small",
-                  "title": "HP",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Lenovo",
-                  "spacing": "Small",
-                  "title": "Lenovo",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Microsoft",
-                  "spacing": "Small",
-                  "title": "Microsoft",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Msi",
-                  "spacing": "Small",
-                  "title": "MSI",
-                  "value": "false"
-                }
-              ],
-              "width": "stretch"
-            },
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Razer",
-                  "spacing": "Small",
-                  "title": "Razer",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "marca:Toshiba",
-                  "spacing": "Small",
-                  "title": "Toshiba",
-                  "value": "false"
-                }
-              ],
-              "width": "stretch"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "Container",
-      "separator": true,
-      "items": [
-        {
-          "type": "TextBlock",
-          "weight": "Bolder",
-          "text": "Tipo:"
-        },
-        {
-          "type": "ColumnSet",
-          "columns": [
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Input.Toggle",
-                  "id": "tipo:gaming",
-                  "title": "Gaming",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "tipo:mobilidade",
-                  "title": "Mobilidade",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "tipo:performance",
-                  "title": "Performance",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "tipo:avançado",
-                  "title": "Avançado",
-                  "value": "false"
-                }
-              ],
-              "width": "stretch"
-            },
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Input.Toggle",
-                  "id": "tipo:essencial",
-                  "title": "Essential",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "tipo:convertível 2 em 1",
-                  "title": "Convertível 2 in 1",
-                  "value": "false"
-                },
-                {
-                  "type": "Input.Toggle",
-                  "id": "tipo:ultra fino",
-                  "title": "Ultra Fino",
-                  "value": "false"
-                }
-              ],
-              "width": "stretch"
-            }
-          ]
-        }
-      ]
-    }
-  ],
+    ],
     "actions": [
-          {
+        {
             "type": "Action.Submit",
-            "title": "Pesquisar",
+            "title": "Editar",
             "data": {
-                "reply_type" : "filter"
-                }
-          }
-        ],
+                "reply_type": "edit_account"
+            }
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
     "version": "1.0"
 }

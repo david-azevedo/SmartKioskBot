@@ -74,7 +74,7 @@ namespace SmartKioskBot.Dialogs
             if (state.Equals(State.FILTER_AGAIN))
             {
                 JObject json = att.Content as JObject;
-                SetFilterCardValue(json, filters);
+                FilterLogic.SetFilterCardValue(json, filters);
             }
 
             filters = new List<Filter>();

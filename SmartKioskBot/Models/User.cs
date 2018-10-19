@@ -28,5 +28,8 @@ namespace SmartKioskBot.Models
 
         [BsonElement("country")]
         public string Country { get; set; }
+
+        [BsonElement("gender")]
+        public string Gender { get; set; }
     }
 }
