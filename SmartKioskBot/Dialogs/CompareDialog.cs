@@ -19,15 +19,13 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class CompareDialog : IDialog<Object>
     {
-        public User user;
         public State state = State.INIT;
         public List<Product> products = new List<Product>();
 
         public enum State { INIT, INPUT_HANDLER };
 
-        public CompareDialog(User user, State state)
+        public CompareDialog(State state)
         {
-            this.user = user;
             this.products = new List<Product>();
             this.state = state;
         }
@@ -50,10 +48,10 @@ namespace SmartKioskBot.Dialogs
             List<ButtonType> buttons = new List<ButtonType>();
 
             // fetch products
-            var itemsToCompare = ContextController.GetContext(this.user.Id).Comparator;
-
-            foreach (ObjectId o in itemsToCompare)
-                products.Add(ProductController.getProduct(o.ToString()));
+            var itemsToCompare = StateHelper.GetComparatorItems(context);
+            
+            foreach(string o in itemsToCompare)
+                products.Add(ProductController.getProduct(o));
 
             var reply = context.MakeMessage();
 
@@ -131,7 +129,7 @@ namespace SmartKioskBot.Dialogs
                                 context.Wait(InputHandler);
                                 break;
                             case ClickType.ADD_PRODUCT:
-                                context.Call(new FilterDialog(user, new List<Context.Filter>(), FilterDialog.State.INIT), ResumeAfterDialogCall);
+                                context.Call(new FilterDialog(FilterDialog.State.INIT), ResumeAfterDialogCall);
                                 break;
                         }
                     }
@@ -160,9 +158,9 @@ namespace SmartKioskBot.Dialogs
         public async Task Compare(IDialogContext context)
         {
             // fetch products
-            var itemsToCompare = ContextController.GetContext(this.user.Id).Comparator;
+            var itemsToCompare = StateHelper.GetComparatorItems(context);
 
-            foreach (ObjectId o in itemsToCompare)
+            foreach(string o in itemsToCompare)
                 products.Add(ProductController.getProduct(o.ToString()));
 
             if(products.Count > 0)
@@ -196,16 +194,16 @@ namespace SmartKioskBot.Dialogs
             
         }
 
-        public static async Task AddComparator(IDialogContext context, string message, User user)
+        public static async Task AddComparator(IDialogContext context, string message)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
             {
-                var user_context = ContextController.GetContext(user.Id);
+                List<string> items = StateHelper.GetComparatorItems(context);
 
-                if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= user_context.Comparator.Length)
+                if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= items.Count)
                     await context.PostAsync("Lamento mas o número máximo de produtos permitidos no comparador é de " + 
                         ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR.ToString() + "produtos.");
                 else
@@ -216,27 +214,23 @@ namespace SmartKioskBot.Dialogs
                     reply.Text = String.Format(BotDefaultAnswers.getAddComparator());
                     await context.PostAsync(reply);
 
-                    //UPDATE AO COMPARADOR DO USER
-                    ContextController.AddComparator(user, product);
+                    StateHelper.AddItemComparator(context, product);
                 }
             }
         }
 
-        public static async Task RmvComparator(IDialogContext _context, string message, User user)
+        public static async Task RmvComparator(IDialogContext _context, string message)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
             {
-                var context = ContextController.GetContext(user.Id);
-
                 var reply = _context.MakeMessage();
                 reply.Text = BotDefaultAnswers.getRemComparator();
                 await _context.PostAsync(reply);
-
-                //REMOVER PRODUTO
-                ContextController.RemComparator(user, product);
+                
+                StateHelper.RemItemComparator(_context, product);
             }
         }
 

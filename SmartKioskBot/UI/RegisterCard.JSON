@@ -1,0 +1,119 @@
+﻿{
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "separator": true,
+            "size": "Large",
+            "weight": "Bolder",
+            "color": "Accent",
+            "text": "Registar Cliente"
+        },
+        {
+            "type": "Container",
+            "spacing": "Medium",
+            "separator": true,
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "spacing": "Small",
+                    "weight": "Bolder",
+                    "text": "Nome:"
+                },
+                {
+                    "type": "Input.Text",
+                    "id": "name",
+                    "spacing": "Small",
+                    "title": "New Input.Toggle",
+                    "placeholder": "Insira o seu nome aqui"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "E-mail:"
+                },
+                {
+                    "type": "Input.Text",
+                    "id": "email",
+                    "spacing": "Small",
+                    "title": "New Input.Toggle",
+                    "placeholder": "Insira o seu email aqui"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Número de Cliente:"
+                },
+                {
+                    "type": "Input.Number",
+                    "id": "client_id",
+                    "spacing": "Small",
+                    "title": "New Input.Toggle",
+                    "value": "0",
+                    "placeholder": "Insira o seu número de cliente aqui"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Género:"
+                },
+                {
+                    "type": "Input.ChoiceSet",
+                    "id": "gender",
+                    "spacing": "Small",
+                    "value": "Desconhecido",
+                    "placeholder": "Placeholder text",
+                    "choices": [
+                        {
+                            "title": "Feminino",
+                            "value": "Feminino"
+                        },
+                        {
+                            "title": "Masculino",
+                            "value": "Masculino"
+                        },
+                        {
+                            "title": "Outro",
+                            "value": "Outro"
+                        },
+                        {
+                            "title": "Desconhecido",
+                            "value": "Desconhecido"
+                        }
+                    ],
+                    "style": "expanded"
+                }
+            ]
+        },
+        {
+            "type": "Container"
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.Submit",
+            "title": "Criar Conta",
+            "data": {
+              "reply_type": "register_save",
+              "dialog": "account"
+            }
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
+}

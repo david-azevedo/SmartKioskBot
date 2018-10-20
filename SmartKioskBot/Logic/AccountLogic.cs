@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
 using Newtonsoft.Json.Linq;
 using SmartKioskBot.Controllers;
+using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
@@ -25,9 +26,10 @@ namespace SmartKioskBot.Logic
          * UI Cards
          */
 
-        public static void SetAccountCardFields(JToken card, User user, bool edit_card)
+        public static void SetAccountCardFields(JToken card, IDialogContext context, bool edit_card)
         {
-            var customer_card = user.CustomerCard.ToString();
+            User user = StateHelper.GetUser(context);
+            var customer_card = user.CustomerCard;
             var info_tag = "text";
             if (customer_card == "")
                 customer_card = "Desconhecido";
@@ -36,7 +38,7 @@ namespace SmartKioskBot.Logic
                 info_tag = "value";
 
             GetAccountCardSection(card, CardField.NAME)[info_tag] = user.Name;
-            GetAccountCardSection(card, CardField.CLIENT_NUMBER)[info_tag] = customer_card;
+            GetAccountCardSection(card, CardField.CLIENT_NUMBER)[info_tag] = user.CustomerCard;
             GetAccountCardSection(card, CardField.GENDER)[info_tag] = user.Gender;
             GetAccountCardSection(card, CardField.EMAIL)[info_tag] = user.Email;
         }
@@ -58,12 +60,9 @@ namespace SmartKioskBot.Logic
             return null;
         }
 
-        public static string SaveAccountInfo(List<InputData> fields, User user)
+        public static string SaveAccountInfo(List<InputData> fields, IDialogContext context)
         {
-            var name = user.Name;
-            var email = user.Email;
-            var client_id = user.CustomerCard;
-            var gender = user.Gender;
+            User user = StateHelper.GetUser(context);
 
             string fail = "";
 
@@ -73,7 +72,7 @@ namespace SmartKioskBot.Logic
                 {
                     case name_field:
                         if(f.value != "")
-                            name = f.value;
+                            user.Name = f.value;
                         break;
                     case email_field:
                         if(f.value != "")
@@ -81,7 +80,7 @@ namespace SmartKioskBot.Logic
                             try
                             {
                                 var m = new MailAddress(f.value);
-                                email = f.value;
+                                user.Email = f.value;
                             }
                             catch
                             {
@@ -90,13 +89,13 @@ namespace SmartKioskBot.Logic
                         }                        
                         break;
                     case gender_field:
-                        gender = f.value;
+                        user.Gender = f.value;
                         break;
                     case client_id_field:
                         if (f.value != "")
                         {
                             if (UserController.getUserByCard(f.value) == null)
-                                client_id = f.value;
+                                user.CustomerCard = f.value;
                             else
                                 fail += "Já existe um outro email associado a este cartão de cliente. ";
                         }
@@ -105,8 +104,97 @@ namespace SmartKioskBot.Logic
                 }
             }
 
-            UserController.SetUserInfo(user, name, email, client_id, gender);
+            UserController.SetUserInfo(user.Id,user.Country,user.Name,user.Email,user.CustomerCard,user.Gender);
+            StateHelper.SetUser(context,user);
             return fail;
+        }
+
+        public static string Register(List<InputData> fields, IDialogContext context)
+        {
+            string fail = "";
+
+            string name = "";
+            string email = "";
+            string card = "";
+            string gender = "";
+
+            foreach (InputData f in fields)
+            {
+                switch (f.attribute)
+                {
+                    case name_field:
+                        if (f.value != "")
+                            name = f.value;
+                        else
+                            fail += "O campo 'Nome' é obrigatório.\n";
+                        break;
+                    case email_field:
+                        if (f.value != "")
+                        {
+                            try
+                            {
+                                var m = new MailAddress(f.value);
+                                email = f.value;
+                            }
+                            catch
+                            {
+                                fail += "O email não está no formato correcto (exemplo: user123@mail.com).\n";
+                            }
+                        }
+                        else
+                            fail += "O campo 'Email' é obrigatório.\n";
+                        break;
+                    case gender_field:
+                        gender = f.value;
+                        break;
+                    case client_id_field:
+                        if (f.value != "")
+                            card = f.value;
+                        break;
+
+                }
+            }
+
+            if (UserController.getUserByEmail(email) != null)
+                fail += "O email que inseriu já está associado a uma conta.\n";
+            else
+            {
+                Random r = new Random();
+                UserController.CreateUser(email, name,(r.Next(25) + 1).ToString(), gender);
+                User u = UserController.getUserByEmail(email);
+                ContextController.CreateContext(u);
+                CRMController.AddCustomer(u);
+
+                if (card != "0")
+                {
+                    UserController.SetCustomerCard(u, card);
+                    u.CustomerCard = card;
+                }
+
+                StateHelper.SetUser(context,u);
+            }
+            return fail;
+        }
+
+        public static string Login(List<InputData> fields, IDialogContext context)
+        {
+            foreach(InputData data in fields)
+            {
+                if (data.attribute.Equals(email_field))
+                {
+                    User u = UserController.getUserByEmail(data.value);
+
+                    if (u != null)
+                    {
+                        StateHelper.Login(context, u);
+                        return "";
+                    }
+                }
+            }
+
+            return "Não conheço ninguém com esse email. Deseja registar-se para que o possa " +
+                            "conhecer melhor? Caso contrário pode tentar novamente. Por favor selecione uma das " +
+                            "opções abaixo. Obrigada";
         }
     }
 }

@@ -19,7 +19,7 @@ namespace SmartKioskBot.Helpers
         public static string CARDS_PATH = HostingEnvironment.MapPath(@"~/UI");
 
         
-        public enum CardType {VIEW_ACCOUNT, EDIT_ACCOUNT, FILTER, MENU, INFO_MENU, NONE};
+        public enum CardType {VIEW_ACCOUNT, EDIT_ACCOUNT, FILTER, MENU, INFO_MENU, NOT_LOGIN, REGISTER, LOGIN, NONE};
         public enum ButtonType { PAGINATION, FILTER_AGAIN, ADD_PRODUCT, COMPARE};
         //Clicked Button
         public enum ClickType {
@@ -32,6 +32,10 @@ namespace SmartKioskBot.Helpers
             ACCOUNT_EDIT,
             ACCOUNT_SAVE,
             LOGOUT,
+            REGISTER,
+            REGISTER_SAVE,
+            LOGIN,
+            LOGIN_START,
             NONE };
 
         public static string REPLY_ATR = "reply_type";
@@ -42,11 +46,12 @@ namespace SmartKioskBot.Helpers
         {
             string path = getCardFileName(type);
             string json = await FileAsync.ReadAllTextAsync(CARDS_PATH + "/" + path + ".JSON");
+            var content = JObject.Parse(@json);
 
             Attachment att = new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
-                Content = JObject.Parse(@json)
+                Content = content
             };
 
             return att;
@@ -116,6 +121,12 @@ namespace SmartKioskBot.Helpers
                     return "AccountCard";
                 case CardType.EDIT_ACCOUNT:
                     return "EditAccountCard";
+                case CardType.NOT_LOGIN:
+                    return "NotLoginCard";
+                case CardType.REGISTER:
+                    return "RegisterCard";
+                case CardType.LOGIN:
+                    return "LoginCard";
             }
             return "";
         }
@@ -149,6 +160,14 @@ namespace SmartKioskBot.Helpers
                     return ClickType.ACCOUNT_EDIT;
                 case "account_save":
                     return ClickType.ACCOUNT_SAVE;
+                case "register":
+                    return ClickType.REGISTER;
+                case "login":
+                    return ClickType.LOGIN;
+                case "register_save":
+                    return ClickType.REGISTER_SAVE;
+                case "login_start":
+                    return ClickType.LOGIN_START;
             }
 
             return ClickType.NONE;

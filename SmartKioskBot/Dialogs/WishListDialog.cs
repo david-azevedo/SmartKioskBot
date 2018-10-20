@@ -20,16 +20,13 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class WishListDialog : IDialog<object>
     {
-        private ObjectId[] wishes;
         private int skip = 0;
-        private User user = null;
         private State state;
 
         public enum State { INIT, INPUT_HANDLER };
 
-        public WishListDialog(User user, State state)
+        public WishListDialog(State state)
         {
-            this.user = user;
             this.state = state;
         }
 
@@ -48,7 +45,7 @@ namespace SmartKioskBot.Dialogs
 
         public async Task ShowWishesAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-            this.wishes = ContextController.GetContext(user.Id).WishList;
+            List<string> wishes = StateHelper.GetWishlistItems(context);
 
             //Retrive wishes information
             var to_retrieve = wishes;
@@ -57,13 +54,17 @@ namespace SmartKioskBot.Dialogs
             List<ButtonType> buttons = new List<ButtonType>();
 
             //fetch only a limited number of wishes
-            if (wishes.Length > Constants.N_ITEMS_CARROUSSEL)
+            if (wishes.Count() > Constants.N_ITEMS_CARROUSSEL)
             {
-                to_retrieve = wishes.Skip(this.skip)               
-                                    .Take(Constants.N_ITEMS_CARROUSSEL) 
-                                    .ToArray();
+                to_retrieve = wishes.Skip(this.skip)
+                                    .Take(Constants.N_ITEMS_CARROUSSEL)
+                                    .ToList();
             }
-            var products = ProductController.getProducts(to_retrieve);
+
+            var products = new List<Product>();
+
+            foreach (string i in to_retrieve)
+                products.Add(ProductController.getProduct(i));
 
             //Prepare answer
 
@@ -95,7 +96,7 @@ namespace SmartKioskBot.Dialogs
                 await context.PostAsync(reply);
 
                 //Check if pagination is needed and display wishes
-                if (wishes.Length > this.skip + Constants.N_ITEMS_CARROUSSEL)
+                if (wishes.Count() > this.skip + Constants.N_ITEMS_CARROUSSEL)
                 {
                     buttons.Add(ButtonType.PAGINATION);
                     skip += skip + Constants.N_ITEMS_CARROUSSEL;
@@ -151,7 +152,7 @@ namespace SmartKioskBot.Dialogs
                                 await StartAsync(context);
                                 break;
                             case ClickType.ADD_PRODUCT:
-                                var dialog = new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT);
+                                var dialog = new FilterDialog(FilterDialog.State.INIT);
                                 context.Call(dialog, ResumeAfterDialogCall);
                                 break;
                         }
@@ -175,27 +176,26 @@ namespace SmartKioskBot.Dialogs
             context.Done(code);
         }
 
-
         /*
          * Auxiliary Methods
          */
 
-        public static void AddToWishList(string message, User user)
+        public static void AddToWishList(IDialogContext context, string message)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
-                ContextController.AddWishList(user, product);
+                StateHelper.AddItemWishList(context, product);
         }
 
-        public static void RemoveFromWishList(string message, User user)
+        public static void RemoveFromWishList(IDialogContext context, string message)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
-                ContextController.RemWishList(user, product);
+                StateHelper.RemItemWishlist(context, product);
         }
     }
 }

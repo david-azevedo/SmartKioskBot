@@ -14,14 +14,12 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class MenuDialog : IDialog<object>
     {
-        public User user = null;
         public State state;
 
         public enum State { INIT, INPUT_HANDLE}
 
-        public MenuDialog(User user, State state)
+        public MenuDialog( State state)
         {
-            this.user = user;
             this.state = state;
         }
 
@@ -73,25 +71,25 @@ namespace SmartKioskBot.Dialogs
                         switch (data[0].value)
                         {
                             case "menu_session":
-                                context.Call(new AccountDialog(user, AccountDialog.State.INIT), 
+                                context.Call(new AccountDialog(AccountDialog.State.INIT), 
                                     ResumeAfterDialogCall);
                                 break;
                             case "menu_filter":
-                                context.Call(new FilterDialog(user, new List<Filter>(), FilterDialog.State.INIT), 
+                                context.Call(new FilterDialog(FilterDialog.State.INIT), 
                                     ResumeAfterDialogCall);
                                 break;
                             case "menu_comparator":
-                                context.Call(new CompareDialog(user, CompareDialog.State.INIT),
+                                context.Call(new CompareDialog(CompareDialog.State.INIT),
                                     ResumeAfterDialogCall);
                                 break;
                             case "menu_recommendations":
                                 context.Call(
-                                    new RecommendationDialog(user,RecommendationDialog.State.INIT),
+                                    new RecommendationDialog(RecommendationDialog.State.INIT),
                                     ResumeAfterDialogCall);
                                 break;
                             case "menu_wishlist":
                                 context.Call(
-                                    new WishListDialog(user,WishListDialog.State.INIT), 
+                                    new WishListDialog(WishListDialog.State.INIT), 
                                     ResumeAfterDialogCall);
                                 break;
                             case "menu_stores":

@@ -126,13 +126,13 @@ namespace SmartKioskBot.Controllers
         /// <param name="name"></param>
         /// <param name="email"></param>
         /// <param name="customerId"></param>
-        public static void SetUserInfo(User user, string name, string email, string customerId, string gender)
+        public static void SetUserInfo(ObjectId id, string country, string name, string email, string customerId, string gender)
         {
             var userCollection = DbSingleton.GetDatabase().GetCollection<User>(AppSettings.UserCollection);
             var update = Builders<User>.Update.Set(o => o.Name, name).Set(o => o.Email, email).Set(o => o.CustomerCard, customerId).Set(o => o.Gender, gender);
             var filter = Builders<User>.Filter.And(
-                Builders<User>.Filter.Eq(o => o.Id, user.Id),
-                Builders<User>.Filter.Eq(o => o.Country, user.Country));
+                Builders<User>.Filter.Eq(o => o.Id, id),
+                Builders<User>.Filter.Eq(o => o.Country, country));
 
             userCollection.UpdateOne(filter, update);
         }
