@@ -8,12 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using static SmartKioskBot.Models.Context;
+using static SmartKioskBot.Models.Customer;
 
 namespace SmartKioskBot.Logic
 {
     public abstract class RecommendationsLogic
     {
-
+        public const int MAX_N_FILTERS_POPULAR = 5;
         public static Filter DEFAULT_RECOMMENDATION = new Filter()
         {
             FilterName = FilterLogic.brand_filter,
@@ -40,5 +41,24 @@ namespace SmartKioskBot.Logic
 
             return similarProducts;
         }
-    }
+
+        public static List<Filter> GetPopularFilters(List<FilterCount> counts)
+        {
+            List<Filter> popular = new List<Filter>();
+
+            counts.Sort(
+                delegate (FilterCount l1, FilterCount l2)
+                {
+                    return l1.NSearches.CompareTo(l2.NSearches);
+                }
+            );
+
+            for (int i = 0; i < MAX_N_FILTERS_POPULAR && i < counts.Count; i++)
+            {
+                popular.Add(counts[i].Filter);
+            }
+
+            return popular;
+        }
+}
 }

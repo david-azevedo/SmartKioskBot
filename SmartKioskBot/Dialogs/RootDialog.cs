@@ -10,6 +10,8 @@ using SmartKioskBot.Models;
 using SmartKioskBot.Controllers;
 using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using Newtonsoft.Json.Linq;
+using SmartKioskBot.Helpers;
+using System.Net.Mail;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -20,9 +22,6 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class RootDialog : IDialog<Object>
     {
-        private User user = null;
-        private bool identified = false;
-
         public async Task StartAsync(IDialogContext context)
         {
             TryIdentification(context);
@@ -32,8 +31,6 @@ namespace SmartKioskBot.Dialogs
         private async Task InputHandler(IDialogContext context, IAwaitable<object> result)
         {
             var activity = await result as Activity;
-
-            var i = 1;
 
             //message
             if (activity.Text != null)
@@ -53,7 +50,7 @@ namespace SmartKioskBot.Dialogs
 
         private async Task MessageHandler(IDialogContext context, Activity activity)
         {
-            await context.Forward(new LuisProcessingDialog(user), ResumeAfterDialogCall, activity);
+            await context.Forward(new LuisProcessingDialog(), ResumeAfterDialogCall, activity);
         }
 
         private async Task EventHandler(IDialogContext context, DialogType dialog, Activity message)
@@ -63,28 +60,28 @@ namespace SmartKioskBot.Dialogs
                 case DialogType.ACCOUNT:
                     //TODO
                     await context.Forward(
-                        new AccountDialog(user, AccountDialog.State.INPUT_HANDLER),
+                        new AccountDialog(AccountDialog.State.INPUT_HANDLER),
                         ResumeAfterDialogCall, message);
                     break;
                 case DialogType.COMPARE:
                     await context.Forward(
-                        new CompareDialog(user, CompareDialog.State.INPUT_HANDLER),
+                        new CompareDialog(CompareDialog.State.INPUT_HANDLER),
                         ResumeAfterDialogCall, message);
                     break;
                 case DialogType.FILTER:
                     await context.Forward(
-                        new FilterDialog(user, new List<Context.Filter>(), FilterDialog.State.INPUT_HANDLER),
+                        new FilterDialog(FilterDialog.State.INPUT_HANDLER),
                         ResumeAfterDialogCall, message);
                     break;
                 case DialogType.MENU:
                     await context.Forward(
-                        new MenuDialog(user,MenuDialog.State.INPUT_HANDLE), 
+                        new MenuDialog(MenuDialog.State.INPUT_HANDLE), 
                         ResumeAfterDialogCall, message);
                     break;
                 case DialogType.RECOMMENDATION:
                     await context.Forward(
                         new RecommendationDialog(
-                            user,RecommendationDialog.State.INPUT_HANDLE), 
+                            RecommendationDialog.State.INPUT_HANDLE), 
                         ResumeAfterDialogCall, message);
                     break;
                 case DialogType.STORE:
@@ -95,7 +92,7 @@ namespace SmartKioskBot.Dialogs
                     break;
                 case DialogType.WISHLIST:
                     await context.Forward(
-                        new WishListDialog(user,WishListDialog.State.INPUT_HANDLER), 
+                        new WishListDialog(WishListDialog.State.INPUT_HANDLER), 
                         ResumeAfterDialogCall, message);
                     break;
             }
@@ -124,23 +121,21 @@ namespace SmartKioskBot.Dialogs
 
         private void TryIdentification(IDialogContext context)
         {
-            if (identified == false && !context.Activity.From.Id.Equals("default-user"))
-            {
-                //TODO
-                string email = "123@mail.com";
-                //email -> activity.ChannelId
+            StateHelper.ResetUserData(context);
+            bool found_mail = false;
 
-                var activity = context.Activity;
-                this.user = UserController.getUserByEmail(email);
-                if (user == null)
+            try
+            {
+                var m = new MailAddress(context.Activity.ChannelId);
+
+                var user = UserController.getUserByEmail(m.Address);
+                if(user != null)
                 {
-                    var r = new Random();
-                    UserController.CreateUser(email, activity.From.Name, (r.Next(25) + 1).ToString(),"Desconhecido");
-                    this.user = UserController.getUserByEmail(email);
-                    ContextController.CreateContext(user);
-                    CRMController.AddCustomer(user);
+                    StateHelper.Login(context,user);
                 }
-                identified = true;
+            }
+            catch
+            {
             }
         }
 

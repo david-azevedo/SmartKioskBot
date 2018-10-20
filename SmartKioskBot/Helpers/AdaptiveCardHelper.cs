@@ -42,11 +42,12 @@ namespace SmartKioskBot.Helpers
         {
             string path = getCardFileName(type);
             string json = await FileAsync.ReadAllTextAsync(CARDS_PATH + "/" + path + ".JSON");
+            var content = JObject.Parse(@json);
 
             Attachment att = new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
-                Content = JObject.Parse(@json)
+                Content = content
             };
 
             return att;

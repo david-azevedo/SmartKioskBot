@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
 using Newtonsoft.Json.Linq;
 using SmartKioskBot.Controllers;
+using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
@@ -25,9 +26,9 @@ namespace SmartKioskBot.Logic
          * UI Cards
          */
 
-        public static void SetAccountCardFields(JToken card, User user, bool edit_card)
+        public static void SetAccountCardFields(JToken card, IDialogContext context, bool edit_card)
         {
-            var customer_card = user.CustomerCard.ToString();
+            var customer_card = StateHelper.GetUserProperty(context, StateHelper.USER_CARD_ID_ATR);
             var info_tag = "text";
             if (customer_card == "")
                 customer_card = "Desconhecido";
@@ -35,10 +36,10 @@ namespace SmartKioskBot.Logic
             if (edit_card)
                 info_tag = "value";
 
-            GetAccountCardSection(card, CardField.NAME)[info_tag] = user.Name;
-            GetAccountCardSection(card, CardField.CLIENT_NUMBER)[info_tag] = customer_card;
-            GetAccountCardSection(card, CardField.GENDER)[info_tag] = user.Gender;
-            GetAccountCardSection(card, CardField.EMAIL)[info_tag] = user.Email;
+            GetAccountCardSection(card, CardField.NAME)[info_tag] = StateHelper.GetUserProperty(context, StateHelper.USER_NAME_ATR);
+            GetAccountCardSection(card, CardField.CLIENT_NUMBER)[info_tag] = StateHelper.GetUserProperty(context, StateHelper.USER_CARD_ID_ATR);
+            GetAccountCardSection(card, CardField.GENDER)[info_tag] = StateHelper.GetUserProperty(context, StateHelper.USER_GENDER_ATR);
+            GetAccountCardSection(card, CardField.EMAIL)[info_tag] = StateHelper.GetUserProperty(context, StateHelper.USER_EMAIL_ATR);
         }
 
         private static JToken GetAccountCardSection(JToken card, CardField field)
@@ -58,12 +59,14 @@ namespace SmartKioskBot.Logic
             return null;
         }
 
-        public static string SaveAccountInfo(List<InputData> fields, User user)
+        public static string SaveAccountInfo(List<InputData> fields, IDialogContext context)
         {
-            var name = user.Name;
-            var email = user.Email;
-            var client_id = user.CustomerCard;
-            var gender = user.Gender;
+            var id = StateHelper.GetUserId(context);
+            var country = StateHelper.GetUserProperty(context, StateHelper.USER_COUNTRY_ATR);
+            var name = StateHelper.GetUserProperty(context, StateHelper.USER_NAME_ATR);
+            var email = StateHelper.GetUserProperty(context, StateHelper.USER_EMAIL_ATR);
+            var client_id = StateHelper.GetUserProperty(context, StateHelper.USER_CARD_ID_ATR);
+            var gender = StateHelper.GetUserProperty(context, StateHelper.USER_GENDER_ATR);
 
             string fail = "";
 
@@ -105,7 +108,8 @@ namespace SmartKioskBot.Logic
                 }
             }
 
-            UserController.SetUserInfo(user, name, email, client_id, gender);
+            UserController.SetUserInfo(id,country, name, email, client_id, gender);
+            StateHelper.SetUserState(context, name, email, client_id, gender);
             return fail;
         }
     }

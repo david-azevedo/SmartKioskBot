@@ -78,29 +78,7 @@ namespace SmartKioskBot.Controllers
                     case ActivityTypes.Message:
                         //Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
                         //activity.Text = nt.Item1;
-                        
-                        using (var scope = DialogModule.BeginLifetimeScope(Conversation.Container, activity))
-                        {
-                            /*
-                            var botDataStore = scope.Resolve<IBotDataStore<BotData>>();
-                            var key = new AddressKey()
-                            {
-                                BotId = activity.Recipient.Id,
-                                ChannelId = activity.ChannelId,
-                                UserId = activity.From.Id,
-                                ConversationId = activity.Conversation.Id,
-                                ServiceUrl = activity.ServiceUrl
-                            };
-                            var userData = await botDataStore.LoadAsync(key, BotStoreType.BotConversationData, CancellationToken.None);
 
-                            //var varName = userData.GetProperty<string>("varName");
-                            //userData.SetProperty<object>("varName", null);
-
-                            await botDataStore.SaveAsync(key, BotStoreType.BotConversationData, userData, CancellationToken.None);
-                            //await botDataStore.FlushAsync(key, CancellationToken.None);
-                            */
-
-                        }
                         activity.Locale = "pt-PT";
                         await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog());
 
@@ -120,30 +98,6 @@ namespace SmartKioskBot.Controllers
                                 {
                                     if (newMember.Id != activity.Recipient.Id)
                                     {
-                                        //initiate user data
-                                        var botDataStore = scope.Resolve<IBotDataStore<BotData>>();
-                                        var key = new AddressKey()
-                                        {
-                                            BotId = activity.Recipient.Id,
-                                            ChannelId = activity.ChannelId,
-                                            UserId = activity.From.Id,
-                                            ConversationId = activity.Conversation.Id,
-                                            ServiceUrl = activity.ServiceUrl
-                                        };
-                                        var userData = await botDataStore.LoadAsync(key, BotStoreType.BotConversationData, CancellationToken.None);
-
-                                        //var varName = userData.GetProperty<string>("varName");
-                                        userData.SetProperty<List<ObjectId>>(StateHelper.WISHLIST_ATR,new List<ObjectId>());
-                                        userData.SetProperty<List<Filter>>(StateHelper.FILTERS_ATR, new List<Filter>());
-                                        userData.SetProperty<List<ObjectId>>(StateHelper.COMPARATOR_ATR, new List<ObjectId>());
-                                        userData.SetProperty<List<FilterCount>>(StateHelper.FILTER_COUNT_ATR, new List<FilterCount>());
-                                        userData.SetProperty<List<ProductClicks>>(StateHelper.PRODUCT_CLICKS_ATR, new List<ProductClicks>());
-
-                                        await botDataStore.SaveAsync(key, BotStoreType.BotConversationData, userData, CancellationToken.None);
-                                        /*
-                                        reply.Text = $"Welcome {newMember.Name}!";
-                                        await client.Conversations.ReplyToActivityAsync(reply);
-                                        */
                                     }
                                 }
                             }
@@ -160,13 +114,5 @@ namespace SmartKioskBot.Controllers
             }
             return new HttpResponseMessage(System.Net.HttpStatusCode.Accepted);
         }
-    }
-    public class AddressKey : IAddress
-    {
-        public string BotId { get; set; }
-        public string ChannelId { get; set; }
-        public string ConversationId { get; set; }
-        public string ServiceUrl { get; set; }
-        public string UserId { get; set; }
     }
 }

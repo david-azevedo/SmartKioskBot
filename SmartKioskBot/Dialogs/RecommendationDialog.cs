@@ -20,25 +20,24 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class RecommendationDialog : IDialog<object>
     {
-        private List<Filter> filtersApplied;
-        private User user;
         private ObjectId lastFetchId;
         private int page = 1;
         private State state;
 
         public enum State { INIT, INPUT_HANDLE}
 
-        public RecommendationDialog(User user, State state)
+        public RecommendationDialog(State state)
         {
-            this.user = user;
             this.state = state;
 
             //recommendation type
-            this. filtersApplied = new List<Filter>(CRMController.GetMostPopularFilters(user.Id, Constants.MAX_N_FILTERS_RECOMM));
+            //CHECK
+            //this. filtersApplied = new List<Filter>(CRMController.GetMostPopularFilters(user.Id, Constants.MAX_N_FILTERS_RECOMM));
+
 
             //Default
-            if (filtersApplied == null || filtersApplied.Count == 0)
-                this.filtersApplied.Add(RecommendationsLogic.DEFAULT_RECOMMENDATION);
+            //if (filtersApplied == null || filtersApplied.Count == 0)
+              //  this.filtersApplied.Add(RecommendationsLogic.DEFAULT_RECOMMENDATION);
         }
 
         public async Task StartAsync(IDialogContext context)
@@ -57,10 +56,11 @@ namespace SmartKioskBot.Dialogs
         private async Task ShowRecommendations(IDialogContext context, IAwaitable<object> result)
         {
             List<Product> products = new List<Product>();
+            List<Filter> popular = RecommendationsLogic.GetPopularFilters(StateHelper.GetFiltersCount(context));
 
             while (true)
             {
-                FilterDefinition<Product> joinedFilters = FilterLogic.GetJoinedFilter(this.filtersApplied);
+                FilterDefinition<Product> joinedFilters = FilterLogic.GetJoinedFilter(popular);
 
                 //fetch +1 product to see if pagination is needed
                 products = ProductController.getProductsFilter(
@@ -70,7 +70,7 @@ namespace SmartKioskBot.Dialogs
 
                 //filters didn't retrieved any products at the first try
                 if (products.Count == 0 && lastFetchId == null)
-                    filtersApplied.RemoveAt(filtersApplied.Count - 1);
+                    popular.RemoveAt(popular.Count - 1);
                 else
                     break;
             }

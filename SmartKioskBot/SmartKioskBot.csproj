@@ -275,7 +275,9 @@
     <Content Include="UI\AccountCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="UI\EditAccountCard.JSON" />
+    <Content Include="UI\EditAccountCard.JSON">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="UI\MenuCard.JSON">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

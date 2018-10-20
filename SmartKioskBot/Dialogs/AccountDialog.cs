@@ -9,20 +9,19 @@ using Newtonsoft.Json.Linq;
 using SmartKioskBot.Logic;
 using System.Collections.Generic;
 using SmartKioskBot.Controllers;
+using SmartKioskBot.Helpers;
 
 namespace SmartKioskBot.Dialogs
 {
     [Serializable]
     public class AccountDialog : IDialog<object>
     {
-        private User user;
         private State state;
 
         public enum State { INIT, INPUT_HANDLER };
 
-        public AccountDialog(User user, State state)
+        public AccountDialog(State state)
         {
-            this.user = user;
             this.state = state;
         }
 
@@ -31,7 +30,10 @@ namespace SmartKioskBot.Dialogs
             switch (state)
             {
                 case State.INIT:
-                    await ViewAccountDialog(context, null);
+                    if (StateHelper.IsLoggedIn(context))
+                        await ViewAccountDialog(context, null);
+                    else
+                        await NotLoginDialog(context, null);
                     break;
                 case State.INPUT_HANDLER:
                     context.Wait(InputHandler);
@@ -44,15 +46,20 @@ namespace SmartKioskBot.Dialogs
             var reply = context.MakeMessage();
             Attachment att = await getCardAttachment(CardType.VIEW_ACCOUNT);
 
-            this.user = UserController.getUser(user.Id);
-
             JObject json = att.Content as JObject;
-            AccountLogic.SetAccountCardFields(json,user ,false);
+            AccountLogic.SetAccountCardFields(json,context, false);
 
             reply.Attachments.Add(att);
             await context.PostAsync(reply);
 
             context.Wait(InputHandler);
+        }
+
+        public async Task NotLoginDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
+        {
+            //TODO
+            await context.PostAsync("TODO: CARD LOGIN");
+            context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         public async Task InputHandler(IDialogContext context, IAwaitable<object> argument)
@@ -93,13 +100,13 @@ namespace SmartKioskBot.Dialogs
                                 var reply = context.MakeMessage();
                                 Attachment att = await getCardAttachment(CardType.EDIT_ACCOUNT);
                                 JObject content = att.Content as JObject;
-                                AccountLogic.SetAccountCardFields(content, user, true);
+                                AccountLogic.SetAccountCardFields(content, context, true);
                                 reply.Attachments.Add(att);
                                 await context.PostAsync(reply);
                                 context.Wait(InputHandler);
                                 break;
                             case ClickType.ACCOUNT_SAVE:
-                                var fail_text = AccountLogic.SaveAccountInfo(data, user);
+                                var fail_text = AccountLogic.SaveAccountInfo(data, context);
                                 if (fail_text != "")
                                     await context.PostAsync(fail_text);
 
