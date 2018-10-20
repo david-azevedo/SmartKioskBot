@@ -68,6 +68,7 @@ namespace SmartKioskBot.Helpers
             PROCESS_EVENT,  //event to be processed
             PROCESS_LUIS,   //message needs to be processed by luis
             DONE,           //do nothing
+            RESET          //resets conversation
         }        
 
         public class CODE

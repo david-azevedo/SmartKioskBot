@@ -19,8 +19,14 @@ namespace SmartKioskBot.Helpers
         public static string COMPARATOR_ATR = "comparator";
         public static string FILTER_COUNT_ATR = "filter-count";
         public static string PRODUCT_CLICKS_ATR = "product-clicks";
-        public static string USER_ATR = "user";
         public static string LOGIN_ATR = "login";
+
+        public static string USER_ID_ATR = "user-id";
+        public static string USER_COUNTRY_ATR = "user-country";
+        public static string USER_NAME_ATR = "user-name";
+        public static string USER_EMAIL_ATR = "user-email";
+        public static string USER_CARD_ATR = "user-card";
+        public static string USER_GENDER_ATR = "user-gender";
 
         public static void ResetUserData(IDialogContext context)
         {
@@ -43,7 +49,12 @@ namespace SmartKioskBot.Helpers
             userdata.SetValue<bool>(LOGIN_ATR, true);
 
             //User info
-            userdata.SetValue<User>(USER_ATR, user);
+            userdata.SetValue<string>(USER_ID_ATR, user.Id.ToString());
+            userdata.SetValue<string>(USER_COUNTRY_ATR, user.Country);
+            userdata.SetValue<string>(USER_NAME_ATR, user.Name);
+            userdata.SetValue<string>(USER_EMAIL_ATR, user.Email);
+            userdata.SetValue<string>(USER_CARD_ATR, user.CustomerCard);
+            userdata.SetValue<string>(USER_GENDER_ATR, user.Gender);
 
             //User context
             List<string> compare = new List<string>();
@@ -74,7 +85,16 @@ namespace SmartKioskBot.Helpers
         
         public static User GetUser(IDialogContext context)
         {
-            return context.PrivateConversationData.GetValue<User>(USER_ATR);
+            User u = new User();
+
+            u.Id = new ObjectId(context.PrivateConversationData.GetValue<string>(USER_ID_ATR));
+            u.Country = context.PrivateConversationData.GetValue<string>(USER_COUNTRY_ATR);
+            u.Name = context.PrivateConversationData.GetValue<string>(USER_NAME_ATR);
+            u.Email = context.PrivateConversationData.GetValue<string>(USER_EMAIL_ATR);
+            u.CustomerCard = context.PrivateConversationData.GetValue<string>(USER_CARD_ATR);
+            u.Gender = context.PrivateConversationData.GetValue<string>(USER_GENDER_ATR);
+
+            return u;
         }
 
         public static List<string> GetComparatorItems(IDialogContext context)
@@ -108,7 +128,14 @@ namespace SmartKioskBot.Helpers
 
         public static void SetUser(IDialogContext context, User user)
         {
-            context.PrivateConversationData.SetValue<User>(USER_ATR,user);
+            context.PrivateConversationData.SetValue<string>(USER_ID_ATR, user.Id.ToString());
+            context.PrivateConversationData.SetValue<string>(USER_COUNTRY_ATR, user.Country);
+            context.PrivateConversationData.SetValue<string>(USER_NAME_ATR, user.Name);
+            context.PrivateConversationData.SetValue<string>(USER_EMAIL_ATR, user.Email);
+            context.PrivateConversationData.SetValue<string>(USER_CARD_ATR, user.CustomerCard);
+            context.PrivateConversationData.SetValue<string>(USER_GENDER_ATR, user.Gender);
+
+            context.PrivateConversationData.SetValue<bool>(LOGIN_ATR, true);
         }
 
         public static bool AddFilter(Filter f, IDialogContext context)

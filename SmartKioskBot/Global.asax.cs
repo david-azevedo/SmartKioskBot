@@ -6,6 +6,7 @@ using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Internals;
 using System.Web.Http;
+using System.Reflection;
 
 namespace SmartKioskBot
 {
@@ -22,6 +23,8 @@ namespace SmartKioskBot
            Conversation.UpdateContainer(
            builder =>
            {
+               builder.RegisterModule(new AzureModule(Assembly.GetExecutingAssembly()));
+
                builder.Register(c => store)
                          .Keyed<IBotDataStore<BotData>>(AzureModule.Key_DataStore)
                          .AsSelf()

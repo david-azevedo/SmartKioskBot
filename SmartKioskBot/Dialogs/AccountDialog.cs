@@ -41,6 +41,17 @@ namespace SmartKioskBot.Dialogs
             }
         }
 
+        public async Task NotLoginDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
+        {
+            var reply = context.MakeMessage();
+            Attachment att = await getCardAttachment(CardType.NOT_LOGIN);
+
+            reply.Attachments.Add(att);
+            await context.PostAsync(reply);
+
+            context.Wait(InputHandler);
+        }
+
         public async Task ViewAccountDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             var reply = context.MakeMessage();
@@ -53,13 +64,6 @@ namespace SmartKioskBot.Dialogs
             await context.PostAsync(reply);
 
             context.Wait(InputHandler);
-        }
-
-        public async Task NotLoginDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
-        {
-            //TODO
-            await context.PostAsync("TODO: CARD LOGIN");
-            context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         public async Task InputHandler(IDialogContext context, IAwaitable<object> argument)
@@ -94,19 +98,48 @@ namespace SmartKioskBot.Dialogs
                     if (data[1].value.Equals(getDialogName(DialogType.ACCOUNT)) &&
                         click != ClickType.NONE)
                     {
+                        var reply = context.MakeMessage();
                         switch (click)
                         {
-                            case ClickType.ACCOUNT_EDIT:
-                                var reply = context.MakeMessage();
-                                Attachment att = await getCardAttachment(CardType.EDIT_ACCOUNT);
-                                JObject content = att.Content as JObject;
-                                AccountLogic.SetAccountCardFields(content, context, true);
+                            case ClickType.LOGIN:
+                                Attachment att = await getCardAttachment(CardType.LOGIN);
                                 reply.Attachments.Add(att);
                                 await context.PostAsync(reply);
                                 context.Wait(InputHandler);
                                 break;
+                            case ClickType.LOGIN_START:
+                                var fail_text = AccountLogic.Login(data, context);
+                                if (fail_text != "")
+                                    await context.PostAsync(fail_text);
+
+                                state = State.INIT;
+                                await StartAsync(context);
+                                break;
+                                break;
+                            case ClickType.REGISTER:
+                                Attachment att1 = await getCardAttachment(CardType.REGISTER);
+                                reply.Attachments.Add(att1);
+                                await context.PostAsync(reply);
+                                context.Wait(InputHandler);
+                                break;
+                            case ClickType.REGISTER_SAVE:
+                                fail_text = AccountLogic.SaveRegisterInfo(data, context);
+                                if (fail_text != "")
+                                    await context.PostAsync(fail_text);
+
+                                state = State.INIT;
+                                await StartAsync(context);
+                                break;
+                            case ClickType.ACCOUNT_EDIT:
+                                Attachment att3 = await getCardAttachment(CardType.EDIT_ACCOUNT);
+                                JObject content = att3.Content as JObject;
+                                AccountLogic.SetAccountCardFields(content, context, true);
+                                reply.Attachments.Add(att3);
+                                await context.PostAsync(reply);
+                                context.Wait(InputHandler);
+                                break;
                             case ClickType.ACCOUNT_SAVE:
-                                var fail_text = AccountLogic.SaveAccountInfo(data, context);
+                                fail_text = AccountLogic.SaveAccountInfo(data, context);
                                 if (fail_text != "")
                                     await context.PostAsync(fail_text);
 
@@ -114,7 +147,7 @@ namespace SmartKioskBot.Dialogs
                                 await StartAsync(context);
                                 break;
                             case ClickType.LOGOUT:
-                                //TODO
+                                context.Done<CODE>(new CODE(DIALOG_CODE.RESET));
                                 break;
                         }
                     }

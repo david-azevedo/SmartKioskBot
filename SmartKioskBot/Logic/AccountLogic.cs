@@ -108,5 +108,93 @@ namespace SmartKioskBot.Logic
             StateHelper.SetUser(context,user);
             return fail;
         }
+
+        public static string SaveRegisterInfo(List<InputData> fields, IDialogContext context)
+        {
+            string fail = "";
+
+            string name = "";
+            string email = "";
+            string card = "";
+            string gender = "";
+
+            foreach (InputData f in fields)
+            {
+                switch (f.attribute)
+                {
+                    case name_field:
+                        if (f.value != "")
+                            name = f.value;
+                        else
+                            fail += "O campo 'Nome' é obrigatório.\n";
+                        break;
+                    case email_field:
+                        if (f.value != "")
+                        {
+                            try
+                            {
+                                var m = new MailAddress(f.value);
+                                email = f.value;
+                            }
+                            catch
+                            {
+                                fail += "O email não está no formato correcto (exemplo: user123@mail.com).\n";
+                            }
+                        }
+                        else
+                            fail += "O campo 'Email' é obrigatório.\n";
+                        break;
+                    case gender_field:
+                        gender = f.value;
+                        break;
+                    case client_id_field:
+                        if (f.value != "")
+                            card = f.value;
+                        break;
+
+                }
+            }
+
+            if (UserController.getUserByEmail(email) != null)
+                fail += "O email que inseriu já está associado a uma conta.\n";
+            else
+            {
+                Random r = new Random();
+                UserController.CreateUser(email, name,(r.Next(25) + 1).ToString(), gender);
+                User u = UserController.getUserByEmail(email);
+                ContextController.CreateContext(u);
+                CRMController.AddCustomer(u);
+
+                if (card != "0")
+                {
+                    UserController.SetCustomerCard(u, card);
+                    u.CustomerCard = card;
+                }
+
+                StateHelper.SetUser(context,u);
+            }
+            return fail;
+        }
+
+        public static string Login(List<InputData> fields, IDialogContext context)
+        {
+            foreach(InputData data in fields)
+            {
+                if (data.attribute.Equals(email_field))
+                {
+                    User u = UserController.getUserByEmail(data.value);
+
+                    if (u != null)
+                    {
+                        StateHelper.SetUser(context, u);
+                        return "";
+                    }
+                }
+            }
+
+            return "Não conheço ninguém com esse email. Deseja registar-se para que o possa " +
+                            "conhecer melhor? Caso contrário pode tentar novamente. Por favor selecione uma das " +
+                            "opções abaixo. Obrigada";
+        }
     }
 }
