@@ -108,15 +108,15 @@ namespace SmartKioskBot.Dialogs
                 //dialog ended
                 if (c.code == DIALOG_CODE.DONE)
                     context.Wait(InputHandler);
+                //reset conversation
+                else if (c.code == DIALOG_CODE.RESET)
+                    context.Done<object>(null);
                 //message to handle
                 else if (c.dialog == DialogType.NONE)
                     await MessageHandler(context, c.activity);
                 //event handle
                 else if (c.code == DIALOG_CODE.PROCESS_EVENT)
                     await EventHandler(context, c.dialog, c.activity);
-                //reset conversation
-                else if (c.code == DIALOG_CODE.RESET)
-                    context.Done<object>(null);
             }
             else
                 context.Wait(InputHandler);

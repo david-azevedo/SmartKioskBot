@@ -45,9 +45,6 @@ namespace SmartKioskBot.Dialogs
 
         public async Task ShowWishesAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-            //CHECK
-            //this.wishes = ContextController.GetContext(user.Id).WishList;
-
             List<string> wishes = StateHelper.GetWishlistItems(context);
 
             //Retrive wishes information
@@ -190,8 +187,6 @@ namespace SmartKioskBot.Dialogs
 
             if (parts.Length >= 2)
                 StateHelper.AddItemWishList(context, product);
-                //CHECK
-                //ContextController.AddWishList(user, product);
         }
 
         public static void RemoveFromWishList(IDialogContext context, string message)
@@ -201,9 +196,6 @@ namespace SmartKioskBot.Dialogs
 
             if (parts.Length >= 2)
                 StateHelper.RemItemWishlist(context, product);
-
-                //CHECK
-                //ContextController.RemWishList(user, product);
         }
     }
 }

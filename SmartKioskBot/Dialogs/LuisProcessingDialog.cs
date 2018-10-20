@@ -173,7 +173,7 @@ namespace SmartKioskBot.Dialogs
             FilterDialog.State state = FilterDialog.State.INIT;
 
             if (filter_luis.Count != 0)
-                state = FilterDialog.State.FILTER_PREVIOUS;
+                state = FilterDialog.State.FILTER;
             else
                 state = FilterDialog.State.INIT;
 

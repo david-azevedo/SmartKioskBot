@@ -109,7 +109,7 @@ namespace SmartKioskBot.Logic
             return fail;
         }
 
-        public static string SaveRegisterInfo(List<InputData> fields, IDialogContext context)
+        public static string Register(List<InputData> fields, IDialogContext context)
         {
             string fail = "";
 
@@ -186,7 +186,7 @@ namespace SmartKioskBot.Logic
 
                     if (u != null)
                     {
-                        StateHelper.SetUser(context, u);
+                        StateHelper.Login(context, u);
                         return "";
                     }
                 }

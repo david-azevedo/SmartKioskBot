@@ -125,7 +125,7 @@ namespace SmartKioskBot.Helpers
         /*
          * SET
          */
-
+         
         public static void SetUser(IDialogContext context, User user)
         {
             context.PrivateConversationData.SetValue<string>(USER_ID_ATR, user.Id.ToString());
@@ -150,6 +150,10 @@ namespace SmartKioskBot.Helpers
             List<Filter> filters_state = user_data.GetValue<List<Filter>>(FILTERS_ATR);
             filters_state.Add(f);
             user_data.SetValue<List<Filter>>(FILTERS_ATR, filters_state);
+
+            if (IsLoggedIn(context))
+                ContextController.AddFilter(GetUser(context), f.FilterName, f.Operator, f.Value);
+
             return true;
         }
 
@@ -157,6 +161,15 @@ namespace SmartKioskBot.Helpers
         {
             var user_data = context.PrivateConversationData;
             user_data.SetValue<List<Filter>>(FILTERS_ATR, new_filters);
+
+            if (IsLoggedIn(context))
+            {
+                User u = GetUser(context);
+                ContextController.CleanFilters(u);
+
+                foreach (Filter f in new_filters)
+                    ContextController.AddFilter(u, f.FilterName, f.Operator, f.Value);
+            }
         }
 
         public static void AddFilterCount(IDialogContext context, Filter f)
@@ -175,12 +188,24 @@ namespace SmartKioskBot.Helpers
             cnt.NSearches = 1;
 
             counts.Add(cnt);
-            context.PrivateConversationData.SetValue<List<FilterCount>>(FILTER_COUNT_ATR,counts);
+            context.PrivateConversationData.SetValue<List<FilterCount>>(FILTER_COUNT_ATR, counts);
+
+            if (IsLoggedIn(context))
+            {
+                User u = GetUser(context);
+                CRMController.AddFilterUsage(u.Id, u.Country, f);
+            }
         }
 
         public static void CleanFilters(IDialogContext context)
         {
             context.PrivateConversationData.SetValue<List<Filter>>(FILTERS_ATR, new List<Filter>());
+
+            if (IsLoggedIn(context))
+            {
+                User u = GetUser(context);
+                ContextController.CleanFilters(u);
+            }
         }
 
         public static void AddItemComparator(IDialogContext context, string item)
@@ -193,6 +218,12 @@ namespace SmartKioskBot.Helpers
 
             items.Add(item.ToString());
             context.PrivateConversationData.SetValue<List<string>>(COMPARATOR_ATR, items);
+
+            if (IsLoggedIn(context))
+            {
+                User u = GetUser(context);
+                ContextController.AddComparator(u, item);
+            }
         }
 
         public static void RemItemComparator(IDialogContext context, string item)
@@ -205,6 +236,12 @@ namespace SmartKioskBot.Helpers
                 {
                     items.Remove(i);
                     context.PrivateConversationData.SetValue<List<string>>(COMPARATOR_ATR, items);
+
+                    if (IsLoggedIn(context))
+                    {
+                        User u = GetUser(context);
+                        ContextController.RemComparator(u, item);
+                    }
                     break;
                 }
             }
@@ -221,6 +258,12 @@ namespace SmartKioskBot.Helpers
 
             items.Add(item);
             context.PrivateConversationData.SetValue<List<string>>(WISHLIST_ATR, items);
+
+            if (IsLoggedIn(context))
+            {
+                User u = GetUser(context);
+                ContextController.AddWishList(u, item);
+            }
         }
 
         public static void RemItemWishlist(IDialogContext context, string item)
@@ -233,6 +276,12 @@ namespace SmartKioskBot.Helpers
                 {
                     items.Remove(i);
                     context.PrivateConversationData.SetValue<List<string>>(WISHLIST_ATR, items);
+
+                    if (IsLoggedIn(context))
+                    {
+                        User u = GetUser(context);
+                        ContextController.RemWishList(u, item);
+                    }
                     break;
                 }
             }
@@ -257,6 +306,12 @@ namespace SmartKioskBot.Helpers
 
             clicks.Add(pc);
             context.PrivateConversationData.SetValue<List<ProductClicks>>(PRODUCT_CLICKS_ATR, clicks);
+
+            if (IsLoggedIn(context))
+            {
+                User u = GetUser(context);
+                CRMController.AddProductClick(u.Id, u.Country, new ObjectId(id));
+            }
         }
     }
 }

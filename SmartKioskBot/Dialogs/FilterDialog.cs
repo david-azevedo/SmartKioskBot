@@ -24,13 +24,11 @@ namespace SmartKioskBot.Dialogs
         private State state;
 
         public enum State {
-            INIT,
-            FILTER_PREVIOUS,
-            FILTER,
-            FILTER_AGAIN,
-            CLEAN,
-            CLEAN_ALL,
-            INPUT_HANDLER };
+            INIT,               //Form
+            FILTER,             //Perform filtering
+            FILTER_AGAIN,       //Form with previous filters
+            CLEAN_ALL,      
+            INPUT_HANDLER };    //Handle input
 
         public FilterDialog(State state)
         {
@@ -47,10 +45,7 @@ namespace SmartKioskBot.Dialogs
                     await InitDialog(context, null);
                     break;
                 case State.FILTER:
-                case State.FILTER_PREVIOUS:
                     await FilterAsync(context, null);
-                    break;
-                case State.CLEAN:
                     break;
                 case State.CLEAN_ALL:
                     break;
@@ -76,8 +71,6 @@ namespace SmartKioskBot.Dialogs
             }
             //reset filters (they will be added again in the filtering process)
             StateHelper.SetFilters(new List<Filter>(), context);
-            //CHECK
-            //ContextController.SetFilters(CLEAN);
 
             //send form
             reply.Attachments.Add(att);
@@ -89,18 +82,6 @@ namespace SmartKioskBot.Dialogs
         public async Task FilterAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
             List<Filter> filters = StateHelper.GetFilters(context);
-            /*
-            // join the retrieved filters with the added ones
-            // in case the user entered the filters manually
-            if (this.state.Equals(State.FILTER_PREVIOUS))
-            {
-                foreach(Filter f in filters){
-                    StateHelper.AddFilterCount(context, f);
-                    //CHECK
-                    //CRMController.AddFilterUsage(user.Id, user.Country, f1);
-                    //ContextController.AddFilter
-                }
-            }*/
             
             // search products based on the last fetch id (inclusive)
             // search will fetch +1 product to know if pagination is needed
@@ -237,8 +218,6 @@ namespace SmartKioskBot.Dialogs
         public static IMessageActivity CleanAllFilters(IDialogContext context)
         {
             StateHelper.CleanFilters(context);
-            //CHECK
-            //ContextController.CleanFilters(user);
             var reply = context.MakeMessage();
             reply.Text = BotDefaultAnswers.getCleanAllFilters();
             return reply;

@@ -115,7 +115,6 @@ namespace SmartKioskBot.Dialogs
                                 state = State.INIT;
                                 await StartAsync(context);
                                 break;
-                                break;
                             case ClickType.REGISTER:
                                 Attachment att1 = await getCardAttachment(CardType.REGISTER);
                                 reply.Attachments.Add(att1);
@@ -123,7 +122,7 @@ namespace SmartKioskBot.Dialogs
                                 context.Wait(InputHandler);
                                 break;
                             case ClickType.REGISTER_SAVE:
-                                fail_text = AccountLogic.SaveRegisterInfo(data, context);
+                                fail_text = AccountLogic.Register(data, context);
                                 if (fail_text != "")
                                     await context.PostAsync(fail_text);
 
@@ -147,6 +146,7 @@ namespace SmartKioskBot.Dialogs
                                 await StartAsync(context);
                                 break;
                             case ClickType.LOGOUT:
+                                await context.PostAsync("A sua sessão foi terminada. Não se preocupe, ainda me lembro da nossa conversa.");
                                 context.Done<CODE>(new CODE(DIALOG_CODE.RESET));
                                 break;
                         }

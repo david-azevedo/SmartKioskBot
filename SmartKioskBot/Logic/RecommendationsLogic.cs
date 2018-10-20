@@ -58,6 +58,9 @@ namespace SmartKioskBot.Logic
                 popular.Add(counts[i].Filter);
             }
 
+            if (popular.Count == 0)
+                popular.Add(DEFAULT_RECOMMENDATION);
+
             return popular;
         }
 }

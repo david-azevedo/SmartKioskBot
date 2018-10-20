@@ -29,15 +29,6 @@ namespace SmartKioskBot.Dialogs
         public RecommendationDialog(State state)
         {
             this.state = state;
-
-            //recommendation type
-            //CHECK
-            //this. filtersApplied = new List<Filter>(CRMController.GetMostPopularFilters(user.Id, Constants.MAX_N_FILTERS_RECOMM));
-
-
-            //Default
-            //if (filtersApplied == null || filtersApplied.Count == 0)
-              //  this.filtersApplied.Add(RecommendationsLogic.DEFAULT_RECOMMENDATION);
         }
 
         public async Task StartAsync(IDialogContext context)

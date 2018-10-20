@@ -201,9 +201,6 @@ namespace SmartKioskBot.Dialogs
 
             if (parts.Length >= 2)
             {
-                //CHECK
-                //var user_context = ContextController.GetContext(user.Id);
-
                 List<string> items = StateHelper.GetComparatorItems(context);
 
                 if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= items.Count)
@@ -217,9 +214,6 @@ namespace SmartKioskBot.Dialogs
                     reply.Text = String.Format(BotDefaultAnswers.getAddComparator());
                     await context.PostAsync(reply);
 
-                    //UPDATE AO COMPARADOR DO USER
-                    //CHECK
-                    //ContextController.AddComparator(user, product);
                     StateHelper.AddItemComparator(context, product);
                 }
             }
@@ -232,16 +226,10 @@ namespace SmartKioskBot.Dialogs
 
             if (parts.Length >= 2)
             {
-                //CHECK
-                //var context = ContextController.GetContext(user.Id);
-
                 var reply = _context.MakeMessage();
                 reply.Text = BotDefaultAnswers.getRemComparator();
                 await _context.PostAsync(reply);
-
-                //REMOVER PRODUTO
-                //CHECK
-                //ContextController.RemComparator(user, product);
+                
                 StateHelper.RemItemComparator(_context, product);
             }
         }
