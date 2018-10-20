@@ -28,7 +28,8 @@ namespace SmartKioskBot.Logic
 
         public static void SetAccountCardFields(JToken card, IDialogContext context, bool edit_card)
         {
-            var customer_card = StateHelper.GetUserProperty(context, StateHelper.USER_CARD_ID_ATR);
+            User user = StateHelper.GetUser(context);
+            var customer_card = user.CustomerCard;
             var info_tag = "text";
             if (customer_card == "")
                 customer_card = "Desconhecido";
@@ -36,10 +37,10 @@ namespace SmartKioskBot.Logic
             if (edit_card)
                 info_tag = "value";
 
-            GetAccountCardSection(card, CardField.NAME)[info_tag] = StateHelper.GetUserProperty(context, StateHelper.USER_NAME_ATR);
-            GetAccountCardSection(card, CardField.CLIENT_NUMBER)[info_tag] = StateHelper.GetUserProperty(context, StateHelper.USER_CARD_ID_ATR);
-            GetAccountCardSection(card, CardField.GENDER)[info_tag] = StateHelper.GetUserProperty(context, StateHelper.USER_GENDER_ATR);
-            GetAccountCardSection(card, CardField.EMAIL)[info_tag] = StateHelper.GetUserProperty(context, StateHelper.USER_EMAIL_ATR);
+            GetAccountCardSection(card, CardField.NAME)[info_tag] = user.Name;
+            GetAccountCardSection(card, CardField.CLIENT_NUMBER)[info_tag] = user.CustomerCard;
+            GetAccountCardSection(card, CardField.GENDER)[info_tag] = user.Gender;
+            GetAccountCardSection(card, CardField.EMAIL)[info_tag] = user.Email;
         }
 
         private static JToken GetAccountCardSection(JToken card, CardField field)
@@ -61,12 +62,7 @@ namespace SmartKioskBot.Logic
 
         public static string SaveAccountInfo(List<InputData> fields, IDialogContext context)
         {
-            var id = StateHelper.GetUserId(context);
-            var country = StateHelper.GetUserProperty(context, StateHelper.USER_COUNTRY_ATR);
-            var name = StateHelper.GetUserProperty(context, StateHelper.USER_NAME_ATR);
-            var email = StateHelper.GetUserProperty(context, StateHelper.USER_EMAIL_ATR);
-            var client_id = StateHelper.GetUserProperty(context, StateHelper.USER_CARD_ID_ATR);
-            var gender = StateHelper.GetUserProperty(context, StateHelper.USER_GENDER_ATR);
+            User user = StateHelper.GetUser(context);
 
             string fail = "";
 
@@ -76,7 +72,7 @@ namespace SmartKioskBot.Logic
                 {
                     case name_field:
                         if(f.value != "")
-                            name = f.value;
+                            user.Name = f.value;
                         break;
                     case email_field:
                         if(f.value != "")
@@ -84,7 +80,7 @@ namespace SmartKioskBot.Logic
                             try
                             {
                                 var m = new MailAddress(f.value);
-                                email = f.value;
+                                user.Email = f.value;
                             }
                             catch
                             {
@@ -93,13 +89,13 @@ namespace SmartKioskBot.Logic
                         }                        
                         break;
                     case gender_field:
-                        gender = f.value;
+                        user.Gender = f.value;
                         break;
                     case client_id_field:
                         if (f.value != "")
                         {
                             if (UserController.getUserByCard(f.value) == null)
-                                client_id = f.value;
+                                user.CustomerCard = f.value;
                             else
                                 fail += "Já existe um outro email associado a este cartão de cliente. ";
                         }
@@ -108,8 +104,8 @@ namespace SmartKioskBot.Logic
                 }
             }
 
-            UserController.SetUserInfo(id,country, name, email, client_id, gender);
-            StateHelper.SetUserState(context, name, email, client_id, gender);
+            UserController.SetUserInfo(user.Id,user.Country,user.Name,user.Email,user.CustomerCard,user.Gender);
+            StateHelper.SetUser(context,user);
             return fail;
         }
     }

@@ -48,7 +48,7 @@ namespace SmartKioskBot.Dialogs
             //CHECK
             //this.wishes = ContextController.GetContext(user.Id).WishList;
 
-            List<ObjectId> wishes = StateHelper.GetWishlistItems(context);
+            List<string> wishes = StateHelper.GetWishlistItems(context);
 
             //Retrive wishes information
             var to_retrieve = wishes;
@@ -63,7 +63,11 @@ namespace SmartKioskBot.Dialogs
                                     .Take(Constants.N_ITEMS_CARROUSSEL)
                                     .ToList();
             }
-            var products = ProductController.getProducts(to_retrieve.ToArray());
+
+            var products = new List<Product>();
+
+            foreach (string i in to_retrieve)
+                products.Add(ProductController.getProduct(i));
 
             //Prepare answer
 
@@ -185,7 +189,7 @@ namespace SmartKioskBot.Dialogs
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
-                StateHelper.AddItemWishList(context, new ObjectId(product));
+                StateHelper.AddItemWishList(context, product);
                 //CHECK
                 //ContextController.AddWishList(user, product);
         }

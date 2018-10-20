@@ -49,9 +49,9 @@ namespace SmartKioskBot.Dialogs
 
             // fetch products
             var itemsToCompare = StateHelper.GetComparatorItems(context);
-
-            foreach (ObjectId o in itemsToCompare)
-                products.Add(ProductController.getProduct(o.ToString()));
+            
+            foreach(string o in itemsToCompare)
+                products.Add(ProductController.getProduct(o));
 
             var reply = context.MakeMessage();
 
@@ -160,7 +160,7 @@ namespace SmartKioskBot.Dialogs
             // fetch products
             var itemsToCompare = StateHelper.GetComparatorItems(context);
 
-            foreach (ObjectId o in itemsToCompare)
+            foreach(string o in itemsToCompare)
                 products.Add(ProductController.getProduct(o.ToString()));
 
             if(products.Count > 0)
@@ -204,7 +204,7 @@ namespace SmartKioskBot.Dialogs
                 //CHECK
                 //var user_context = ContextController.GetContext(user.Id);
 
-                List<ObjectId> items = StateHelper.GetComparatorItems(context);
+                List<string> items = StateHelper.GetComparatorItems(context);
 
                 if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= items.Count)
                     await context.PostAsync("Lamento mas o número máximo de produtos permitidos no comparador é de " + 
@@ -220,7 +220,7 @@ namespace SmartKioskBot.Dialogs
                     //UPDATE AO COMPARADOR DO USER
                     //CHECK
                     //ContextController.AddComparator(user, product);
-                    StateHelper.AddItemComparator(context, productToAdd.Id);
+                    StateHelper.AddItemComparator(context, product);
                 }
             }
         }
