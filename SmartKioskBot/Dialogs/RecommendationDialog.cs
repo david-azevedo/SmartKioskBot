@@ -30,7 +30,7 @@ namespace SmartKioskBot.Dialogs
             this.user = user;
 
             //recommendation type
-            this. filtersApplied = new List<Filter>(CRMController.GetMostPopularFilters(user.Id, Constants.MAX_N_FILTERS_RECOMM));
+            this.filtersApplied = new List<Filter>(CRMController.GetMostPopularFilters(user.Id, Constants.MAX_N_FILTERS_RECOMM));
 
             //Default
             if (filtersApplied == null || filtersApplied.Count == 0)
@@ -62,8 +62,17 @@ namespace SmartKioskBot.Dialogs
                 else
                     break;
             }
-            
-            if(products.Count > Constants.N_ITEMS_CARROUSSEL) 
+
+            // Add recommendations based on Wish List products
+            ObjectId[] wishes = ContextController.GetContext(user.Id).WishList;
+
+            foreach (ObjectId obj in wishes)
+            {
+                List<Product> l = Logic.RecommendationsLogic.GetSimilarProducts(obj);
+                products.InsertRange(0, l);
+            }
+
+            if (products.Count > Constants.N_ITEMS_CARROUSSEL) 
                 lastFetchId = products[products.Count - 2].Id;
             
             var reply = context.MakeMessage();
