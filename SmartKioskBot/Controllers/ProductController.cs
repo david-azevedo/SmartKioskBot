@@ -24,10 +24,10 @@ namespace SmartKioskBot.Controllers
                 return context[0];
         }
 
-        public static List<Product> getProducts(ObjectId[] productsIds)
+        public static List<Product> getProducts(string[] productsIds)
         {
             var productCollection = DbSingleton.GetDatabase().GetCollection<Product>(AppSettings.ProductsCollection);
-            var filter = MongoDB.Driver.Builders<Product>.Filter.In(p => p.Id, productsIds);
+            var filter = MongoDB.Driver.Builders<Product>.Filter.In(p => p.Id.ToString(), productsIds);
 
            return productCollection.Find(filter).ToList();
         }

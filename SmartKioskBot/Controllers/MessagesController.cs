@@ -11,8 +11,13 @@ using Autofac;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Internals;
 using Microsoft.Bot.Connector;
+using System.Threading;
+using MongoDB.Bson;
+using static SmartKioskBot.Models.Context;
+using static SmartKioskBot.Models.Customer;
+using SmartKioskBot.Helpers;
 
-namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
+namespace SmartKioskBot.Controllers
 {
 
     /// <summary>
@@ -45,8 +50,6 @@ namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
     [BotAuthentication(CredentialProviderType = typeof(MultiCredentialProvider))]
     public class MessagesController : ApiController
     {
-
-
         static MessagesController()
         {
 
@@ -73,12 +76,12 @@ namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
                 switch (activity.GetActivityType())
                 {
                     case ActivityTypes.Message:
-                        {
-                            //Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
-                            //activity.Text = nt.Item1;
-                            activity.Locale = "pt-PT";
-                            await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog());
-                        }
+                        //Tuple<string, string> nt = await botTranslator.TranslateAsync(activity.Text, "Detect", "Portuguese");
+                        //activity.Text = nt.Item1;
+
+                        activity.Locale = "pt-PT";
+                        await Conversation.SendAsync(activity, () => new SmartKioskBot.Dialogs.RootDialog());
+
                         break;
 
                     case ActivityTypes.ConversationUpdate:
@@ -95,8 +98,6 @@ namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
                                 {
                                     if (newMember.Id != activity.Recipient.Id)
                                     {
-                                        reply.Text = $"Welcome {newMember.Name}!";
-                                        await client.Conversations.ReplyToActivityAsync(reply);
                                     }
                                 }
                             }
@@ -105,7 +106,7 @@ namespace Microsoft.Bot.Sample.SimpleMultiCredentialBot
                     case ActivityTypes.ContactRelationUpdate:
                     case ActivityTypes.Typing:
                     case ActivityTypes.DeleteUserData:
-                    case ActivityTypes.Ping:
+                        break;
                     default:
                         Trace.TraceError($"Unknown activity type ignored: {activity.GetActivityType()}");
                         break;

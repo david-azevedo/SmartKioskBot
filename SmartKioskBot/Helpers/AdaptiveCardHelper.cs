@@ -2,12 +2,14 @@
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json.Linq;
 using SmartKioskBot.Logic;
+using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
+using static SmartKioskBot.Logic.AccountLogic;
 using static SmartKioskBot.Models.Context;
 
 namespace SmartKioskBot.Helpers
@@ -16,15 +18,24 @@ namespace SmartKioskBot.Helpers
     {
         public static string CARDS_PATH = HostingEnvironment.MapPath(@"~/UI");
 
-        public enum CardType {FILTER, MENU, INFO_MENU, NONE};
+        
+        public enum CardType {VIEW_ACCOUNT, EDIT_ACCOUNT, FILTER, MENU, INFO_MENU, NOT_LOGIN, REGISTER, LOGIN, NONE};
         public enum ButtonType { PAGINATION, FILTER_AGAIN, ADD_PRODUCT, COMPARE};
+        //Clicked Button
         public enum ClickType {
-            MENU,
+            MENU,           //Is parsed better in the dialog
             FILTER,
             PAGINATION,
             FILTER_AGAIN,
             ADD_PRODUCT,
             COMPARE,
+            ACCOUNT_EDIT,
+            ACCOUNT_SAVE,
+            LOGOUT,
+            REGISTER,
+            REGISTER_SAVE,
+            LOGIN,
+            LOGIN_START,
             NONE };
 
         public static string REPLY_ATR = "reply_type";
@@ -35,11 +46,12 @@ namespace SmartKioskBot.Helpers
         {
             string path = getCardFileName(type);
             string json = await FileAsync.ReadAllTextAsync(CARDS_PATH + "/" + path + ".JSON");
+            var content = JObject.Parse(@json);
 
             Attachment att = new Attachment()
             {
                 ContentType = AdaptiveCard.ContentType,
-                Content = JObject.Parse(@json)
+                Content = content
             };
 
             return att;
@@ -105,6 +117,16 @@ namespace SmartKioskBot.Helpers
                     return "MenuCard";
                 case CardType.INFO_MENU:
                     return "InfoMenuCard";
+                case CardType.VIEW_ACCOUNT:
+                    return "AccountCard";
+                case CardType.EDIT_ACCOUNT:
+                    return "EditAccountCard";
+                case CardType.NOT_LOGIN:
+                    return "NotLoginCard";
+                case CardType.REGISTER:
+                    return "RegisterCard";
+                case CardType.LOGIN:
+                    return "LoginCard";
             }
             return "";
         }
@@ -132,6 +154,20 @@ namespace SmartKioskBot.Helpers
                 case "menu_help":
                 case "menu_info":
                     return ClickType.MENU;
+                case "account_logout":
+                    return ClickType.LOGOUT;
+                case "account_edit":
+                    return ClickType.ACCOUNT_EDIT;
+                case "account_save":
+                    return ClickType.ACCOUNT_SAVE;
+                case "register":
+                    return ClickType.REGISTER;
+                case "login":
+                    return ClickType.LOGIN;
+                case "register_save":
+                    return ClickType.REGISTER_SAVE;
+                case "login_start":
+                    return ClickType.LOGIN_START;
             }
 
             return ClickType.NONE;
@@ -175,91 +211,6 @@ namespace SmartKioskBot.Helpers
             }
         }
 
-        /*
-         * CARD SPECIFIC
-         */
-
-        public static void SetFilterCardValue(JToken card, List<Filter> applied_filters)
-        {
-            List<JToken> card_fields = new List<JToken>();
-            string last_retrieved = "";
-
-            for(int i = 0; i < applied_filters.Count(); i++)
-            {
-                var f = applied_filters[i];
-
-                if(last_retrieved != f.FilterName)
-                    card_fields = GetFilterCardSection(card, f.FilterName);
-
-                string lookup = f.FilterName + ":";
-                bool checkbox = false;
-
-                if (f.Operator.Equals("<"))
-                    lookup += "max";
-                else if (f.Operator.Equals(">"))
-                    lookup += "min";
-                else
-                {
-                    lookup += f.Value;
-                    checkbox = true;
-                }
-
-                for (int j = 0; j < card_fields.Count; j++)
-                {
-                    if (card_fields[j]["id"].ToString().Equals(lookup))
-                    {
-                        if (!checkbox)
-                            card_fields[j]["value"] = f.Value;
-                        else
-                            card_fields[j]["value"] = "true";
-                        break;
-                    }
-                }
-            }
-        }
-
-        private static List<JToken> GetFilterCardSection(JToken card, string section)
-        {
-            List<JToken> fields = new List<JToken>();
-
-            switch (section)
-            {
-                case Constants.cpu_family_filter:
-                    fields = card.SelectTokens("body[1].columns[0].items").Children().ToList();
-                    fields.RemoveAt(0);
-                    break;
-                case Constants.gpu_filter:
-                    fields = card.SelectTokens("body[1].columns[1].items").Children().ToList();
-                    fields.RemoveAt(0);
-                    break;
-                case Constants.price_filter:
-                    fields.Add(card.SelectToken("body[2].columns[0].items[1].columns[0].items[0]"));
-                    fields.Add(card.SelectToken("body[2].columns[0].items[1].columns[1].items[0]"));
-                    break;
-                case Constants.storage_type_filter:
-                    fields.Add(card.SelectToken("body[3].items[1]"));
-                    fields.Add(card.SelectToken("body[3].items[2]"));
-                    break;
-                case Constants.storage_filter:
-                    fields.Add(card.SelectToken("body[3].items[3].columns[0].items[0]"));
-                    fields.Add(card.SelectToken("body[3].items[3].columns[1].items[0]"));
-                    break;
-                case Constants.ram_filter:
-                    fields.Add(card.SelectToken("body[3].items[5].columns[0].items[0]"));
-                    fields.Add(card.SelectToken("body[3].items[5].columns[1].items[0]"));
-                    break;
-                case Constants.brand_filter:
-                    fields = card.SelectTokens("body[4].items[1].columns[0].items").Children().ToList();
-                    fields = fields.Concat(card.SelectTokens("body[4].items[1].columns[1].items").Children().ToList()).ToList();
-                    fields = fields.Concat(card.SelectTokens("body[4].items[1].columns[2].items").Children().ToList()).ToList();
-                    break;
-                case Constants.type_filter:
-                    fields = card.SelectTokens("body[5].items[1].columns[0].items").Children().ToList();
-                    fields = fields.Concat(card.SelectTokens("body[5].items[1].columns[1].items").Children().ToList()).ToList();
-                    break;
-            }
-
-            return fields;
-        }
+       
     }
 }

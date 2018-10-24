@@ -1,0 +1,47 @@
+﻿{
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "size": "Large",
+            "weight": "Bolder",
+            "color": "Accent",
+            "text": "Identificação"
+        },
+        {
+            "type": "Container",
+            "spacing": "Medium",
+            "separator": true,
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                    "text": "Email:"
+                },
+                {
+                    "type": "Input.Text",
+                    "id": "email",
+                    "spacing": "None",
+                    "title": "New Input.Toggle",
+                    "placeholder": "Insira aqui o seu email"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "spacing": "Medium"
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.Submit",
+          "title": "Identificar-me",
+          "data": {
+            "reply_type": "login_start",
+            "dialog": "account"
+          }
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
+}

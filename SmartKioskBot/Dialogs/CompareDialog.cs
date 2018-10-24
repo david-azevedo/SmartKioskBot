@@ -19,18 +19,28 @@ namespace SmartKioskBot.Dialogs
     [Serializable]
     public class CompareDialog : IDialog<Object>
     {
-        public User user;
-        public List<Product> products;
+        public State state = State.INIT;
+        public List<Product> products = new List<Product>();
 
-        public CompareDialog(User user)
+        public enum State { INIT, INPUT_HANDLER };
+
+        public CompareDialog(State state)
         {
-            this.user = user;
             this.products = new List<Product>();
+            this.state = state;
         }
 
         public async Task StartAsync(IDialogContext context)
         {
-            await InitAsync(context, null);
+            switch (state)
+            {
+                case State.INIT:
+                    await InitAsync(context, null);
+                    break;
+                case State.INPUT_HANDLER:
+                    context.Wait(InputHandler);
+                    break;
+            }
         }
 
         public async Task InitAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
@@ -38,18 +48,17 @@ namespace SmartKioskBot.Dialogs
             List<ButtonType> buttons = new List<ButtonType>();
 
             // fetch products
-            products = new List<Product>();
-            var itemsToCompare = ContextController.GetContext(this.user.Id).Comparator;
-
-            foreach (ObjectId o in itemsToCompare)
-                products.Add(ProductController.getProduct(o.ToString()));
+            var itemsToCompare = StateHelper.GetComparatorItems(context);
+            
+            foreach(string o in itemsToCompare)
+                products.Add(ProductController.getProduct(o));
 
             var reply = context.MakeMessage();
 
             if (products.Count > 0)
             {
                 await context.PostAsync("Bem vindo ao comparador, estes são os produtos que adicionou ao comparador: ");
-                
+
                 //display products 
                 reply = context.MakeMessage();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
@@ -62,17 +71,17 @@ namespace SmartKioskBot.Dialogs
                 reply.Attachments = cards;
                 await context.PostAsync(reply);
 
-                //Check if pagination is needed
-                if (products.Count > Constants.N_ITEMS_CARROUSSEL)
-                    buttons.Add(ButtonType.PAGINATION);
+                if (products.Count <= ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR)
+                    buttons.Add(ButtonType.ADD_PRODUCT);
 
                 buttons.Add(ButtonType.COMPARE);
             }
             else
+            {
                 await context.PostAsync("Não tem produtos para comparar.");
-
-            buttons.Add(ButtonType.ADD_PRODUCT);
-
+                buttons.Add(ButtonType.ADD_PRODUCT);
+            }
+            
             //show options
             reply = context.MakeMessage();
             reply.Attachments.Add(getCardButtonsAttachment(buttons, DialogType.COMPARE));
@@ -85,74 +94,116 @@ namespace SmartKioskBot.Dialogs
         {
            var activity = await argument as Activity;
 
-            //close dialog at the end without more processing
-            bool done_ok = true;
-            
             //Received a Message
             if (activity.Text != null)
-            {
-                done_ok = false;
-                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
-            }
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity));
             //Received an Event
             else if (activity.Value != null)
-            {
-                JObject json = activity.Value as JObject;
-                List<InputData> data = getReplyData(json);
-
-                //have mandatory info
-                if (data.Count >= 2)
-                {
-                    //json structure is correct
-                    if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
-                    {
-                        ClickType click = getClickType(data[0].value);
-
-                        if (data[1].value.Equals(getDialogName(DialogType.COMPARE)) &&
-                            click != ClickType.NONE)
-                        {
-                            switch (click)
-                            {
-                                case ClickType.COMPARE:
-                                    done_ok = false;
-
-                                    var reply = context.MakeMessage();
-                                    reply.Text = BotDefaultAnswers.getOngoingComp();
-                                    await context.PostAsync(reply);
-
-                                    ComparatorLogic.ShowProductComparison(context, products);
-                                    context.Wait(InputHandler);
-                                    break;
-                                case ClickType.ADD_PRODUCT:
-                                    done_ok = false;
-                                    context.Call(new FilterDialog(user, new List<Context.Filter>(), FilterDialog.State.INIT), ResumeAfterDialogCall);
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(done_ok)
+                await EventHandler(context, activity);
+            else
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
+        private async Task EventHandler(IDialogContext context, Activity activity)
+        {
+            JObject json = activity.Value as JObject;
+            List<InputData> data = getReplyData(json);
+
+            //have mandatory info
+            if (data.Count >= 2)
+            {
+                //json structure is correct
+                if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
+                {
+                    ClickType event_click = getClickType(data[0].value);
+                    DialogType event_dialog = getDialogType(data[1].value);
+
+                    //event for this dialog
+                    if (event_dialog == DialogType.COMPARE &&
+                        event_click != ClickType.NONE)
+                    {
+                        switch (event_click)
+                        {
+                            case ClickType.COMPARE:
+                                await Compare(context);
+                                context.Wait(InputHandler);
+                                break;
+                            case ClickType.ADD_PRODUCT:
+                                context.Call(new FilterDialog(FilterDialog.State.INIT), ResumeAfterDialogCall);
+                                break;
+                        }
+                    }
+                    // event not for this dialog
+                    else
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity, event_dialog));
+                }
+                else
+                    context.Done(new CODE(DIALOG_CODE.DONE));
+            }
+            else
+                context.Done(new CODE(DIALOG_CODE.DONE));
+        }
+        
         private async Task ResumeAfterDialogCall(IDialogContext context, IAwaitable<object> result)
         {
             CODE code = await result as CODE;
-            context.Done(code);
+
+            //child dialog invoked an event of this dialog
+            if (code.dialog == DialogType.COMPARE)
+                await EventHandler(context, code.activity);
+            else
+                context.Done(code);
         }
 
-        public static async Task AddComparator(IDialogContext context, string message, User user)
+        public async Task Compare(IDialogContext context)
+        {
+            // fetch products
+            var itemsToCompare = StateHelper.GetComparatorItems(context);
+
+            foreach(string o in itemsToCompare)
+                products.Add(ProductController.getProduct(o.ToString()));
+
+            if(products.Count > 0)
+            {
+                var reply = context.MakeMessage();
+                reply.Text = BotDefaultAnswers.getOngoingComp();
+                await context.PostAsync(reply);
+
+                ComparatorLogic.ShowProductComparison(context, products);
+
+                //show options
+                if(products.Count <= ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR)
+                {
+                    reply = context.MakeMessage();
+                    reply.Attachments.Add(getCardButtonsAttachment(
+                        new List<ButtonType> { ButtonType.ADD_PRODUCT }, DialogType.COMPARE));
+                    await context.PostAsync(reply);
+                }
+               
+            }
+            else
+            {
+                await context.PostAsync("Não tem produtos para comparar.");
+
+                //show options
+                var reply = context.MakeMessage();
+                reply.Attachments.Add(getCardButtonsAttachment(
+                    new List<ButtonType> { ButtonType.ADD_PRODUCT }, DialogType.COMPARE));
+                await context.PostAsync(reply);
+            }
+            
+        }
+
+        public static async Task AddComparator(IDialogContext context, string message)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
             {
-                var user_context = ContextController.GetContext(user.Id);
+                List<string> items = StateHelper.GetComparatorItems(context);
 
-                if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= user_context.Comparator.Length)
+                if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= items.Count)
                     await context.PostAsync("Lamento mas o número máximo de produtos permitidos no comparador é de " + 
                         ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR.ToString() + "produtos.");
                 else
@@ -163,27 +214,23 @@ namespace SmartKioskBot.Dialogs
                     reply.Text = String.Format(BotDefaultAnswers.getAddComparator());
                     await context.PostAsync(reply);
 
-                    //UPDATE AO COMPARADOR DO USER
-                    ContextController.AddComparator(user, product);
+                    StateHelper.AddItemComparator(context, product);
                 }
             }
         }
 
-        public static async Task RmvComparator(IDialogContext _context, string message, User user)
+        public static async Task RmvComparator(IDialogContext _context, string message)
         {
             string[] parts = message.Split(':');
             var product = parts[1].Replace(" ", "");
 
             if (parts.Length >= 2)
             {
-                var context = ContextController.GetContext(user.Id);
-
                 var reply = _context.MakeMessage();
                 reply.Text = BotDefaultAnswers.getRemComparator();
                 await _context.PostAsync(reply);
-
-                //REMOVER PRODUTO
-                ContextController.RemComparator(user, product);
+                
+                StateHelper.RemItemComparator(_context, product);
             }
         }
 

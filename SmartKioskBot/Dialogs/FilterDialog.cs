@@ -1,14 +1,11 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
-using MongoDB.Driver;
 using SmartKioskBot.Controllers;
 using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 using SmartKioskBot.UI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using static SmartKioskBot.Models.Context;
 using SmartKioskBot.Logic;
@@ -16,31 +13,26 @@ using MongoDB.Bson;
 using static SmartKioskBot.Helpers.Constants;
 using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using Newtonsoft.Json.Linq;
-using System.Threading;
 
 namespace SmartKioskBot.Dialogs
 {
     [Serializable]
     public class FilterDialog : IDialog<object>
     {
-        private User user;
-        private List<Filter> filters;
-        private List<Filter> filters_received;  //from luis
         private ObjectId last_fetch_id;
         private int page = 1;
         private State state;
 
-        public enum State { INIT, FILTER_PREVIOUS, FILTER, FILTER_AGAIN, CLEAN, CLEAN_ALL };
+        public enum State {
+            INIT,               //Form
+            FILTER,             //Perform filtering
+            FILTER_AGAIN,       //Form with previous filters
+            CLEAN_ALL,      
+            INPUT_HANDLER };    //Handle input
 
-        public FilterDialog(User user, List<Filter> filters_luis, State state)
+        public FilterDialog(State state)
         {
-            this.user = user;
-            this.filters_received = filters_luis;
-            this.filters = new List<Filter>();
             this.state = state;
-
-            if (filters_received.Count == 0)
-                this.state = State.INIT;
         }
 
         public async Task StartAsync(IDialogContext context)
@@ -51,17 +43,17 @@ namespace SmartKioskBot.Dialogs
                 case State.INIT:
                 case State.FILTER_AGAIN:
                     await InitDialog(context, null);
-                    break; ;
-                case State.FILTER:
-                case State.FILTER_PREVIOUS:
-                    await FilterAsync(context, null);
                     break;
-                case State.CLEAN:
+                case State.FILTER:
+                    await FilterAsync(context, null);
                     break;
                 case State.CLEAN_ALL:
                     break;
+                case State.INPUT_HANDLER:
+                    context.Wait(InputHandler);
+                    break;
                 default:
-                    await FilterAsync(context, null);
+                    context.Wait(FilterAsync);
                     break;
             }
         }
@@ -74,11 +66,11 @@ namespace SmartKioskBot.Dialogs
             //Fills the form with the previous choosen filters
             if (state.Equals(State.FILTER_AGAIN))
             {
-                JObject json = att.Content as JObject;
-                SetFilterCardValue(json, filters);
+                JObject json = JObject.Parse(att.Content.ToString());
+                FilterLogic.SetFilterCardValue(json, StateHelper.GetFilters(context));
             }
             //reset filters (they will be added again in the filtering process)
-            filters = new List<Filter>();
+            StateHelper.SetFilters(new List<Filter>(), context);
 
             //send form
             reply.Attachments.Add(att);
@@ -89,26 +81,7 @@ namespace SmartKioskBot.Dialogs
 
         public async Task FilterAsync(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
-            // join the retrieved filters with the added ones
-            // in case the user entered the filters manually
-            if (this.state.Equals(State.FILTER_PREVIOUS))
-            {
-                filters = ContextController.getFilters(user);
-
-                foreach (Filter f1 in filters_received)
-                {
-                    bool exists = false;
-                    foreach (Filter f2 in filters)
-                        if (f1.Equals(f2))
-                            exists = true;
-                    if (!exists)
-                    {
-                        filters.Add(f1);
-                        ContextController.AddFilter(user, f1.FilterName, f1.Operator, f1.Value);
-                        CRMController.AddFilterUsage(user.Id, user.Country, f1);
-                    }
-                }
-            }
+            List<Filter> filters = StateHelper.GetFilters(context);
             
             // search products based on the last fetch id (inclusive)
             // search will fetch +1 product to know if pagination is needed
@@ -175,121 +148,78 @@ namespace SmartKioskBot.Dialogs
         {
             var activity = await argument as Activity;
 
-            //close dialog at the end without more processing
-            bool done_ok = true;
-
             //Received a Message
             if (activity.Text != null)
-            {
-                done_ok = false;
-                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity as IMessageActivity));
-            }
+                context.Done(new CODE(DIALOG_CODE.PROCESS_LUIS, activity));
             //Received an Event
             else if (activity.Value != null)
-            {
-                JObject json = activity.Value as JObject;
-                List<InputData> data = getReplyData(json);
-
-                //has the mandatory info
-                if (data.Count >= 2)
-                {
-                    //json structure is correct
-                    if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
-                    {
-                        ClickType click = getClickType(data[0].value);
-
-                        if (data[1].value.Equals(getDialogName(DialogType.FILTER)) &&
-                            click != ClickType.NONE)
-                        {
-                            switch (click)
-                            {
-                                case ClickType.PAGINATION:
-                                    page++;
-                                    done_ok = false;
-                                    await StartAsync(context);
-                                    break;
-                                case ClickType.FILTER:
-                                    done_ok = false;
-                                    data.RemoveAt(0);   //remove reply_type
-                                    data.RemoveAt(0);   //remove dialog
-                                    this.filters = FilterLogic.GetFilterFromForm(data);
-                                    this.state = State.FILTER;
-                                    await StartAsync(context);
-                                    break;
-                                case ClickType.FILTER_AGAIN:
-                                    done_ok = false;
-                                    this.state = State.FILTER_AGAIN;
-                                    await StartAsync(context);
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(done_ok)
+                await EventHandler(context, activity);
+            //Other
+            else
                 context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
-        public static IMessageActivity CleanAllFilters(IDialogContext context, User user)
+        public async Task EventHandler(IDialogContext context, Activity activity)
         {
-            ContextController.CleanFilters(user);
-            var reply = context.MakeMessage();
-            reply.Text = BotDefaultAnswers.getCleanAllFilters();
-            return reply;
-        }
+            JObject json = activity.Value as JObject;
+            List<InputData> data = getReplyData(json);
 
-        public static IMessageActivity CleanFilter(IDialogContext _context, User user, Context context, IList<EntityRecommendation> entities)
-        {
-            var reply = _context.MakeMessage();
-
-            foreach (EntityRecommendation e in entities)
+            //has the mandatory info
+            if (data.Count >= 2)
             {
-                string filtername = "";
-
-                if (e.Type.Contains("filter-type"))
-                    filtername = e.Type.Remove(0, e.Type.LastIndexOf(":") + 1);
-                else if (e.Type == "memory-type")
+                //json structure is correct
+                if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
                 {
-                    if (e.Entity == "ram") filtername = Constants.ram_filter;
-                    else filtername = Constants.storage_type_filter;
-                }
-                else if (e.Type == "brand")
-                    filtername = Constants.brand_filter;
-                else if (e.Type == "cpu")
-                    filtername = Constants.cpu_family_filter;
-                else if (e.Type == "gpu")
-                    filtername = Constants.gpu_filter;
+                    ClickType event_click = getClickType(data[0].value);
+                    DialogType event_dialog = getDialogType(data[1].value);
 
-                if (filtername != "")
-                {
-                    var removedIdx = -1;
-                    for(var i = 0; i < context.Filters.Count(); i++)
+                    //event of this dialog
+                    if (event_dialog == DialogType.FILTER &&
+                        event_click != ClickType.NONE)
                     {
-                        if (context.Filters[i].FilterName == filtername)
+                        switch (event_click)
                         {
-                            removedIdx = i;
-                            reply.Text = BotDefaultAnswers.getRemovedFilter(BotDefaultAnswers.State.SUCCESS, filtername);
-                            ContextController.RemFilter(user, filtername);
+                            case ClickType.PAGINATION:
+                                page++;
+                                await StartAsync(context);
+                                break;
+                            case ClickType.FILTER:
+                                data.RemoveAt(0);   //remove reply_type
+                                data.RemoveAt(0);   //remove dialog
+
+                                List<Filter> filters= FilterLogic.GetFilterFromForm(data);
+                                StateHelper.SetFilters(filters, context);
+
+                                foreach (Filter f in filters)
+                                    StateHelper.AddFilterCount(context, f);
+
+                                this.state = State.FILTER;
+                                await StartAsync(context);
+                                break;
+                            case ClickType.FILTER_AGAIN:
+                                this.state = State.FILTER_AGAIN;
+                                await StartAsync(context);
+                                break;
                         }
                     }
-
-                    if (removedIdx == -1)
-                        reply.Text = BotDefaultAnswers.getRemovedFilter(BotDefaultAnswers.State.FAIL, filtername);
+                    // event of other dialog
+                    else
+                    {
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity, event_dialog));
+                    }
                 }
+                else
+                    context.Done(new CODE(DIALOG_CODE.DONE));
             }
-
-            context = ContextController.GetContext(user.Id);
-            //display current filters
-            if (context.Filters.Count() == 0)
-                reply.Text += "  \n  \n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.FAIL);
             else
-            {
-                reply.Text += "  \n  \n" + BotDefaultAnswers.getViewFilters(BotDefaultAnswers.State.SUCCESS) + "  \n";
-                foreach (Filter f in context.Filters)
-                    reply.Text += f.FilterName + f.Operator + f.Value + ", ";
-            }
+                context.Done(new CODE(DIALOG_CODE.DONE));
+        }
 
+        public static IMessageActivity CleanAllFilters(IDialogContext context)
+        {
+            StateHelper.CleanFilters(context);
+            var reply = context.MakeMessage();
+            reply.Text = BotDefaultAnswers.getCleanAllFilters();
             return reply;
         }
     }

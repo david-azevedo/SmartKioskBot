@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder.Luis.Models;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 using SmartKioskBot.Models;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,109 @@ using System.Web;
 using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using static SmartKioskBot.Models.Context;
 using static SmartKioskBot.Helpers.Constants;
+using SmartKioskBot.Helpers;
 
 namespace SmartKioskBot.Logic
 {
     public class FilterLogic
     {
+        /*
+         * UI
+         */
+
+        public const string brand_filter = "marca";
+        public const string ram_filter = "ram";
+        public const string storage_type_filter = "tipo_armazenamento";
+        public const string cpu_family_filter = "familia_cpu";
+        public const string gpu_filter = "placa_grafica";
+        public const string type_filter = "tipo";
+        public const string price_filter = "preço";
+        public const string storage_filter = "armazenamento";
+        public const string screen_size_filter = "tamanho_ecra";
+        public const string autonomy_filter = "autonomia";
+
+        public static void SetFilterCardValue(JToken card, List<Filter> applied_filters)
+        {
+            List<JToken> card_fields = new List<JToken>();
+            string last_retrieved = "";
+
+            for (int i = 0; i < applied_filters.Count(); i++)
+            {
+                var f = applied_filters[i];
+
+                if (last_retrieved != f.FilterName)
+                    card_fields = GetFilterCardSection(card, f.FilterName);
+
+                string lookup = f.FilterName + ":";
+                bool checkbox = false;
+
+                if (f.Operator.Equals("<"))
+                    lookup += "max";
+                else if (f.Operator.Equals(">"))
+                    lookup += "min";
+                else
+                {
+                    lookup += f.Value;
+                    checkbox = true;
+                }
+
+                for (int j = 0; j < card_fields.Count; j++)
+                {
+                    if (card_fields[j]["id"].ToString().Equals(lookup))
+                    {
+                        if (!checkbox)
+                            card_fields[j]["value"] = f.Value;
+                        else
+                            card_fields[j]["value"] = "true";
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static List<JToken> GetFilterCardSection(JToken card, string section)
+        {
+            List<JToken> fields = new List<JToken>();
+
+            switch (section)
+            {
+                case cpu_family_filter:
+                    fields = card.SelectTokens("body[1].columns[0].items").Children().ToList();
+                    fields.RemoveAt(0);
+                    break;
+                case gpu_filter:
+                    fields = card.SelectTokens("body[1].columns[1].items").Children().ToList();
+                    fields.RemoveAt(0);
+                    break;
+                case price_filter:
+                    fields.Add(card.SelectToken("body[2].columns[0].items[1].columns[0].items[0]"));
+                    fields.Add(card.SelectToken("body[2].columns[0].items[1].columns[1].items[0]"));
+                    break;
+                case storage_type_filter:
+                    fields.Add(card.SelectToken("body[3].items[1]"));
+                    fields.Add(card.SelectToken("body[3].items[2]"));
+                    break;
+                case storage_filter:
+                    fields.Add(card.SelectToken("body[3].items[3].columns[0].items[0]"));
+                    fields.Add(card.SelectToken("body[3].items[3].columns[1].items[0]"));
+                    break;
+                case ram_filter:
+                    fields.Add(card.SelectToken("body[3].items[5].columns[0].items[0]"));
+                    fields.Add(card.SelectToken("body[3].items[5].columns[1].items[0]"));
+                    break;
+                case brand_filter:
+                    fields = card.SelectTokens("body[4].items[1].columns[0].items").Children().ToList();
+                    fields = fields.Concat(card.SelectTokens("body[4].items[1].columns[1].items").Children().ToList()).ToList();
+                    fields = fields.Concat(card.SelectTokens("body[4].items[1].columns[2].items").Children().ToList()).ToList();
+                    break;
+                case type_filter:
+                    fields = card.SelectTokens("body[5].items[1].columns[0].items").Children().ToList();
+                    fields = fields.Concat(card.SelectTokens("body[5].items[1].columns[1].items").Children().ToList()).ToList();
+                    break;
+            }
+
+            return fields;
+        }
 
         public static List<Filter> GetFilterFromForm(List<InputData> data)
         {
