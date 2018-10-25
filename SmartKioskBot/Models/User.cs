@@ -14,9 +14,6 @@ namespace SmartKioskBot.Models
         [BsonId]
         public MongoDB.Bson.ObjectId Id { get; set; }
 
-        [BsonElement("channelsIds")]
-        public string[] ChannelsIds { get; set; }
-
         [BsonElement("email")]
         public string Email { get; set; }
 
@@ -28,5 +25,8 @@ namespace SmartKioskBot.Models
 
         [BsonElement("country")]
         public string Country { get; set; }
+
+        [BsonElement("gender")]
+        public string Gender { get; set; }
     }
 }

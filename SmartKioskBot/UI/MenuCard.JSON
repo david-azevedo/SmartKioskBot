@@ -1,0 +1,116 @@
+﻿{
+    "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "TextBlock",
+      "horizontalAlignment": "Center",
+      "spacing": "Large",
+      "separator": true,
+      "size": "Medium",
+      "weight": "Bolder",
+      "color": "Accent",
+      "text": "Menu Principal"
+    },
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Image",
+                  "horizontalAlignment": "Center",
+                  "url": "http://www.free-icons-download.net/images/info-logo-icon-95232.png",
+                  "size": "Small",
+                  "width": "25px",
+                  "height": "25px"
+                }
+              ],
+              "width": "stretch",
+              "selectAction": {
+                "type": "Action.Submit",
+                "title": "Info",
+                "data": {
+                  "reply_type": "menu_info",
+                  "dialog": "menu"
+                }
+              }
+            },
+            {
+              "type": "Column",
+              "width": "stretch"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+    "actions": [
+      {
+        "type": "Action.Submit",
+        "title": "Sessão",
+        "data": {
+          "reply_type": "menu_session",
+          "dialog": "menu"
+        }
+      },
+      {
+        "type": "Action.Submit",
+        "title": "Procurar",
+        "data": {
+          "reply_type": "menu_filter",
+          "dialog": "menu"
+        }
+      },
+      {
+        "type": "Action.Submit",
+        "title": "Comparar",
+        "data": {
+          "reply_type": "menu_comparator",
+          "dialog": "menu"
+        }
+      },
+      {
+        "type": "Action.Submit",
+        "title": "Favoritos",
+        "data": {
+          "reply_type": "menu_wishlist",
+          "dialog": "menu"
+        }
+      },
+      {
+        "type": "Action.Submit",
+        "title": "Recommendações",
+        "data": {
+          "reply_type": "menu_recommendations",
+          "dialog": "menu"
+        }
+      },
+      {
+        "type": "Action.Submit",
+        "title": "Lojas",
+        "data": {
+          "reply_type": "menu_stores",
+          "dialog": "menu"
+        }
+      },
+      {
+        "type": "Action.Submit",
+        "title": "Ajuda",
+        "data": {
+          "reply_type": "menu_help",
+          "dialog": "menu"
+        }
+      }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
+}
