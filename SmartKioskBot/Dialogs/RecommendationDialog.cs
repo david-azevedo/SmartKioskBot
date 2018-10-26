@@ -65,19 +65,14 @@ namespace SmartKioskBot.Dialogs
                 else
                     break;
             }
+            
+            List<string> currentWishlist = StateHelper.GetWishlistItems(context);
 
-            if (StateHelper.IsLoggedIn(context))
+            foreach (string str in currentWishlist)
             {
-                User contextUser = StateHelper.GetUser(context);
-
-                // Add recommendations based on Wish List products
-                ObjectId[] wishes = ContextController.GetContext(contextUser.Id).WishList;
-
-                foreach (ObjectId obj in wishes)
-                {
-                    List<Product> l = Logic.RecommendationsLogic.GetSimilarProducts(obj);
-                    products.InsertRange(0, l);
-                }
+                ObjectId obj = new ObjectId(str);
+                List<Product> l = Logic.RecommendationsLogic.GetSimilarProducts(obj);
+                products.InsertRange(0, l);
             }
 
             if (products.Count > Constants.N_ITEMS_CARROUSSEL) 
