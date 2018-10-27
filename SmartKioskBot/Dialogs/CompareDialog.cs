@@ -160,8 +160,16 @@ namespace SmartKioskBot.Dialogs
             // fetch products
             var itemsToCompare = StateHelper.GetComparatorItems(context);
 
-            foreach(string o in itemsToCompare)
-                products.Add(ProductController.getProduct(o.ToString()));
+            foreach (string o in itemsToCompare)
+            {
+                Product productToAddToComparator = ProductController.getProduct(o.ToString());
+
+                // Only add product if it's not already in the comparator. Otherwise, it'll create duplicates.
+                if (!products.Contains(productToAddToComparator))
+                {
+                    products.Add(ProductController.getProduct(o.ToString()));
+                }
+            }
 
             if(products.Count > 0)
             {

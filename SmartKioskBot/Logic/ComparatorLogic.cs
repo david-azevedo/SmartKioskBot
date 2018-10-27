@@ -12,6 +12,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using SmartKioskBot.UI;
 using SmartKioskBot.Dialogs;
+using AdaptiveCards;
 
 namespace SmartKioskBot.Logic
 {
@@ -180,7 +181,7 @@ namespace SmartKioskBot.Logic
                 Product currentProduct = products[i];
                 int price = 0;
 
-                price = (int)currentProduct.Price;              
+                price = (int)currentProduct.Price;
                 prices.Add(new Part.Price(price));
             }
 
@@ -213,36 +214,47 @@ namespace SmartKioskBot.Logic
 
         public static void ShowProductComparison(IDialogContext context, List<Product> productsToCompare)
         {
+            /* This is a dictionary that for each part points to a ordered List of indexes. The first element of the list is the index of the
+             * BEST product for that part.
+             */
             Dictionary<ComparatorLogic.Parts, List<int>> comparisonResults = GetBestProduct(productsToCompare); //TODO VERIFICAR RESULTS
 
 
             //size of products to show on result(top 3 if >3)
-           /* var resultSize = 0;
-            if (productsToCompare.Count > 3)
-                resultSize = 3;
-            else */var resultSize = productsToCompare.Count;
+            /* var resultSize = 0;
+             if (productsToCompare.Count > 3)
+                 resultSize = 3;
+             else */
+
+            var resultSize = productsToCompare.Count;
 
             var reply = context.MakeMessage();
 
-            //Sends a reply for each specification compared and shows the products(best ones first)
-            foreach (KeyValuePair<ComparatorLogic.Parts, List<int>> entry in comparisonResults)
+            AdaptiveCard scoreTableCard = new AdaptiveCard()
             {
-                reply = context.MakeMessage();
-                reply.Text = "### " + BotDefaultAnswers.getComparator(entry.Key.ToString()) + "  \n";
+                Version = "1.0",
+                Body = { },
+                Actions = { }
+            };
 
-                for (int i = 0; i < resultSize && i <7; i++)
+            List<AdaptiveColumn> scoreColumns = new List<AdaptiveColumn>();
+            scoreColumns.Add(new AdaptiveColumn()
+            {
+                Items = new List<AdaptiveElement>
                 {
-                    reply.Text += i+1 + ". "  + productsToCompare[entry.Value[i]].Brand + " "  + productsToCompare[entry.Value[i]].Model + ";  \n";
+                    new AdaptiveTextBlock()
+                    {
+                        Text = "Product",
+                        Weight = AdaptiveTextWeight.Bolder
+                    }
                 }
-                //Send individual classification
-                context.PostAsync(reply);
             }
-            
-            
+            );
 
             List<double> overallBest = new List<double>(new double[productsToCompare.Count]);
             var bestInPart = new Product();
             var product = new Product();
+
             //calculate score for each product
             foreach (KeyValuePair<ComparatorLogic.Parts, List<int>> entry in comparisonResults)
             {
@@ -267,7 +279,7 @@ namespace SmartKioskBot.Logic
                         {
                             bestInPart = productsToCompare[entry.Value[i]];
                         }
-                            overallBest[entry.Value[i]] += (double)(1-(Math.Abs(bestInPart.Price - product.Price) * 0.3 / bestInPart.Price));
+                        overallBest[entry.Value[i]] += (double)(1 - (Math.Abs(bestInPart.Price - product.Price) * 0.3 / bestInPart.Price));
                     }
                     //GPU
                     else if (entry.Key == ComparatorLogic.Parts.GPU)
@@ -287,55 +299,102 @@ namespace SmartKioskBot.Logic
                 }
             }
 
-            List<Attachment> cards = new List<Attachment>();
             Dictionary<int, double> result = new Dictionary<int, double>();
 
-            for(int i = 0; i < overallBest.Count; i++)
+            for (int i = 0; i < overallBest.Count; i++)
             {
                 result.Add(i, overallBest[i]);
             }
 
             //sort by descending score
-            IEnumerable<KeyValuePair< int, double>> sortedResult = result.OrderByDescending(i => i.Key);
+            IEnumerable<KeyValuePair<int, double>> sortedResult = result.OrderByDescending(i => i.Value);
 
-            int keyBestProduct = 0;
-            int keySecondBestProduct = 0;
+            /* This for loop creates the table to present the results.
+             * First, it adds a row to the first column for each product that is being examined.
+             * Then, it creates "n" new columns, where "n" is the number of parts being compared.
+             * The first column is ordered by best overall products. That is, the first row should have the best overall product and its 
+             * scores for each of the parts. The last row should have the worst overall.
+             */
+
+            int position = 1;
+
+            // Creates a row for each product
+            foreach (KeyValuePair<int, double> entry in sortedResult)
+            {
+                int currentProductIndex = entry.Key;
+                Product currentProduct = productsToCompare[currentProductIndex];
+
+                scoreColumns[0].Items.Add(
+                    new AdaptiveTextBlock()
+                    {
+                        Text = position + ". " + currentProduct.Brand + " " + currentProduct.Model,
+                        Separator = true
+                    }
+                    );
+
+                position++;
+            }
+
+            // Creates a column for each part
+            foreach (KeyValuePair<ComparatorLogic.Parts, List<int>> entry in comparisonResults)
+            {
+                Parts part = entry.Key;
+
+                List<AdaptiveElement> partColumnCells = new List<AdaptiveElement>()
+                {
+                    new AdaptiveTextBlock()
+                    {
+                        Text = part.ToString(),
+                        Weight = AdaptiveTextWeight.Bolder
+                    }
+                };
+
+                for (int i = 0; i < sortedResult.Count(); i++)
+                {
+                    KeyValuePair<int, double> currentIndexToScore = sortedResult.ElementAt(i);
+                    int currentProductIndex = currentIndexToScore.Key;
+
+                    int currentProductRankingInPart = comparisonResults[part][currentProductIndex] + 1;
+
+                    partColumnCells.Add(new AdaptiveTextBlock()
+                    {
+                        Text = currentProductRankingInPart.ToString(),
+                        HorizontalAlignment = AdaptiveHorizontalAlignment.Center
+                    });
+                }
+
+                scoreColumns.Add(new AdaptiveColumn()
+                {
+                    Width = AdaptiveColumnWidth.Stretch,
+                    Items = partColumnCells
+                });
+            }
+
+            scoreTableCard.Body.Add(new AdaptiveColumnSet()
+            {
+                Columns = scoreColumns
+            });
+
+            // Create the attachment.
+            Attachment attachment = new Attachment()
+            {
+                ContentType = AdaptiveCard.ContentType,
+                Content = scoreTableCard
+            };
+
+            reply = context.MakeMessage();
+            reply.Attachments.Add(attachment);
+
+            //Send table
+            context.PostAsync(reply);
 
             //add products to cards
+            List<Attachment> cards = new List<Attachment>();
+
             foreach (KeyValuePair<int, double> kvp in sortedResult)
             {
-                if(keyBestProduct == 0)
-                {
-                    keyBestProduct = kvp.Key;
-                }
-                else
-                {
-                    if(keySecondBestProduct == 0)
-                    {
-                        keySecondBestProduct = kvp.Key;
-                    }
-                }
-
                 cards.Add(ProductCard.GetProductCard(productsToCompare[kvp.Key], ProductCard.CardType.COMPARATOR).ToAttachment());
             }
-
-            string response = "";
-
-            if(keyBestProduct != 0)
-            {
-                string bestProductModel = productsToCompare[keyBestProduct].Brand + " " + productsToCompare[keyBestProduct].Model;
-
-                response += "O melhor computador pelo preço é o " + bestProductModel + ".";
-
-                if(keySecondBestProduct != 0)
-                {
-                    string secondBestProductModel = productsToCompare[keySecondBestProduct].Brand + " " + productsToCompare[keySecondBestProduct].Model;
-                    response += "A alternativa é o " + secondBestProductModel + ".";
-                }
-
-            }
-
-            context.PostAsync(response);
 
             reply = context.MakeMessage();
             reply.Attachments = cards;

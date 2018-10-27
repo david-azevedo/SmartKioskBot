@@ -143,5 +143,21 @@ namespace SmartKioskBot.Models
         [BsonElement("Part Number")]
         public string PartNr { get; set; }
 
+        public override bool Equals(object obj)
+        {
+            var item = obj as Product;
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            return this.Id.Equals(item.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode();
+        }
     }
 }
