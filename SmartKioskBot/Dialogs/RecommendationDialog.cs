@@ -66,7 +66,16 @@ namespace SmartKioskBot.Dialogs
                     break;
             }
             
-            if(products.Count > Constants.N_ITEMS_CARROUSSEL) 
+            List<string> currentWishlist = StateHelper.GetWishlistItems(context);
+
+            foreach (string str in currentWishlist)
+            {
+                ObjectId obj = new ObjectId(str);
+                List<Product> l = Logic.RecommendationsLogic.GetSimilarProducts(obj);
+                products.InsertRange(0, l);
+            }
+
+            if (products.Count > Constants.N_ITEMS_CARROUSSEL) 
                 lastFetchId = products[products.Count - 2].Id;
             
             var reply = context.MakeMessage();
