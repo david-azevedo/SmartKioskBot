@@ -14,43 +14,7 @@
     {
       "type": "Container",
       "spacing": "Medium",
-      "items": [
-        {
-          "type": "ColumnSet",
-          "columns": [
-            {
-              "type": "Column",
-              "width": "stretch"
-            },
-            {
-              "type": "Column",
-              "items": [
-                {
-                  "type": "Image",
-                  "horizontalAlignment": "Center",
-                  "url": "http://www.free-icons-download.net/images/info-logo-icon-95232.png",
-                  "size": "Small",
-                  "width": "25px",
-                  "height": "25px"
-                }
-              ],
-              "width": "stretch",
-              "selectAction": {
-                "type": "Action.Submit",
-                "title": "Info",
-                "data": {
-                  "reply_type": "menu_info",
-                  "dialog": "menu"
-                }
-              }
-            },
-            {
-              "type": "Column",
-              "width": "stretch"
-            }
-          ]
-        }
-      ]
+      "separator": true
     }
   ],
     "actions": [
@@ -99,14 +63,6 @@
         "title": "Lojas",
         "data": {
           "reply_type": "menu_stores",
-          "dialog": "menu"
-        }
-      },
-      {
-        "type": "Action.Submit",
-        "title": "Ajuda",
-        "data": {
-          "reply_type": "menu_help",
           "dialog": "menu"
         }
       }
