@@ -93,8 +93,8 @@ namespace SmartKioskBot.Dialogs
                                     ResumeAfterDialogCall);
                                 break;
                             case "menu_stores":
-                                //Add call to stores
-                                context.Wait(InputHandler);
+                                await StoreDialog.ShowClosestStores(context);
+                                context.Done(new CODE(DIALOG_CODE.DONE));
                                 break;
                             case "menu_help":
                                 //Add call to help

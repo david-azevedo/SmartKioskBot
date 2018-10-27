@@ -92,7 +92,7 @@ namespace SmartKioskBot.Logic
                         user.Gender = f.value;
                         break;
                     case client_id_field:
-                        if (f.value != "")
+                        if (f.value != "" && StateHelper.GetUser(context).Email != f.value)
                         {
                             if (UserController.getUserByCard(f.value) == null)
                                 user.CustomerCard = f.value;
@@ -155,7 +155,7 @@ namespace SmartKioskBot.Logic
                 }
             }
 
-            if (UserController.getUserByEmail(email) != null)
+            if (UserController.getUserByEmail(email) != null && email != "")
                 fail += "O email que inseriu já está associado a uma conta.\n";
             else
             {

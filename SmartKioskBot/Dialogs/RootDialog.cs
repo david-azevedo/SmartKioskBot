@@ -12,6 +12,7 @@ using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using Newtonsoft.Json.Linq;
 using SmartKioskBot.Helpers;
 using System.Net.Mail;
+using SmartKioskBot.Dialogs.QnA;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -58,7 +59,6 @@ namespace SmartKioskBot.Dialogs
             switch (dialog)
             {
                 case DialogType.ACCOUNT:
-                    //TODO
                     await context.Forward(
                         new AccountDialog(AccountDialog.State.INPUT_HANDLER),
                         ResumeAfterDialogCall, message);
@@ -83,12 +83,6 @@ namespace SmartKioskBot.Dialogs
                         new RecommendationDialog(
                             RecommendationDialog.State.INPUT_HANDLE), 
                         ResumeAfterDialogCall, message);
-                    break;
-                case DialogType.STORE:
-                    //TODO: call store dialog
-                    break;
-                case DialogType.TUTORIAL:
-                    //TODO: calldialog
                     break;
                 case DialogType.WISHLIST:
                     await context.Forward(
@@ -146,6 +140,5 @@ namespace SmartKioskBot.Dialogs
         {
             context.Wait(InputHandler);
         }
-
     }
 }
