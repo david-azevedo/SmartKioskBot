@@ -101,6 +101,15 @@ namespace SmartKioskBot.Controllers
                                     {
                                         reply.Text = Interactions.Greeting("");
                                         await client.Conversations.ReplyToActivityAsync(reply);
+                                        Thread.Sleep(2000);
+                                        reply.Text = "Não me estou a lembrar de si. Já nos apresentamos antes?\n" +
+                                            "Se for do seu interesse, aceda ao meu menu principal para que se possa " +
+                                            "apresentar ou identificar caso já se tenha apresentado antes. Se o fizer, poderei auxiliar-lhe de uma forma " +
+                                            "mais eficiente e tornar a sua experiência de pré-compra mais pessoal e " +
+                                            "personalizada.\nO menu principal permite-lhe conhecer e aceder às minhas áreas " +
+                                            "de expertise para que o possa ajudar mais facilmente. Para ter acesso ao mesmo, basta me " +
+                                            "pedir ajuda ou dizer-me que quer aceder ao menu principal. Poderá fazê-lo em qualquer altura.";
+                                        await client.Conversations.ReplyToActivityAsync(reply);
                                     }
                                 }
                             }

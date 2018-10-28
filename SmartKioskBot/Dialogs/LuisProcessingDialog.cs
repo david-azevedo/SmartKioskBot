@@ -66,17 +66,16 @@ namespace SmartKioskBot.Dialogs
         public async Task Guidance(IDialogContext context, LuisResult result)
         {
             FilterIntentScore(context, result);
+            await Interactions.SendMessage(context,Interactions.MainMenu(),0,2000);
             context.Call(new MenuDialog(MenuDialog.State.INIT), ResumeAfterDialogueCall);
         }
         
         [LuisIntent("Greeting")]
         public async Task Greeting(IDialogContext context, LuisResult result)
         {
-            /*
             var reply = context.MakeMessage();
             reply.Text = Interactions.Greeting(StateHelper.GetUser(context).Name);
             await context.PostAsync(reply);
-            */
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
 

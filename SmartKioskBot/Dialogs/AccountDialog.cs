@@ -75,8 +75,9 @@ namespace SmartKioskBot.Dialogs
             reply.Attachments.Add(att);
             await context.PostAsync(reply);
 
-            await Interactions.SendMessage(context, "Existe alguma questão em que lhe possa ser útil? Com o menu principal é mais fácil mostrar-lhe as áreas em que o posso ajudar.", 0, 3000);
-            context.Call(new MenuDialog(MenuDialog.State.INIT), ResumeAfterDialogCall);
+            await Interactions.SendMessage(context, "Precisa de ajuda numa outra questão ?", 1000, 0);
+
+            context.Wait(InputHandler);
         }
 
         public async Task InputHandler(IDialogContext context, IAwaitable<object> argument)
@@ -170,9 +171,10 @@ namespace SmartKioskBot.Dialogs
 
             state = State.INIT;
             string msg = StateHelper.GetUser(context).Name + " agora já me lembro de você!";
-            await Interactions.SendMessage(context, msg, 0, 1500);
+            await Interactions.SendMessage(context, msg, 0, 2000);
 
-            await StartAsync(context);
+            await Interactions.SendMessage(context, "Existe alguma questão em que lhe possa ser útil? Com o menu principal é mais fácil mostrar-lhe as áreas em que o posso ajudar.", 0, 2000);
+            context.Call(new MenuDialog(MenuDialog.State.INIT), ResumeAfterDialogCall);
         }
 
         public async Task Register(IDialogContext context)
@@ -228,7 +230,7 @@ namespace SmartKioskBot.Dialogs
 
             state = State.INIT;
             await Interactions.SendMessage(context, "Obrigado por me ter corrigido.", 0, 3000);
-            await Interactions.SendMessage(context, "Existe alguma questão em que lhe possa ser útil? Com o menu principal é mais fácil mostrar-lhe as áreas em que o posso ajudar.", 1000, 3000);
+            await Interactions.SendMessage(context, "Existe alguma questão em que lhe possa ser útil? Com o menu principal é mais fácil mostrar-lhe as áreas em que o posso ajudar.",0,2000);
 
             context.Call(new MenuDialog(MenuDialog.State.INIT), ResumeAfterDialogCall);
         }

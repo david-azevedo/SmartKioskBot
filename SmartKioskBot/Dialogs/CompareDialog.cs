@@ -54,14 +54,15 @@ namespace SmartKioskBot.Dialogs
                 products.Add(ProductController.getProduct(o));
 
             var reply = context.MakeMessage();
-            
-            await Interactions.SendMessage(context, "Bem-vindo ao comparador. Aqui posso dar-lhe sugestões sobre quais os melhores produtos que deseja comparar.", 0, 1500);
 
+            string intro_msg = "Bem-vindo ao comparador. Aqui posso dar-lhe sugestões sobre quais os melhores produtos que deseja comparar.";
+            string button_msg = "";
 
             if (products.Count > 0)
             {
 
-                await Interactions.SendMessage(context, "Vou buscar os produtos em que demonstrou interesse em avaliar. Espere só um momento por favor.", 0, 3000);
+                intro_msg = "\nVou buscar os produtos em que demonstrou interesse em avaliar. Espere só um momento por favor.";
+                await Interactions.SendMessage(context, intro_msg, 0, 0);
 
                 //display products 
                 reply = context.MakeMessage();
@@ -74,7 +75,7 @@ namespace SmartKioskBot.Dialogs
 
                 reply.Attachments = cards;
 
-                await Interactions.SendMessage(context, "Aqui estão os produtos:", 0, 1000);
+                await Interactions.SendMessage(context, "Aqui estão os produtos:", 4000, 2000);
                 await context.PostAsync(reply);
 
                 if (products.Count <= ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR)
@@ -82,16 +83,17 @@ namespace SmartKioskBot.Dialogs
 
                 buttons.Add(ButtonType.COMPARE);
 
-                await Interactions.SendMessage(context, "Se quiser posso fazer uma avaliação dos produtos, clique no botão abaixo para que eu iniciar a comparação.",0,2000);
+                button_msg = "Se quiser posso fazer uma avaliação dos produtos, clique no botão abaixo para que eu iniciar a comparação.";
             }
             else
             {
-                await Interactions.SendMessage(context,"De momentos ainda não adicionou nenhum produto para ser avaliado.",0,2000);
+                intro_msg = "\nDe momentos ainda não adicionou nenhum produto para ser avaliado.";
+                await Interactions.SendMessage(context, intro_msg, 0, 3000);
                 buttons.Add(ButtonType.ADD_PRODUCT);
             }
 
-            string msg = "Se tiver interesse em adicionar produtos para serem avaliados, faça uma pesquisa no nosso catálogo. Para isto, clique no botão abaixo para preencher um formulário de pesquisa.";
-            await Interactions.SendMessage(context, msg, 0, 2000);
+            button_msg += "\nSe tiver interesse em adicionar produtos para serem avaliados, faça uma pesquisa no nosso catálogo. Para isto, clique no botão abaixo para preencher um formulário de pesquisa.";
+            await Interactions.SendMessage(context, button_msg, 3000, 2000);
 
             //show options
             reply = context.MakeMessage();
@@ -182,6 +184,7 @@ namespace SmartKioskBot.Dialogs
 
                 ComparatorLogic.ShowProductComparison(context, products);
 
+                /*
                 //show options
                 if(products.Count <= ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR)
                 {
@@ -189,7 +192,7 @@ namespace SmartKioskBot.Dialogs
                     reply.Attachments.Add(getCardButtonsAttachment(
                         new List<ButtonType> { ButtonType.ADD_PRODUCT }, DialogType.COMPARE));
                     await context.PostAsync(reply);
-                }
+                }*/
                
             }
             else
@@ -216,7 +219,7 @@ namespace SmartKioskBot.Dialogs
 
                 if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= items.Count)
                     await context.PostAsync("Lamento mas só consigo avaliar até " + 
-                        ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR.ToString() + "produtos.");
+                        ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR.ToString() + " produtos.");
                 else
                 {
                     Product productToAdd = ProductController.getProduct(product);

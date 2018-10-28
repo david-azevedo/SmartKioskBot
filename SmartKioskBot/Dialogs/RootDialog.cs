@@ -25,10 +25,8 @@ namespace SmartKioskBot.Dialogs
     {
         public async Task StartAsync(IDialogContext context)
         {
-            if (!TryIdentification(context))
-                context.Call(new AccountDialog(AccountDialog.State.INIT), ResumeAfterDialogCall);
-            else
-                context.Wait(InputHandler);
+            TryIdentification(context);
+            context.Wait(InputHandler);
         }
 
         private async Task InputHandler(IDialogContext context, IAwaitable<object> result)

@@ -60,15 +60,20 @@ namespace SmartKioskBot.Dialogs
 
         public async Task InitDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
+
             var reply = context.MakeMessage();
             Attachment att = await getCardAttachment(CardType.FILTER);
             
             //Fills the form with the previous choosen filters
             if (state.Equals(State.FILTER_AGAIN))
             {
+                await Interactions.SendMessage(context, "Modifique os seus requisitos para efetuarmos uma nova pesquisa no nosso catálogo.", 0, 2000);
                 JObject json = JObject.Parse(att.Content.ToString());
                 FilterLogic.SetFilterCardValue(json, StateHelper.GetFilters(context));
             }
+            else
+                await Interactions.SendMessage(context, "Preencha o formulário abaixo com as suas preferências para que ue possa reunir os melhores produtos para si.", 0, 2000);
+
             //reset filters (they will be added again in the filtering process)
             StateHelper.SetFilters(new List<Filter>(), context);
 
@@ -109,10 +114,12 @@ namespace SmartKioskBot.Dialogs
                     text += ", ";
             }
 
-            await context.PostAsync(text);
+            await Interactions.SendMessage(context, text, 0, 3000);
 
             bool done = false;
             List<ButtonType> buttons = new List<ButtonType>();
+
+            string button_text = "";
 
             //show products
             if (products.Count > 0)
@@ -131,8 +138,14 @@ namespace SmartKioskBot.Dialogs
 
                 //Check if pagination is needed
                 if (products.Count > Constants.N_ITEMS_CARROUSSEL)
+                {
+                    button_text = "Não consegui trazer todos os produtos do catálogo com esses requisitos. Se quiser ver mais produtos clique no botão abaixo.";
                     buttons.Add(ButtonType.PAGINATION);
+                }
             }
+
+            button_text += "\nPara alterar os parâmetros da pesquisa carregue no respetivo botão.";
+            await Interactions.SendMessage(context, button_text, 0, 2000);
 
             buttons.Add(ButtonType.FILTER_AGAIN);
 
