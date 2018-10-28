@@ -74,13 +74,13 @@ namespace SmartKioskBot.Dialogs
             // No products on wishlsit
             if (products.Count == 0)
             {
-                text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.FAIL,0);
+                text = Interactions.getWishList(Interactions.State.FAIL,0);
                 await context.PostAsync(text);
             }
             // Has Products
             else
             {
-                text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS,skip/Constants.N_ITEMS_CARROUSSEL + 1);
+                text = Interactions.getWishList(Interactions.State.SUCCESS,skip/Constants.N_ITEMS_CARROUSSEL + 1);
                 await context.PostAsync(text);
                 
                 //display products 
@@ -140,13 +140,14 @@ namespace SmartKioskBot.Dialogs
                 //json structure is correct
                 if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
                 {
-                    ClickType click = getClickType(data[0].value);
+                    ClickType event_click = getClickType(data[0].value);
+                    DialogType event_dialog = getDialogType(data[1].value);
 
                     //process in this dialog
-                    if (data[1].value.Equals(getDialogName(DialogType.WISHLIST)) &&
-                        click != ClickType.NONE)
+                    if (event_dialog == DialogType.WISHLIST &&
+                        event_click != ClickType.NONE)
                     {
-                        switch (click)
+                        switch (event_click)
                         {
                             case ClickType.PAGINATION:
                                 await StartAsync(context);
@@ -159,7 +160,7 @@ namespace SmartKioskBot.Dialogs
                     }
                     //process in parent dialog
                     else
-                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity));
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity,event_dialog));
                 }
                 else
                     context.Done(new CODE(DIALOG_CODE.DONE));

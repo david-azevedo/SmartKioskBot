@@ -129,12 +129,13 @@ namespace SmartKioskBot.Dialogs
                 //json structure is correct
                 if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
                 {
-                    ClickType click = getClickType(data[0].value);
+                    ClickType event_click = getClickType(data[0].value);
+                    DialogType event_dialog = getDialogType(data[1].value);
 
-                    if (data[1].value.Equals(getDialogName(DialogType.RECOMMENDATION)) &&
-                        click != ClickType.NONE)
+                    if (event_dialog == DialogType.RECOMMENDATION &&
+                        event_click != ClickType.NONE)
                     {
-                        switch (click)
+                        switch (event_click)
                         {
                             case ClickType.PAGINATION:
                                 {
@@ -146,7 +147,7 @@ namespace SmartKioskBot.Dialogs
                         }
                     }
                     else
-                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity));
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity,event_dialog));
                 }
                 else
                     context.Done(new CODE(DIALOG_CODE.DONE));

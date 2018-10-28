@@ -16,6 +16,7 @@ using MongoDB.Bson;
 using static SmartKioskBot.Models.Context;
 using static SmartKioskBot.Models.Customer;
 using SmartKioskBot.Helpers;
+using SmartKioskBot.Dialogs;
 
 namespace SmartKioskBot.Controllers
 {
@@ -98,6 +99,8 @@ namespace SmartKioskBot.Controllers
                                 {
                                     if (newMember.Id != activity.Recipient.Id)
                                     {
+                                        reply.Text = Interactions.Greeting("");
+                                        await client.Conversations.ReplyToActivityAsync(reply);
                                     }
                                 }
                             }

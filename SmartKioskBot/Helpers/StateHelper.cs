@@ -87,12 +87,15 @@ namespace SmartKioskBot.Helpers
         {
             User u = new User();
 
-            u.Id = new ObjectId(context.PrivateConversationData.GetValue<string>(USER_ID_ATR));
-            u.Country = context.PrivateConversationData.GetValue<string>(USER_COUNTRY_ATR);
-            u.Name = context.PrivateConversationData.GetValue<string>(USER_NAME_ATR);
-            u.Email = context.PrivateConversationData.GetValue<string>(USER_EMAIL_ATR);
-            u.CustomerCard = context.PrivateConversationData.GetValue<string>(USER_CARD_ATR);
-            u.Gender = context.PrivateConversationData.GetValue<string>(USER_GENDER_ATR);
+            if (IsLoggedIn(context))
+            {
+                u.Id = new ObjectId(context.PrivateConversationData.GetValue<string>(USER_ID_ATR));
+                u.Country = context.PrivateConversationData.GetValue<string>(USER_COUNTRY_ATR);
+                u.Name = context.PrivateConversationData.GetValue<string>(USER_NAME_ATR);
+                u.Email = context.PrivateConversationData.GetValue<string>(USER_EMAIL_ATR);
+                u.CustomerCard = context.PrivateConversationData.GetValue<string>(USER_CARD_ATR);
+                u.Gender = context.PrivateConversationData.GetValue<string>(USER_GENDER_ATR);
+            }
 
             return u;
         }

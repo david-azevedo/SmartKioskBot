@@ -80,6 +80,10 @@ namespace SmartKioskBot.Logic
                             try
                             {
                                 var m = new MailAddress(f.value);
+
+                                if (f.value != StateHelper.GetUser(context).Email && UserController.getUserByEmail(f.value) != null)
+                                    fail += "O email que inseriu já está associado a uma outra conversa.\n";
+
                                 user.Email = f.value;
                             }
                             catch
@@ -92,12 +96,9 @@ namespace SmartKioskBot.Logic
                         user.Gender = f.value;
                         break;
                     case client_id_field:
-                        if (f.value != "" && StateHelper.GetUser(context).Email != f.value)
+                        if (f.value != "")
                         {
-                            if (UserController.getUserByCard(f.value) == null)
-                                user.CustomerCard = f.value;
-                            else
-                                fail += "Já existe um outro email associado a este cartão de cliente. ";
+                            user.CustomerCard = f.value;
                         }
                         break;
 
@@ -126,7 +127,7 @@ namespace SmartKioskBot.Logic
                         if (f.value != "")
                             name = f.value;
                         else
-                            fail += "O campo 'Nome' é obrigatório.\n";
+                            fail += "Preciso que me diga o seu nome.\n";
                         break;
                     case email_field:
                         if (f.value != "")
@@ -142,7 +143,7 @@ namespace SmartKioskBot.Logic
                             }
                         }
                         else
-                            fail += "O campo 'Email' é obrigatório.\n";
+                            fail += "Por favor insira o seu email. Com ele irei conseguir identificá-lo melhor.\n";
                         break;
                     case gender_field:
                         gender = f.value;
@@ -155,8 +156,8 @@ namespace SmartKioskBot.Logic
                 }
             }
 
-            if (UserController.getUserByEmail(email) != null && email != "")
-                fail += "O email que inseriu já está associado a uma conta.\n";
+            if (email != StateHelper.GetUser(context).Email && UserController.getUserByEmail(email) != null && email != "")
+                fail += "O email que inseriu já está associado a uma outra conversa.\n";
             else
             {
                 Random r = new Random();

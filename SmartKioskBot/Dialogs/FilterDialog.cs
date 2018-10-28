@@ -97,9 +97,9 @@ namespace SmartKioskBot.Dialogs
             var text = "";
 
             if (products.Count > 0)
-                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.SUCCESS,page) + "  \n";
+                text = Interactions.getFilter(Interactions.State.SUCCESS,page) + "  \n";
             else
-                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.FAIL,page) + "  \n";
+                text = Interactions.getFilter(Interactions.State.FAIL,page) + "  \n";
 
             //display current filters
             for(int i = 0; i < filters.Count; i++)
@@ -219,7 +219,7 @@ namespace SmartKioskBot.Dialogs
         {
             StateHelper.CleanFilters(context);
             var reply = context.MakeMessage();
-            reply.Text = BotDefaultAnswers.getCleanAllFilters();
+            reply.Text = Interactions.getCleanAllFilters();
             return reply;
         }
     }

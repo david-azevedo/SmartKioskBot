@@ -41,7 +41,7 @@ namespace SmartKioskBot.Dialogs
 
             reply.Attachments = attachments;
 
-            await context.PostAsync(BotDefaultAnswers.getClosesStore());
+            await context.PostAsync(Interactions.getClosesStore());
             await context.PostAsync(reply);
         }
 
@@ -75,11 +75,11 @@ namespace SmartKioskBot.Dialogs
             if (storesWStock.Count() == 0)
             {
                 reply.AttachmentLayout = AttachmentLayoutTypes.List;
-                text = BotDefaultAnswers.getStockFail();
+                text = Interactions.getStockFail();
             }
             else
             {
-                text = BotDefaultAnswers.getStockSuccess();
+                text = Interactions.getStockSuccess();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
