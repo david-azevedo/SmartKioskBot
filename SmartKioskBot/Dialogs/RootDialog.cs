@@ -104,7 +104,10 @@ namespace SmartKioskBot.Dialogs
                     context.Wait(InputHandler);
                 //reset conversation
                 else if (c.code == DIALOG_CODE.RESET)
-                    context.Done<object>(null);
+                {
+                    StateHelper.ResetUserData(context);
+                    context.Wait(InputHandler);
+                }
                 //message to handle
                 else if (c.dialog == DialogType.NONE)
                     await MessageHandler(context, c.activity);
@@ -116,23 +119,26 @@ namespace SmartKioskBot.Dialogs
                 context.Wait(InputHandler);
         }
 
-        private void TryIdentification(IDialogContext context)
+        private bool TryIdentification(IDialogContext context)
         {
             StateHelper.ResetUserData(context);
-            bool found_mail = false;
 
             try
             {
                 var m = new MailAddress(context.Activity.ChannelId);
 
                 var user = UserController.getUserByEmail(m.Address);
-                if(user != null)
+                if (user != null)
                 {
-                    StateHelper.Login(context,user);
+                    StateHelper.Login(context, user);
+                    return true;
                 }
+                else
+                    return false;
             }
             catch
             {
+                return false;
             }
         }
 

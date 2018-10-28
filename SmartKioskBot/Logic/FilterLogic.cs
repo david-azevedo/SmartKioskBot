@@ -130,6 +130,9 @@ namespace SmartKioskBot.Logic
                 {
                     f.Operator = ">";
                     f.Value = data[i].input;
+
+                    if (f.Value == "0")
+                        add_filter = false;
                 }
                 else if (data[i].value == "max")
                 {
@@ -143,7 +146,7 @@ namespace SmartKioskBot.Logic
                         add_filter = false;
                 }
 
-                if (f.Value == "")
+                if (f.Value == "" &&f.FilterName == "")
                     add_filter = false;
 
                 if(add_filter)

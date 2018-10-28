@@ -218,7 +218,7 @@
     <Compile Include="Controllers\CRMController.cs" />
     <Compile Include="Dialogs\MenuDialog.cs" />
     <Compile Include="Dialogs\AccountDialog.cs" />
-    <Compile Include="Helpers\BotDefaultAnswers.cs" />
+    <Compile Include="Helpers\Interactions.cs" />
     <Compile Include="Dialogs\StoreDialog.cs" />
     <Compile Include="Dialogs\CompareDialog.cs" />
     <Compile Include="Dialogs\FilterDialog.cs" />

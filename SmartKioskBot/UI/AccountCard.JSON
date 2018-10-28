@@ -91,7 +91,7 @@
         },
         {
             "type": "Action.Submit",
-            "title": "Terminar Sessão",
+            "title": "Terminar Conversa",
             "data": {
                 "reply_type": "account_logout",
                 "dialog": "account"

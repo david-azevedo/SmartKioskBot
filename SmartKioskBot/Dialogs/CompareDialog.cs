@@ -55,9 +55,14 @@ namespace SmartKioskBot.Dialogs
 
             var reply = context.MakeMessage();
 
+            string intro_msg = "Bem-vindo ao comparador. Aqui posso dar-lhe sugestões sobre quais os melhores produtos que deseja comparar.";
+            string button_msg = "";
+
             if (products.Count > 0)
             {
-                await context.PostAsync("Bem vindo ao comparador, estes são os produtos que adicionou ao comparador: ");
+
+                intro_msg = "\nVou buscar os produtos em que demonstrou interesse em avaliar. Espere só um momento por favor.";
+                await Interactions.SendMessage(context, intro_msg, 0, 0);
 
                 //display products 
                 reply = context.MakeMessage();
@@ -69,19 +74,27 @@ namespace SmartKioskBot.Dialogs
                     cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.COMPARATOR).ToAttachment());
 
                 reply.Attachments = cards;
+
+                await Interactions.SendMessage(context, "Aqui estão os produtos:", 4000, 2000);
                 await context.PostAsync(reply);
 
                 if (products.Count <= ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR)
                     buttons.Add(ButtonType.ADD_PRODUCT);
 
                 buttons.Add(ButtonType.COMPARE);
+
+                button_msg = "Se quiser posso fazer uma avaliação dos produtos, clique no botão abaixo para que eu iniciar a comparação.";
             }
             else
             {
-                await context.PostAsync("Não tem produtos para comparar.");
+                intro_msg = "\nDe momentos ainda não adicionou nenhum produto para ser avaliado.";
+                await Interactions.SendMessage(context, intro_msg, 0, 3000);
                 buttons.Add(ButtonType.ADD_PRODUCT);
             }
-            
+
+            button_msg += "\nSe tiver interesse em adicionar produtos para serem avaliados, faça uma pesquisa no nosso catálogo. Para isto, clique no botão abaixo para preencher um formulário de pesquisa.";
+            await Interactions.SendMessage(context, button_msg, 3000, 2000);
+
             //show options
             reply = context.MakeMessage();
             reply.Attachments.Add(getCardButtonsAttachment(buttons, DialogType.COMPARE));
@@ -166,11 +179,12 @@ namespace SmartKioskBot.Dialogs
             if(products.Count > 0)
             {
                 var reply = context.MakeMessage();
-                reply.Text = BotDefaultAnswers.getOngoingComp();
+                reply.Text = Interactions.getOngoingComp();
                 await context.PostAsync(reply);
 
                 ComparatorLogic.ShowProductComparison(context, products);
 
+                /*
                 //show options
                 if(products.Count <= ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR)
                 {
@@ -178,7 +192,7 @@ namespace SmartKioskBot.Dialogs
                     reply.Attachments.Add(getCardButtonsAttachment(
                         new List<ButtonType> { ButtonType.ADD_PRODUCT }, DialogType.COMPARE));
                     await context.PostAsync(reply);
-                }
+                }*/
                
             }
             else
@@ -204,14 +218,14 @@ namespace SmartKioskBot.Dialogs
                 List<string> items = StateHelper.GetComparatorItems(context);
 
                 if (ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR <= items.Count)
-                    await context.PostAsync("Lamento mas o número máximo de produtos permitidos no comparador é de " + 
-                        ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR.ToString() + "produtos.");
+                    await context.PostAsync("Lamento mas só consigo avaliar até " + 
+                        ComparatorLogic.MAX_PRODUCTS_ON_COMPARATOR.ToString() + " produtos.");
                 else
                 {
                     Product productToAdd = ProductController.getProduct(product);
                     
                     var reply = context.MakeMessage();
-                    reply.Text = String.Format(BotDefaultAnswers.getAddComparator());
+                    reply.Text = String.Format(Interactions.getAddComparator());
                     await context.PostAsync(reply);
 
                     StateHelper.AddItemComparator(context, product);
@@ -227,7 +241,7 @@ namespace SmartKioskBot.Dialogs
             if (parts.Length >= 2)
             {
                 var reply = _context.MakeMessage();
-                reply.Text = BotDefaultAnswers.getRemComparator();
+                reply.Text = Interactions.getRemComparator();
                 await _context.PostAsync(reply);
                 
                 StateHelper.RemItemComparator(_context, product);

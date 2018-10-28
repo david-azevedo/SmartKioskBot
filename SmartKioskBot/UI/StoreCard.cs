@@ -29,7 +29,7 @@ namespace SmartKioskBot.UI
         {
 
             var buttons = new List<CardAction>();
-            buttons.Add(new CardAction(ActionTypes.ImBack, "Encontrar produto dentro da loja", value: BotDefaultAnswers.in_store_location1 + productId + ":" + s.Id.ToString()));
+            buttons.Add(new CardAction(ActionTypes.ImBack, "Encontrar produto dentro da loja", value: Interactions.in_store_location1 + productId + ":" + s.Id.ToString()));
 
             return new HeroCard
             {

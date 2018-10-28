@@ -5,9 +5,7 @@ using System;
 using Microsoft.Bot.Connector;
 using static SmartKioskBot.Helpers.Constants;
 using Newtonsoft.Json.Linq;
-using static SmartKioskBot.Models.Context;
 using System.Collections.Generic;
-using SmartKioskBot.Models;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -28,6 +26,7 @@ namespace SmartKioskBot.Dialogs
             switch (state)
             {
                 case State.INIT:
+                    //await context.PostAsync(Interactions.MainMenu());
                     var reply = context.MakeMessage();
                     reply.Attachments.Add(await getCardAttachment(CardType.MENU));
                     await context.PostAsync(reply);
@@ -62,11 +61,11 @@ namespace SmartKioskBot.Dialogs
                 //json structure is correct
                 if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
                 {
-                    ClickType click = getClickType(data[0].value);
+                    ClickType event_click = getClickType(data[0].value);
+                    DialogType event_dialog = getDialogType(data[1].value);
 
-                    if (data[1].value.Equals(getDialogName(DialogType.MENU)) &&
-                        click != ClickType.NONE &&
-                        click.Equals(ClickType.MENU))
+                    if (event_dialog == DialogType.MENU &&
+                        event_click == ClickType.MENU)
                     {
                         switch (data[0].value)
                         {
@@ -109,7 +108,7 @@ namespace SmartKioskBot.Dialogs
                         }
                     }
                     else
-                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity));
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT,activity,event_dialog));
                 }
                 else
                     context.Done(new CODE(DIALOG_CODE.DONE));

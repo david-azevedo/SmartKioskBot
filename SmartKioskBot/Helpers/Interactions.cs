@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Collections;
 using SmartKioskBot.Models;
+using Microsoft.Bot.Builder.Dialogs;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SmartKioskBot.Dialogs
 {
-    public abstract class BotDefaultAnswers
+    public abstract class Interactions
     {
         /*
          * Common
@@ -20,25 +20,11 @@ namespace SmartKioskBot.Dialogs
         public const string next_pagination = "Ver Mais";
         public const string unknown_intention = "Não entendi aquilo que disse, poderia refrasear?";
 
-        /*
-         * Activity Dialog
-         */
-
-        public static String getMemberAdded()
-        {
-            String[] welcomes =
-            {
-                "Bem-vindo de volta, reparei agora que está online! Posso ajudá-lo ?",
-                "Estou contente que tenha voltado! Necessita de alguma coisa?"
-            };
-
-            return welcomes[new Random().Next(0, welcomes.Length)];
-        }
 
         /*
          * Button Click Message
          */
-      
+
         public static string show_product_details = "Ver detalhes do produto: ";
         public static string add_wish_list = "Adicionar à lista de desejos o produto: ";
         public static string add_to_comparator = "Adicionar ao comparador o produto: ";
@@ -52,58 +38,94 @@ namespace SmartKioskBot.Dialogs
         public static string show_store_with_stock = "verificar disponibilidade do produto:";
         public static string in_store_location1 = "localização dentro da loja:";
 
-        public const string identification_name = "Qual é o seu nome?";
-        public const string identigication_email = "Qual é o seu email?";
-        public const string identification_storeCard = "Qual é o seu número de cartão da loja?";
-
-        public const string identication = "Não me lembro de falar consigo, gostaria de se identificar?";
-        public const string identification_option = "De que forma deseja ser reconhecido?";
-        public const string identification_identified = "Já falou comigo num outro canal de comunicação?";
-        public const string identification_fail = "Não me lembro de falar com alguém com esse email.";
-        public const string identification_start_registration = "Vamos proceder para o registo dos seus dados para que seja possível eu me lembrar de si em outros canais de comunicação.";
-        public const string identification_end_registration = "Os seus dados foram registados!";
-        public const string identification_card = "Quer associar o seu cartão da loja?";
-        public const string identification_conversation_retrieved = "Agora já me lembrei de você pelas nossas outras conversas!";
-        public const string identification_card_saved = "O seu cartão da loja já foi associado.";
-        public const string identification_tryAgain = "Deseja tentar de novo?";
-
         public const string email = "Email";
         public const string store_card = "Cartão da Loja";
 
-        public static string UserInfoConfirmation(string name, string email)
+        public static async Task SendMessage(IDialogContext context, string msg, int delay_before, int delay_after)
         {
-            return "É esta a sua informação? \n\n" +
-                    "Nome: " + name + " \n\n" +
-                    "Email: " + email + " \n\n" +
-                    "{||}"; 
-        }
-
-        public static string UserInfoConfirmation(string email)
-        {
-            return "É esta a sua informação? \n\n" +
-                   "Email: " + email + " \n\n" +
-                   "{||}"; 
-        }
-
-        public static string UserCardConfirmation(string card)
-        {
-            return "É este o seu cartão da loja? \n\n" +
-                    "Nome: " + card + " \n\n" +
-                    "{||}";
+            Thread.Sleep(delay_before);
+            await context.PostAsync(msg);
+            Thread.Sleep(delay_after);
         }
 
         /*
          * Intents Dialog
          */
 
-        public static String getGreeting(String user_name)
+        public static String Greeting(String user_name)
         {
             String[] greetings = {
-                "Bem vindo à Technon " + user_name + "! O meu nome é Sr. Technon. Em que o posso ajudar?",
+                "Bem-vindo à Technon " + user_name + "! O meu nome é Sr. Technon. Em que o posso ajudar?",
                 "Olá " + user_name + "! O meu nome é Sr.Technon, procura alguma coisa em específico?",
                 "Olá sou o Sr.Technon, em que o posso ajudar " + user_name + "?"
             };
-            return greetings[new Random().Next(0,greetings.Length)];
+            return greetings[new Random().Next(0, greetings.Length)];
+        }
+
+        public static String MainMenu()
+        {
+            String[] info = { "Este é o menu principal. Aqui poderei conseguir identificá-lo como cliente, " +
+                "ajudar na procura de produtos do nosso catálogo, opinar sobre quais os melhores e até dar-lhe " +
+                "algumas recomendações.\n" +
+                "Também lhe posso  mostrar os seus produtos favoritos até agora e, caso esteja interessado," +
+                "também lhe posso mostrar as lojas Technon mais próximas.",
+
+                "Por favor, selecione uma das opções do menu principal para que eu o possa ajudar.",
+                "Este menu principal irá me ajudar a guiá-lo melhor. Por favor selecione a opção que deseja."
+                };
+
+            return info[new Random().Next(0, info.Length)];
+        }
+
+        //ACCOUNT
+        public static String NotLoggedIn()
+        {
+            String[] registered = {
+                "É um cliente da Technon? Por favor identifique-se, assim poderei ajudá-lo melhor!",
+                "Já nos conhecemos? Se sim, por favor identifique-se para que eu me possa lembrar de quem é.",
+                "Não me estou a lembrar de si. Poderia-se identificar? Assim já me vou recordar de si."
+                };
+
+            String[] not_registered =
+            {
+                "Se ainda não nos conhecemos não há problema, clique no botão abaixo para que eu me lembre de si numa próxima vez."
+            };
+
+            return registered[new Random().Next(0, registered.Length)] + "\n" + not_registered[new Random().Next(0, not_registered.Length)];
+        }
+
+        public static String AccountInfo(){
+            String[] interaction =
+                {
+                "Esta é a informação que me deu sobre você. Se há algo que não está certo por favor me corrija, clique no " +
+                    "botão para que eu possa alterar esta informação.\nSe você não for esta pessoa por favor termine a conversa. Obrigada"
+            };
+
+            return interaction[new Random().Next(0, interaction.Length)];
+        }
+
+        public static String Login(string name)
+        {
+            String[] interaction =
+                {
+                name + " nem sei como é que não me lembrei de si mais cedo!",
+                "Bem-vindo de volta " + name + "desculpe não me ter lembrado de você."
+            };
+
+            return interaction[new Random().Next(0, interaction.Length)];
+        }
+        
+        public static String Register(User u)
+        {
+            string msg = "Prazer em conhecê-l";
+            if (u.Gender== "Feminino")
+                msg += "a";
+            else
+                msg += "o";
+
+            msg += " " + u.Name + ", eu sou o Sr.Technon.";
+
+            return msg;
         }
 
         //FILTERS

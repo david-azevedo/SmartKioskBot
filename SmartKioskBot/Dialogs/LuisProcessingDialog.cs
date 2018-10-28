@@ -52,7 +52,7 @@ namespace SmartKioskBot.Dialogs
         {
             FilterIntentScore(context, result);
 
-            string message = BotDefaultAnswers.unknown_intention;
+            string message = Interactions.unknown_intention;
             await context.PostAsync(message);
 
             context.Done(new CODE(DIALOG_CODE.DONE));
@@ -66,15 +66,16 @@ namespace SmartKioskBot.Dialogs
         public async Task Guidance(IDialogContext context, LuisResult result)
         {
             FilterIntentScore(context, result);
+            await Interactions.SendMessage(context,Interactions.MainMenu(),0,2000);
             context.Call(new MenuDialog(MenuDialog.State.INIT), ResumeAfterDialogueCall);
         }
-
+        
         [LuisIntent("Greeting")]
         public async Task Greeting(IDialogContext context, LuisResult result)
         {
             var reply = context.MakeMessage();
-            reply.Text = BotDefaultAnswers.getGreeting(context.Activity.From.Name);
-            await Helpers.BotTranslator.PostTranslated(context, reply, reply.Locale);
+            reply.Text = Interactions.Greeting(StateHelper.GetUser(context).Name);
+            await context.PostAsync(reply);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
@@ -95,7 +96,7 @@ namespace SmartKioskBot.Dialogs
             FilterIntentScore(context, result);
 
             WishListDialog.AddToWishList(context, result.Query);
-            var reply = BotDefaultAnswers.getAddWishList();
+            var reply = Interactions.getAddWishList();
             await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
@@ -106,7 +107,7 @@ namespace SmartKioskBot.Dialogs
             FilterIntentScore(context, result);
 
             WishListDialog.RemoveFromWishList(context, result.Query);
-            var reply = BotDefaultAnswers.getRemWishList();
+            var reply = Interactions.getRemWishList();
             await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
@@ -206,9 +207,7 @@ namespace SmartKioskBot.Dialogs
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
 
-            //hero card
-            IMessageActivity r = StoreDialog.ShowStores(context, id);
-            await context.PostAsync(r);
+            await StoreDialog.ShowStores(context, id);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
 

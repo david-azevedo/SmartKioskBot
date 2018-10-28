@@ -41,11 +41,11 @@ namespace SmartKioskBot.Dialogs
 
             reply.Attachments = attachments;
 
-            await context.PostAsync(BotDefaultAnswers.getClosesStore());
+            await Interactions.SendMessage(context,Interactions.getClosesStore(),0,2000);
             await context.PostAsync(reply);
         }
 
-        public static IMessageActivity ShowStores(IDialogContext context, string productId)
+        public static async Task ShowStores(IDialogContext context, string productId)
         {
             var reply = context.MakeMessage();
 
@@ -75,11 +75,11 @@ namespace SmartKioskBot.Dialogs
             if (storesWStock.Count() == 0)
             {
                 reply.AttachmentLayout = AttachmentLayoutTypes.List;
-                text = BotDefaultAnswers.getStockFail();
+                text = Interactions.getStockFail();
             }
             else
             {
-                text = BotDefaultAnswers.getStockSuccess();
+                text = Interactions.getStockSuccess();
                 reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 List<Attachment> cards = new List<Attachment>();
 
@@ -90,8 +90,8 @@ namespace SmartKioskBot.Dialogs
 
                 reply.Attachments = cards;
             }
-            context.PostAsync(text);
-            return reply;
+            await Interactions.SendMessage(context, text, 0, 2000);
+            await context.PostAsync(reply);
         }
 
     }
