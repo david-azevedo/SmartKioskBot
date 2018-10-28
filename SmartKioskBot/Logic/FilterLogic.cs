@@ -31,7 +31,7 @@ namespace SmartKioskBot.Logic
         public const string screen_size_filter = "tamanho_ecra";
         public const string autonomy_filter = "autonomia";
 
-        public static void SetFilterCardValue(JToken card, List<Filter> applied_filters)
+        public static void SetFilterCardValue(JToken card, List<Filter> applied_filters, string channel)
         {
             List<JToken> card_fields = new List<JToken>();
             string last_retrieved = "";
@@ -63,7 +63,13 @@ namespace SmartKioskBot.Logic
                         if (!checkbox)
                             card_fields[j]["value"] = f.Value;
                         else
-                            card_fields[j]["value"] = "true";
+                        {
+                            if (channel == "webchat")
+                                card_fields[j]["value"] = "True";
+                            else
+                                card_fields[j]["value"] = "true";
+
+                        }
                         break;
                     }
                 }
@@ -142,7 +148,7 @@ namespace SmartKioskBot.Logic
                 else
                 {
                     f.Value = data[i].value;
-                    if (data[i].input.Equals("false"))
+                    if (data[i].input.ToLower().Equals("false"))
                         add_filter = false;
                 }
 

@@ -83,7 +83,7 @@ namespace SmartKioskBot.Dialogs
             else
             {
                 text = Interactions.getWishList(Interactions.State.SUCCESS,skip/Constants.N_ITEMS_CARROUSSEL + 1);
-                await context.PostAsync(text);
+                await Interactions.SendMessage(context, text, 0, 2500);
                 
                 //display products 
                 reply = context.MakeMessage();

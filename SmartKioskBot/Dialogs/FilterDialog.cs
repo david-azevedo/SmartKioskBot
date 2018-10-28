@@ -69,7 +69,7 @@ namespace SmartKioskBot.Dialogs
             {
                 await Interactions.SendMessage(context, "Modifique os seus requisitos para efetuarmos uma nova pesquisa no nosso catálogo.", 0, 2000);
                 JObject json = JObject.Parse(att.Content.ToString());
-                FilterLogic.SetFilterCardValue(json, StateHelper.GetFilters(context));
+                FilterLogic.SetFilterCardValue(json, StateHelper.GetFilters(context),context.Activity.ChannelId);
                 att.Content = @json;
             }
             else
