@@ -207,9 +207,7 @@ namespace SmartKioskBot.Dialogs
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
 
-            //hero card
-            IMessageActivity r = StoreDialog.ShowStores(context, id);
-            await context.PostAsync(r);
+            await StoreDialog.ShowStores(context, id);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
 

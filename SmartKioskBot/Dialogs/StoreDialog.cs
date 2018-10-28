@@ -41,11 +41,11 @@ namespace SmartKioskBot.Dialogs
 
             reply.Attachments = attachments;
 
-            await context.PostAsync(Interactions.getClosesStore());
+            await Interactions.SendMessage(context,Interactions.getClosesStore(),0,2000);
             await context.PostAsync(reply);
         }
 
-        public static IMessageActivity ShowStores(IDialogContext context, string productId)
+        public static async Task ShowStores(IDialogContext context, string productId)
         {
             var reply = context.MakeMessage();
 
@@ -90,8 +90,8 @@ namespace SmartKioskBot.Dialogs
 
                 reply.Attachments = cards;
             }
-            context.PostAsync(text);
-            return reply;
+            await Interactions.SendMessage(context, text, 0, 2000);
+            await context.PostAsync(reply);
         }
 
     }

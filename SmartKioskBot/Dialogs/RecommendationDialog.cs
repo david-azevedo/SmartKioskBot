@@ -46,6 +46,8 @@ namespace SmartKioskBot.Dialogs
 
         private async Task ShowRecommendations(IDialogContext context, IAwaitable<object> result)
         {
+            await Interactions.SendMessage(context, "Tenho tantos produtos que sei que poderiam ser do seu interesse. Espere só um momento, vou analisar o nosso catálogo.", 0, 4000);
+
             List<Product> products = new List<Product>();
             List<Filter> popular = RecommendationsLogic.GetPopularFilters(StateHelper.GetFiltersCount(context));
 
@@ -85,6 +87,8 @@ namespace SmartKioskBot.Dialogs
             for (int i = 0; i < products.Count && i < Constants.N_ITEMS_CARROUSSEL; i++)
                 cards.Add(ProductCard.GetProductCard(products[i], ProductCard.CardType.RECOMMENDATION).ToAttachment());
 
+            await Interactions.SendMessage(context, "Estas são as minhas recomendações:", 0, 2000);
+
             reply.Attachments = cards;
             await context.PostAsync(reply);
 
@@ -93,6 +97,8 @@ namespace SmartKioskBot.Dialogs
                 context.Done(new CODE(DIALOG_CODE.DONE));
             else
             {
+                await Interactions.SendMessage(context, "Ainda tenho mais recomendações para si. Se for do seu interesse não hesite, carregue no botão abaixo.", 2000, 2000);
+
                 reply = context.MakeMessage();
                 
                 reply.Attachments.Add(

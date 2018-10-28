@@ -71,6 +71,8 @@ namespace SmartKioskBot.Dialogs
             var reply = context.MakeMessage();
             var text = "";
 
+            var button_text = "";
+
             // No products on wishlsit
             if (products.Count == 0)
             {
@@ -100,11 +102,15 @@ namespace SmartKioskBot.Dialogs
                 {
                     buttons.Add(ButtonType.PAGINATION);
                     skip += skip + Constants.N_ITEMS_CARROUSSEL;
+                    button_text += "Não consegui exibir todos os seus produtos favoritos. Se desejar ver mais clique no botão abaixo.";
                 }
             }
 
             //add option add more products
             buttons.Add(ButtonType.ADD_PRODUCT);
+            button_text += "\nSe desejar adicionar mais produtos aos seus favoritos faça uma pesquisa no nosso catálogo. Para isso, clique no botão abaixo.";
+
+            await Interactions.SendMessage(context, button_text, 2000, 2000);
 
             //show options
             reply = context.MakeMessage();

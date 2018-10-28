@@ -2,6 +2,7 @@
 using Microsoft.Bot.Connector;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SmartKioskBot.Dialogs;
 using SmartKioskBot.Helpers;
 using SmartKioskBot.Models;
 using SmartKioskBot.UI;
@@ -115,19 +116,22 @@ namespace SmartKioskBot.Logic
             var entity = collection.Find(query_id).ToList();
 
             var store = entity[0];
-            var message = "";
+            var message = "O produto encontra-se no ";
+
+            await Interactions.SendMessage(context, "Vou verificar a localização do produto dentro da loja. Aguarde.", 0, 4000);
 
             for (int i = 0; i < store.ProductsInStock.Count(); i++)
             {
                 if (store.ProductsInStock[i].ProductId.ToString().Equals(productId))
                 {
-                    message += "Corredor(" + store.ProductsInStock[i].InStoreLocation.Corridor + "), ";
-                    message += "Secção(" + store.ProductsInStock[i].InStoreLocation.Section + "), ";
-                    message += "Prateleira(" + store.ProductsInStock[i].InStoreLocation.Shelf + "). ";
+                    message += "no corredor " + store.ProductsInStock[i].InStoreLocation.Corridor + ", ";
+                    message += "da secção " + store.ProductsInStock[i].InStoreLocation.Section + " e na ";
+                    message += "prateleira " + store.ProductsInStock[i].InStoreLocation.Shelf + "";
+                    break;
                 }
             }
 
-            await context.PostAsync(message);
+            await Interactions.SendMessage(context, message, 0, 0);
         }
 
     }

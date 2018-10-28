@@ -70,12 +70,10 @@ namespace SmartKioskBot.Dialogs
                 await Interactions.SendMessage(context, "Modifique os seus requisitos para efetuarmos uma nova pesquisa no nosso catálogo.", 0, 2000);
                 JObject json = JObject.Parse(att.Content.ToString());
                 FilterLogic.SetFilterCardValue(json, StateHelper.GetFilters(context));
+                att.Content = @json;
             }
             else
                 await Interactions.SendMessage(context, "Preencha o formulário abaixo com as suas preferências para que ue possa reunir os melhores produtos para si.", 0, 2000);
-
-            //reset filters (they will be added again in the filtering process)
-            StateHelper.SetFilters(new List<Filter>(), context);
 
             //send form
             reply.Attachments.Add(att);
@@ -114,7 +112,7 @@ namespace SmartKioskBot.Dialogs
                     text += ", ";
             }
 
-            await Interactions.SendMessage(context, text, 0, 3000);
+            await Interactions.SendMessage(context, text, 2000, 3000);
 
             bool done = false;
             List<ButtonType> buttons = new List<ButtonType>();
@@ -145,7 +143,7 @@ namespace SmartKioskBot.Dialogs
             }
 
             button_text += "\nPara alterar os parâmetros da pesquisa carregue no respetivo botão.";
-            await Interactions.SendMessage(context, button_text, 0, 2000);
+            await Interactions.SendMessage(context, button_text, 2000, 2000);
 
             buttons.Add(ButtonType.FILTER_AGAIN);
 
@@ -199,11 +197,10 @@ namespace SmartKioskBot.Dialogs
                             case ClickType.FILTER:
                                 data.RemoveAt(0);   //remove reply_type
                                 data.RemoveAt(0);   //remove dialog
+                                
+                                StateHelper.SetFilters(FilterLogic.GetFilterFromForm(data), context);
 
-                                List<Filter> filters= FilterLogic.GetFilterFromForm(data);
-                                StateHelper.SetFilters(filters, context);
-
-                                foreach (Filter f in filters)
+                                foreach (Filter f in StateHelper.GetFilters(context))
                                     StateHelper.AddFilterCount(context, f);
 
                                 this.state = State.FILTER;
