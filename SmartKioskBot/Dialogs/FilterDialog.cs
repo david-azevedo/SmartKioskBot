@@ -73,7 +73,7 @@ namespace SmartKioskBot.Dialogs
                 att.Content = @json;
             }
             else
-                await Interactions.SendMessage(context, "Preencha o formulário abaixo com as suas preferências para que ue possa reunir os melhores produtos para si.", 0, 2000);
+                await Interactions.SendMessage(context, "Preencha o formulário abaixo com as suas preferências para que eu possa reunir os melhores produtos para si.", 0, 2000);
 
             //send form
             reply.Attachments.Add(att);

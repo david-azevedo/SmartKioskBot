@@ -198,7 +198,7 @@ namespace SmartKioskBot.Dialogs
             if (fail_text != "")
                 await context.PostAsync(fail_text);
             else
-                await Interactions.SendMessage(context, Interactions.Register(StateHelper.GetUser(context)), 0, 3000);
+                await Interactions.SendMessage(context, Interactions.Register(StateHelper.GetUser(context)), 0, 2000);
 
             state = State.INIT;
 

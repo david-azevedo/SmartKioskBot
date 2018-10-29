@@ -156,6 +156,8 @@ namespace SmartKioskBot.Dialogs
 
             List<Filter> filter_luis = FilterLogic.GetEntitiesFilter(result);
 
+            StateHelper.SetFilters(new List<Filter>(), context);
+
             foreach (Filter f in filter_luis)
             {
                 if (StateHelper.AddFilter(f, context) == true)

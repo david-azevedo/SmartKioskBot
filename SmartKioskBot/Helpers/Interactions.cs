@@ -64,11 +64,12 @@ namespace SmartKioskBot.Dialogs
 
         public static String MainMenu()
         {
-            String[] info = { "Este é o menu principal. Aqui poderei conseguir identificá-lo como cliente, " +
+            String[] info = { "Este é o menu principal.\n" + 
+                    "Aqui poderei conseguir identificá-lo como cliente, " +
                 "ajudar na procura de produtos do nosso catálogo, opinar sobre quais os melhores e até dar-lhe " +
                 "algumas recomendações.\n" +
-                "Também lhe posso  mostrar os seus produtos favoritos até agora e, caso esteja interessado," +
-                "também lhe posso mostrar as lojas Technon mais próximas.",
+                "Também lhe posso  mostrar os seus produtos favoritos e, caso esteja interessado," +
+                "também mostrar as lojas Technon mais próximas.",
 
                 "Por favor, selecione uma das opções do menu principal para que eu o possa ajudar.",
                 "Este menu principal irá me ajudar a guiá-lo melhor. Por favor selecione a opção que deseja."
