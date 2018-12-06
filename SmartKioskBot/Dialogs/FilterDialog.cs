@@ -60,17 +60,20 @@ namespace SmartKioskBot.Dialogs
 
         public async Task InitDialog(IDialogContext context, IAwaitable<IMessageActivity> activity)
         {
+
             var reply = context.MakeMessage();
             Attachment att = await getCardAttachment(CardType.FILTER);
             
             //Fills the form with the previous choosen filters
             if (state.Equals(State.FILTER_AGAIN))
             {
+                await Interactions.SendMessage(context, "Modifique os seus requisitos para efetuarmos uma nova pesquisa no nosso catálogo.", 0, 2000);
                 JObject json = JObject.Parse(att.Content.ToString());
-                FilterLogic.SetFilterCardValue(json, StateHelper.GetFilters(context));
+                FilterLogic.SetFilterCardValue(json, StateHelper.GetFilters(context),context.Activity.ChannelId);
+                att.Content = @json;
             }
-            //reset filters (they will be added again in the filtering process)
-            StateHelper.SetFilters(new List<Filter>(), context);
+            else
+                await Interactions.SendMessage(context, "Preencha o formulário abaixo com as suas preferências para que eu possa reunir os melhores produtos para si.", 0, 2000);
 
             //send form
             reply.Attachments.Add(att);
@@ -97,9 +100,9 @@ namespace SmartKioskBot.Dialogs
             var text = "";
 
             if (products.Count > 0)
-                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.SUCCESS,page) + "  \n";
+                text = Interactions.getFilter(Interactions.State.SUCCESS,page) + "  \n";
             else
-                text = BotDefaultAnswers.getFilter(BotDefaultAnswers.State.FAIL,page) + "  \n";
+                text = Interactions.getFilter(Interactions.State.FAIL,page) + "  \n";
 
             //display current filters
             for(int i = 0; i < filters.Count; i++)
@@ -109,10 +112,12 @@ namespace SmartKioskBot.Dialogs
                     text += ", ";
             }
 
-            await context.PostAsync(text);
+            await Interactions.SendMessage(context, text, 2000, 3000);
 
             bool done = false;
             List<ButtonType> buttons = new List<ButtonType>();
+
+            string button_text = "";
 
             //show products
             if (products.Count > 0)
@@ -131,8 +136,14 @@ namespace SmartKioskBot.Dialogs
 
                 //Check if pagination is needed
                 if (products.Count > Constants.N_ITEMS_CARROUSSEL)
+                {
+                    button_text = "Não consegui trazer todos os produtos do catálogo com esses requisitos. Se quiser ver mais produtos clique no botão abaixo.";
                     buttons.Add(ButtonType.PAGINATION);
+                }
             }
+
+            button_text += "\nPara alterar os parâmetros da pesquisa carregue no respetivo botão.";
+            await Interactions.SendMessage(context, button_text, 2000, 2000);
 
             buttons.Add(ButtonType.FILTER_AGAIN);
 
@@ -186,11 +197,10 @@ namespace SmartKioskBot.Dialogs
                             case ClickType.FILTER:
                                 data.RemoveAt(0);   //remove reply_type
                                 data.RemoveAt(0);   //remove dialog
+                                
+                                StateHelper.SetFilters(FilterLogic.GetFilterFromForm(data), context);
 
-                                List<Filter> filters= FilterLogic.GetFilterFromForm(data);
-                                StateHelper.SetFilters(filters, context);
-
-                                foreach (Filter f in filters)
+                                foreach (Filter f in StateHelper.GetFilters(context))
                                     StateHelper.AddFilterCount(context, f);
 
                                 this.state = State.FILTER;
@@ -219,7 +229,7 @@ namespace SmartKioskBot.Dialogs
         {
             StateHelper.CleanFilters(context);
             var reply = context.MakeMessage();
-            reply.Text = BotDefaultAnswers.getCleanAllFilters();
+            reply.Text = Interactions.getCleanAllFilters();
             return reply;
         }
     }

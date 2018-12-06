@@ -7,7 +7,7 @@
             "size": "Large",
             "weight": "Bolder",
             "color": "Accent",
-            "text": "Registar Cliente"
+            "text": "Apresentação"
         },
         {
             "type": "Container",
@@ -107,7 +107,7 @@
     "actions": [
         {
             "type": "Action.Submit",
-            "title": "Criar Conta",
+            "title": "Apresentar-me",
             "data": {
               "reply_type": "register_save",
               "dialog": "account"

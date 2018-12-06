@@ -36,23 +36,23 @@ namespace SmartKioskBot.UI
             var buttons = new List<CardAction>();
             if (option.Equals("set-customer-email"))
             {
-                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: BotDefaultAnswers.set_customer_email + " yes " + value));
-                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: BotDefaultAnswers.set_customer_email + " no "));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: Interactions.set_customer_email + " yes " + value));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: Interactions.set_customer_email + " no "));
             }
             else if (option.Equals("set-customer-card"))
             {
-                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: BotDefaultAnswers.set_customer_card + " yes " + value));
-                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: BotDefaultAnswers.set_customer_card + " no "));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: Interactions.set_customer_card + " yes " + value));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: Interactions.set_customer_card + " no "));
             }
             else if (option.Equals("set-customer-name"))
             {
-                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: BotDefaultAnswers.set_customer_name + " yes " + value));
-                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: BotDefaultAnswers.set_customer_name + " no "));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: Interactions.set_customer_name + " yes " + value));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: Interactions.set_customer_name + " no "));
             }
             else
             {
-                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: BotDefaultAnswers.add_channel + " yes " + value));
-                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: BotDefaultAnswers.add_channel + " no "));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Confirmar", value: Interactions.add_channel + " yes " + value));
+                buttons.Add(new CardAction(ActionTypes.PostBack, "Cancelar", value: Interactions.add_channel + " no "));
             }
 
                 return buttons;

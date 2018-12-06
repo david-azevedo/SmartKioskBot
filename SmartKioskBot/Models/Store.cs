@@ -31,6 +31,9 @@ namespace SmartKioskBot.Models
         [BsonElement("phoneNumber")]
         public string PhoneNumber { get; set; }
 
+        [BsonElement("photo")]
+        public string Photo { get; set; }
+
         [Serializable, JsonObject]
         public class ProductStock
         {

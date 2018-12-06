@@ -24,7 +24,7 @@ namespace SmartKioskBot.UI
                 //subtitle of the card  
                 Subtitle = p.Price + "€",
                 // navigate to page , while tab on card  
-                Tap = new CardAction(ActionTypes.ImBack, "Ver detalhes", value: BotDefaultAnswers.show_product_details + " " + p.Id.ToString()),
+                Tap = new CardAction(ActionTypes.ImBack, "Ver detalhes", value: Interactions.show_product_details + " " + p.Id.ToString()),
                 //Detail Text  
                 Text = p.Name,
                 // list of  Large Image  
@@ -43,30 +43,30 @@ namespace SmartKioskBot.UI
                 case CardType.SEARCH:
                 case CardType.RECOMMENDATION:
                     {
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Verificar Disponibilidade", value: BotDefaultAnswers.show_store_with_stock + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: Interactions.add_wish_list + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: Interactions.add_to_comparator + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Verificar Disponibilidade", value: Interactions.show_store_with_stock + id));
                         break;
                     }
                 case CardType.PRODUCT_DETAILS:
                     {
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Produtos Relacionados", value: BotDefaultAnswers.add_to_comparator + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Verificar Disponibilidade", value: BotDefaultAnswers.show_store_with_stock + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: Interactions.add_wish_list + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: Interactions.add_to_comparator + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Produtos Relacionados", value: Interactions.add_to_comparator + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Verificar Disponibilidade", value: Interactions.show_store_with_stock + id));
                         break;
                     }
                 case CardType.WISHLIST:
                     {
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover da Wish List", value: BotDefaultAnswers.rem_wish_list + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: BotDefaultAnswers.add_to_comparator + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Verificar Disponibilidade", value: BotDefaultAnswers.show_store_with_stock + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover da Wish List", value: Interactions.rem_wish_list + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar ao Comparador", value: Interactions.add_to_comparator + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Verificar Disponibilidade", value: Interactions.show_store_with_stock + id));
                         break;
                     }
                 case CardType.COMPARATOR:
                     {
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: BotDefaultAnswers.add_wish_list + id));
-                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover do Comparador", value: BotDefaultAnswers.rem_comparator + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Adicionar à Wish List", value: Interactions.add_wish_list + id));
+                        buttons.Add(new CardAction(ActionTypes.ImBack, "Remover do Comparador", value: Interactions.rem_comparator + id));
                         break;
                     }
             }

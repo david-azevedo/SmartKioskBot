@@ -16,31 +16,27 @@ namespace SmartKioskBot.UI
 
         public static HeroCard GetStoreCard(Store s)
         {
-            string details = "";
-            details += "Nome: " + s.Name + "\n" +
-                        "Morada: " + s.Address + "\n" +
-                        "Telefone: " + s.PhoneNumber + "\n";
             return new HeroCard
             {
                 Title = s.Name,
-                Text = details
+                Subtitle = "Morada: " + s.Address,
+                Text = "Telefone: " + s.PhoneNumber,
+                Images = new List<CardImage> { new CardImage(s.Photo) }
             };
         }
 
         public static HeroCard GetStoreDetailsCard(Store s, string productId)
         {
-            string details = "";
-            details += "Nome: " + s.Name + "\n\n" +
-                        "Morada: " + s.Address + "\n\n" +
-                        "Telefone: " + s.PhoneNumber + "\n\n";
 
             var buttons = new List<CardAction>();
-            buttons.Add(new CardAction(ActionTypes.ImBack, "Encontrar produto dentro da loja", value: BotDefaultAnswers.in_store_location1 + productId + ":" + s.Id.ToString()));
+            buttons.Add(new CardAction(ActionTypes.ImBack, "Encontrar produto dentro da loja", value: Interactions.in_store_location1 + productId + ":" + s.Id.ToString()));
 
             return new HeroCard
             {
                 Title = s.Name,
-                Text = details,
+                Subtitle = "Morada: " + s.Address,
+                Text = "Telefone: " + s.PhoneNumber,
+                Images = new List<CardImage> { new CardImage(s.Photo) },
                 Buttons = buttons
             };
         }

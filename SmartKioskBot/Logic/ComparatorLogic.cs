@@ -228,7 +228,7 @@ namespace SmartKioskBot.Logic
             foreach (KeyValuePair<ComparatorLogic.Parts, List<int>> entry in comparisonResults)
             {
                 reply = context.MakeMessage();
-                reply.Text = "### " + BotDefaultAnswers.getComparator(entry.Key.ToString()) + "  \n";
+                reply.Text = "### " + Interactions.getComparator(entry.Key.ToString()) + "  \n";
 
                 for (int i = 0; i < resultSize && i <7; i++)
                 {

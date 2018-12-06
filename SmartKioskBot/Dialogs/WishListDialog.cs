@@ -71,17 +71,19 @@ namespace SmartKioskBot.Dialogs
             var reply = context.MakeMessage();
             var text = "";
 
+            var button_text = "";
+
             // No products on wishlsit
             if (products.Count == 0)
             {
-                text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.FAIL,0);
+                text = Interactions.getWishList(Interactions.State.FAIL,0);
                 await context.PostAsync(text);
             }
             // Has Products
             else
             {
-                text = BotDefaultAnswers.getWishList(BotDefaultAnswers.State.SUCCESS,skip/Constants.N_ITEMS_CARROUSSEL + 1);
-                await context.PostAsync(text);
+                text = Interactions.getWishList(Interactions.State.SUCCESS,skip/Constants.N_ITEMS_CARROUSSEL + 1);
+                await Interactions.SendMessage(context, text, 0, 2500);
                 
                 //display products 
                 reply = context.MakeMessage();
@@ -100,11 +102,15 @@ namespace SmartKioskBot.Dialogs
                 {
                     buttons.Add(ButtonType.PAGINATION);
                     skip += skip + Constants.N_ITEMS_CARROUSSEL;
+                    button_text += "Não consegui exibir todos os seus produtos favoritos. Se desejar ver mais clique no botão abaixo.";
                 }
             }
 
             //add option add more products
             buttons.Add(ButtonType.ADD_PRODUCT);
+            button_text += "\nSe desejar adicionar mais produtos aos seus favoritos faça uma pesquisa no nosso catálogo. Para isso, clique no botão abaixo.";
+
+            await Interactions.SendMessage(context, button_text, 2000, 2000);
 
             //show options
             reply = context.MakeMessage();
@@ -140,13 +146,14 @@ namespace SmartKioskBot.Dialogs
                 //json structure is correct
                 if (data[0].attribute == REPLY_ATR && data[1].attribute == DIALOG_ATR)
                 {
-                    ClickType click = getClickType(data[0].value);
+                    ClickType event_click = getClickType(data[0].value);
+                    DialogType event_dialog = getDialogType(data[1].value);
 
                     //process in this dialog
-                    if (data[1].value.Equals(getDialogName(DialogType.WISHLIST)) &&
-                        click != ClickType.NONE)
+                    if (event_dialog == DialogType.WISHLIST &&
+                        event_click != ClickType.NONE)
                     {
-                        switch (click)
+                        switch (event_click)
                         {
                             case ClickType.PAGINATION:
                                 await StartAsync(context);
@@ -159,7 +166,7 @@ namespace SmartKioskBot.Dialogs
                     }
                     //process in parent dialog
                     else
-                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity));
+                        context.Done(new CODE(DIALOG_CODE.PROCESS_EVENT, activity,event_dialog));
                 }
                 else
                     context.Done(new CODE(DIALOG_CODE.DONE));

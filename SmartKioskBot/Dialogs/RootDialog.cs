@@ -12,6 +12,7 @@ using static SmartKioskBot.Helpers.AdaptiveCardHelper;
 using Newtonsoft.Json.Linq;
 using SmartKioskBot.Helpers;
 using System.Net.Mail;
+using SmartKioskBot.Dialogs.QnA;
 
 namespace SmartKioskBot.Dialogs
 {
@@ -58,7 +59,6 @@ namespace SmartKioskBot.Dialogs
             switch (dialog)
             {
                 case DialogType.ACCOUNT:
-                    //TODO
                     await context.Forward(
                         new AccountDialog(AccountDialog.State.INPUT_HANDLER),
                         ResumeAfterDialogCall, message);
@@ -84,12 +84,6 @@ namespace SmartKioskBot.Dialogs
                             RecommendationDialog.State.INPUT_HANDLE), 
                         ResumeAfterDialogCall, message);
                     break;
-                case DialogType.STORE:
-                    //TODO: call store dialog
-                    break;
-                case DialogType.TUTORIAL:
-                    //TODO: calldialog
-                    break;
                 case DialogType.WISHLIST:
                     await context.Forward(
                         new WishListDialog(WishListDialog.State.INPUT_HANDLER), 
@@ -110,7 +104,10 @@ namespace SmartKioskBot.Dialogs
                     context.Wait(InputHandler);
                 //reset conversation
                 else if (c.code == DIALOG_CODE.RESET)
-                    context.Done<object>(null);
+                {
+                    StateHelper.ResetUserData(context);
+                    context.Wait(InputHandler);
+                }
                 //message to handle
                 else if (c.dialog == DialogType.NONE)
                     await MessageHandler(context, c.activity);
@@ -122,23 +119,26 @@ namespace SmartKioskBot.Dialogs
                 context.Wait(InputHandler);
         }
 
-        private void TryIdentification(IDialogContext context)
+        private bool TryIdentification(IDialogContext context)
         {
             StateHelper.ResetUserData(context);
-            bool found_mail = false;
 
             try
             {
                 var m = new MailAddress(context.Activity.ChannelId);
 
                 var user = UserController.getUserByEmail(m.Address);
-                if(user != null)
+                if (user != null)
                 {
-                    StateHelper.Login(context,user);
+                    StateHelper.Login(context, user);
+                    return true;
                 }
+                else
+                    return false;
             }
             catch
             {
+                return false;
             }
         }
 
@@ -146,6 +146,5 @@ namespace SmartKioskBot.Dialogs
         {
             context.Wait(InputHandler);
         }
-
     }
 }

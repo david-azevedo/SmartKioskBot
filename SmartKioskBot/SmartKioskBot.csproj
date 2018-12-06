@@ -216,20 +216,17 @@
     <Compile Include="Controllers\ContextController.cs" />
     <Compile Include="Controllers\StoreController.cs" />
     <Compile Include="Controllers\CRMController.cs" />
-    <Compile Include="Dialogs\AddProductDialog.cs" />
     <Compile Include="Dialogs\MenuDialog.cs" />
     <Compile Include="Dialogs\AccountDialog.cs" />
-    <Compile Include="Helpers\BotDefaultAnswers.cs" />
-    <Compile Include="Dialogs\ClosestStoresDialog.cs" />
+    <Compile Include="Helpers\Interactions.cs" />
+    <Compile Include="Dialogs\StoreDialog.cs" />
     <Compile Include="Dialogs\CompareDialog.cs" />
     <Compile Include="Dialogs\FilterDialog.cs" />
-    <Compile Include="Dialogs\ProductDetails.cs" />
     <Compile Include="Dialogs\QnA\QnADialog.cs" />
     <Compile Include="Dialogs\QnA\QnAMakerResult.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Dialogs\RecommendationDialog.cs" />
     <Compile Include="Dialogs\LuisProcessingDialog.cs" />
-    <Compile Include="Dialogs\StockDialog.cs" />
     <Compile Include="Dialogs\WishListDialog.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -244,6 +241,7 @@
     <Compile Include="Logic\AccountLogic.cs" />
     <Compile Include="Logic\FilterLogic.cs" />
     <Compile Include="Logic\Part.cs" />
+    <Compile Include="Logic\ProductLogic.cs" />
     <Compile Include="Logic\RecommendationsLogic.cs" />
     <Compile Include="Models\Context.cs" />
     <Compile Include="Models\Customer.cs" />

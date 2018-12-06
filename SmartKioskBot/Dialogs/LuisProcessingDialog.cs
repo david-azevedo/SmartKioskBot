@@ -33,15 +33,7 @@ namespace SmartKioskBot.Dialogs
 
                 if (qnaResult != null && result.TopScoringIntent.Score >= INTENT_SCORE_THRESHOLD &&
                     qnaResult.Score >= INTENT_SCORE_THRESHOLD)
-                {
                     await context.PostAsync(qnaResult.Answer);
-                }
-                else
-                {
-                    string message = "Desculpa mas não entendi aquilo que disseste. Podes refrasear por favor? :)";
-                    await context.PostAsync(message);
-                    context.Done(new CODE(DIALOG_CODE.DONE));
-                }
             }
         }
 
@@ -56,15 +48,11 @@ namespace SmartKioskBot.Dialogs
 
         [LuisIntent("")]
         [LuisIntent("None")]
-        //Not yet processed
-        [LuisIntent("Confirmation")]
-        [LuisIntent("Identification")]
-        [LuisIntent("Negation")]
         public async Task None(IDialogContext context, LuisResult result)
         {
             FilterIntentScore(context, result);
 
-            string message = BotDefaultAnswers.unknown_intention;
+            string message = Interactions.unknown_intention;
             await context.PostAsync(message);
 
             context.Done(new CODE(DIALOG_CODE.DONE));
@@ -74,17 +62,21 @@ namespace SmartKioskBot.Dialogs
          * Others
          */
 
+        [LuisIntent("Guidance")]
+        public async Task Guidance(IDialogContext context, LuisResult result)
+        {
+            FilterIntentScore(context, result);
+            await Interactions.SendMessage(context,Interactions.MainMenu(),0,2000);
+            context.Call(new MenuDialog(MenuDialog.State.INIT), ResumeAfterDialogueCall);
+        }
+        
         [LuisIntent("Greeting")]
         public async Task Greeting(IDialogContext context, LuisResult result)
         {
-            //just for test
-            FilterIntentScore(context, result);
-            context.Call(new MenuDialog(MenuDialog.State.INIT), ResumeAfterDialogueCall);
-            
-           /* var reply = context.MakeMessage();
-            reply.Text = BotDefaultAnswers.getGreeting(context.Activity.From.Name);
-            await Helpers.BotTranslator.PostTranslated(context, reply, reply.Locale);
-            context.Done(new CODE(DIALOG_CODE.DONE));*/
+            var reply = context.MakeMessage();
+            reply.Text = Interactions.Greeting(StateHelper.GetUser(context).Name);
+            await context.PostAsync(reply);
+            context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         /*
@@ -104,7 +96,7 @@ namespace SmartKioskBot.Dialogs
             FilterIntentScore(context, result);
 
             WishListDialog.AddToWishList(context, result.Query);
-            var reply = BotDefaultAnswers.getAddWishList();
+            var reply = Interactions.getAddWishList();
             await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
@@ -115,7 +107,7 @@ namespace SmartKioskBot.Dialogs
             FilterIntentScore(context, result);
 
             WishListDialog.RemoveFromWishList(context, result.Query);
-            var reply = BotDefaultAnswers.getRemWishList();
+            var reply = Interactions.getRemWishList();
             await Helpers.BotTranslator.PostTranslated(context, reply, context.MakeMessage().Locale);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
@@ -164,6 +156,8 @@ namespace SmartKioskBot.Dialogs
 
             List<Filter> filter_luis = FilterLogic.GetEntitiesFilter(result);
 
+            StateHelper.SetFilters(new List<Filter>(), context);
+
             foreach (Filter f in filter_luis)
             {
                 if (StateHelper.AddFilter(f, context) == true)
@@ -200,13 +194,10 @@ namespace SmartKioskBot.Dialogs
 
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
-
-            // Add click to CRM
-            // Check
-            //CRMController.AddProductClick(this.user.Id, this.user.Country, ObjectId.Parse(id));
+            
             StateHelper.AddProductClick(context, id);
 
-            await ProductDetails.ShowProductMessage(context, id);
+            await ProductLogic.ShowProductMessage(context, id);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
@@ -218,9 +209,7 @@ namespace SmartKioskBot.Dialogs
             var idx = result.Query.LastIndexOf(":");
             string id = result.Query.Remove(0, idx + 1).Replace(" ", "");
 
-            //hero card
-            IMessageActivity r = StockDialog.ShowStores(context, id);
-            await context.PostAsync(r);
+            await StoreDialog.ShowStores(context, id);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
@@ -235,23 +224,14 @@ namespace SmartKioskBot.Dialogs
             var args = result.Query.Split(':');
             string productId = args[1];
             string storeId = args[2];
-            await ProductDetails.ShowInStoreLocation(context, productId, storeId);
+            await ProductLogic.ShowInStoreLocation(context, productId, storeId);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
 
         [LuisIntent("ClosestStores")]
         public async Task ClosestStores(IDialogContext context, LuisResult result)
         {
-            FilterIntentScore(context, result);
-
-            //simulate user position
-            Random r = new Random();
-            Double[] coords = new Double[]{
-                r.NextDouble() * 180 - 90,
-                r.NextDouble() * 180 - 90
-             };
-
-            await ClosestStoresDialog.ShowClosestStores(context, coords, 3);
+            await StoreDialog.ShowClosestStores(context);
             context.Done(new CODE(DIALOG_CODE.DONE));
         }
 

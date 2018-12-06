@@ -16,6 +16,9 @@ using MongoDB.Bson;
 using static SmartKioskBot.Models.Context;
 using static SmartKioskBot.Models.Customer;
 using SmartKioskBot.Helpers;
+using SmartKioskBot.Dialogs;
+using Microsoft.IdentityModel.Protocols;
+using System.Configuration;
 
 namespace SmartKioskBot.Controllers
 {
@@ -91,15 +94,17 @@ namespace SmartKioskBot.Controllers
                         using (var scope = DialogModule.BeginLifetimeScope(Conversation.Container, activity))
                         {
                             var client = scope.Resolve<IConnectorClient>();
-                            if (update.MembersAdded.Any())
+
+                            if (update.MembersAdded[0].Name == ConfigurationManager.AppSettings["BotId"])
                             {
                                 var reply = activity.CreateReply();
-                                foreach (var newMember in update.MembersAdded)
-                                {
-                                    if (newMember.Id != activity.Recipient.Id)
-                                    {
-                                    }
-                                }
+                                reply.Text = Interactions.Greeting("");
+                                await client.Conversations.ReplyToActivityAsync(reply);
+                                Thread.Sleep(2000);
+                                reply.Text = "Já nos conhecemos antes?\n" +
+                                "Aceda ao menu principal para que se possa apresentar ou identificar.\n" +
+                                "Para ter acesso ao menu, basta me pedir ajuda ou dizer-me que quer aceder ao menu principal. Poderá fazê-lo em qualquer altura.";
+                                await client.Conversations.ReplyToActivityAsync(reply);
                             }
                         }
                         break;

@@ -4,7 +4,7 @@
     "actions": [
       {
         "type": "Action.Submit",
-        "title": "Register",
+        "title": "Apresentar-me",
         "data": {
           "reply_type": "register",
           "dialog": "account"
@@ -12,7 +12,7 @@
       },
       {
               "type": "Action.Submit",
-              "title": "Login",
+              "title": "Identificar-me",
               "data": {
                 "reply_type": "login",
                 "dialog": "account"
